@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(grep -E \"\\\\.\\(js|jsx\\)$\")",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Skill(update-config)",
+      "Skill(update-config:*)"
     ]
   }
 }
