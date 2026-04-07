@@ -1,0 +1,41 @@
+/* 引入專業字體 */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+}
+
+/* 專業卡片樣式 */
+.custom-card {
+  border-radius: 12px;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+}
+
+.custom-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 漸層主色調 */
+.gradient-primary {
+  background: linear-gradient(135deg, #4a90e2 0%, #1e3a8a 100%);
+}
+
+/* 自定義捲軸 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}

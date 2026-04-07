@@ -2,10 +2,10 @@
 
 import { createHashRouter, Navigate } from 'react-router-dom';
 
-// 前台
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminLayout from './layout/AdminLayout';
 import FrontendLayout from './layout/FrontendLayout';
+import AdminHome from './views/admin/AdminHome';
 import AdminInventory from './views/admin/AdminInventory';
 import AdminOrders from './views/admin/AdminOrders';
 import AdminProducts from './views/admin/AdminProducts';
@@ -16,6 +16,7 @@ import NotFound from './views/front/NotFound';
 import Products from './views/front/Products';
 import SingleProduct from './views/front/SingleProduct';
 import Login from './views/Login';
+import AdminCoupon from './views/admin/AdminCoupon';
 const router = createHashRouter([
   {
     path: '/',
@@ -56,6 +57,10 @@ const router = createHashRouter([
     ),
     children: [
       {
+        index: true,
+        element: <AdminHome />,
+      },
+      {
         path: 'product',
         element: <AdminProducts />,
       },
@@ -66,6 +71,10 @@ const router = createHashRouter([
       {
         path: 'inventory',
         element: <AdminInventory />,
+      },
+      {
+        path: 'coupon',
+        element: <AdminCoupon />,
       },
     ],
   },

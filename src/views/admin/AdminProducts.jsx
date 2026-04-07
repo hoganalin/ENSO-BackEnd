@@ -106,7 +106,7 @@ function AdminProducts() {
           className="btn btn-primary rounded-pill px-4"
           onClick={() => openModal('create', INITIAL_TEMPLATE_DATA)}
         >
-          <i className="bi bi-plus-lg me-2"></i>新增商品
+          <i className="bi bi-plus-lg"></i>新增商品
         </button>
       </div>
 

@@ -34,7 +34,13 @@ const getStockBadge = (inventory) => {
   return { color: 'success', label: '庫存充足' };
 };
 
-const REASON_PRESETS = ['進貨入庫', '盤點調整', '銷售出貨', '退貨入庫', '損耗報廢'];
+const REASON_PRESETS = [
+  '進貨入庫',
+  '盤點調整',
+  '銷售出貨',
+  '退貨入庫',
+  '損耗報廢',
+];
 
 function AdminInventory() {
   const { showSuccess, showError } = useMessage();
@@ -91,7 +97,10 @@ function AdminInventory() {
   const previewInventory = () => {
     const current = selectedProduct?.inventory ?? 0;
     const delta = parseInt(adjustQty) || 0;
-    return Math.max(0, adjustType === 'add' ? current + delta : current - delta);
+    return Math.max(
+      0,
+      adjustType === 'add' ? current + delta : current - delta
+    );
   };
 
   const handleAdjust = async () => {
@@ -103,9 +112,7 @@ function AdminInventory() {
 
     const current = selectedProduct.inventory ?? 0;
     const newInventory =
-      adjustType === 'add'
-        ? current + qty
-        : Math.max(0, current - qty);
+      adjustType === 'add' ? current + qty : Math.max(0, current - qty);
 
     setAdjustLoading(true);
     try {
@@ -168,10 +175,10 @@ function AdminInventory() {
     .slice(0, 5);
 
   return (
-    <div className="container" style={{ backgroundColor: '#f5f7fa' }}>
+    <div className="container">
       {/* 標題 */}
-      <div className="px-3">
-        <h2 className="fw-bolder text-dark my-3">庫存管理中心</h2>
+      <div className="px-3 mb-4">
+        <h2 className="fw-bolder text-dark mb-0">庫存管理中心</h2>
       </div>
 
       {/* KPI 卡片 */}
@@ -330,7 +337,9 @@ function AdminInventory() {
                         )}
                       </td>
                       <td>
-                        <span className="fw-bold text-dark">{product.title}</span>
+                        <span className="fw-bold text-dark">
+                          {product.title}
+                        </span>
                       </td>
                       <td>
                         <span className="badge bg-light text-secondary border rounded-pill px-3">
@@ -349,9 +358,7 @@ function AdminInventory() {
                         )}
                       </td>
                       <td className="text-center">
-                        <span
-                          className={`fs-5 fw-bold text-${badge.color}`}
-                        >
+                        <span className={`fs-5 fw-bold text-${badge.color}`}>
                           {inv}
                         </span>
                       </td>
@@ -428,11 +435,13 @@ function AdminInventory() {
                 <div className="d-flex gap-2">
                   <button
                     className={`btn flex-fill rounded-pill fw-bold ${
-                      adjustType === 'add' ? 'btn-success' : 'btn-outline-success'
+                      adjustType === 'add'
+                        ? 'btn-success'
+                        : 'btn-outline-success'
                     }`}
                     onClick={() => setAdjustType('add')}
                   >
-                    <i className="bi bi-plus-lg me-1"></i>增加
+                    <i className="bi bi-plus-lg"></i>增加
                   </button>
                   <button
                     className={`btn flex-fill rounded-pill fw-bold ${
@@ -553,7 +562,9 @@ function AdminInventory() {
                   adjustType === 'add' ? 'btn-success' : 'btn-danger'
                 }`}
                 onClick={handleAdjust}
-                disabled={adjustLoading || !adjustQty || parseInt(adjustQty) <= 0}
+                disabled={
+                  adjustLoading || !adjustQty || parseInt(adjustQty) <= 0
+                }
               >
                 {adjustLoading
                   ? '處理中...'

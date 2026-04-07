@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RotatingTriangles } from 'react-loader-spinner';
+
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 import { useState, useEffect } from 'react';
@@ -7,6 +7,8 @@ import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router';
 
 import useMessage from '../hooks/useMessage';
+import FullPageLoading from './FullPageLoading';
+
 function ProtectedRoute({ children }) {
   //以下都是從 adminProduct copy過來
   const [isAuth, setIsAuth] = useState(false);
@@ -39,15 +41,9 @@ function ProtectedRoute({ children }) {
     };
     checkLogin();
   }, []);
+  
   if (loading) {
-    return (
-      <RotatingTriangles
-        strokeWidth="5"
-        animationDuration="0.75"
-        width="96"
-        visible={true}
-      ></RotatingTriangles>
-    );
+    return <FullPageLoading isLoading={true} />;
   }
   if (!isAuth) return <Navigate to="/login"></Navigate>;
   return children;

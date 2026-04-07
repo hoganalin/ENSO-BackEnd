@@ -3,6 +3,8 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 import useMessage from '../hooks/useMessage';
+import MessageToast from '../components/MessageToast';
+
 const API_BASE = import.meta.env.VITE_API_BASE;
 const API_PATH = import.meta.env.VITE_API_PATH;
 const AdminLayout = () => {
@@ -19,7 +21,8 @@ const AdminLayout = () => {
     }
   };
   return (
-    <>
+    <div className="w-100 min-vh-100 d-flex flex-column overflow-x-hidden">
+      <MessageToast />
       <header
         className="position-relative text-white"
         style={{
@@ -48,10 +51,10 @@ const AdminLayout = () => {
                   letterSpacing: '2px',
                 }}
               >
-                🪔 後臺網站
+                🌿 ENSO 後臺管理
               </h1>
               <small className="text-white-50" style={{ letterSpacing: '1px' }}>
-                後臺管理系統
+                專業線香營運數據監控系統
               </small>
             </div>
             <button
@@ -74,6 +77,31 @@ const AdminLayout = () => {
           </div>
 
           <nav className="d-flex gap-2 pb-3 mt-2">
+            <NavLink
+              className={({ isActive }) =>
+                `text-decoration-none px-4 py-2 rounded-pill fw-bold ${
+                  isActive ? 'text-dark' : 'text-white-50'
+                }`
+              }
+              style={({ isActive }) => ({
+                fontSize: '0.95rem',
+                letterSpacing: '1px',
+                background: isActive
+                  ? 'rgba(255,255,255,0.9)'
+                  : 'rgba(255,255,255,0.08)',
+                backdropFilter: 'blur(6px)',
+                border: isActive ? 'none' : '1px solid rgba(255,255,255,0.12)',
+                transition: 'all 0.3s ease',
+              })}
+              to="/admin"
+              end
+              // 非常重要：確保只有精準匹配 /admin 才顯示 Active
+              // 網址是 /admin ➡️ 亮
+              // 網址是 /admin/product ➡️ 不亮（因為後面還有 /product，不算結束）
+            >
+              📈 總覽面板
+            </NavLink>
+
             <NavLink
               className={({ isActive }) =>
                 `text-decoration-none px-4 py-2 rounded-pill fw-bold ${
@@ -136,10 +164,36 @@ const AdminLayout = () => {
             >
               📊 庫存管理
             </NavLink>
+            <NavLink
+              className={({ isActive }) =>
+                `text-decoration-none px-4 py-2 rounded-pill fw-bold ${
+                  isActive ? 'text-dark' : 'text-white-50'
+                }`
+              }
+              style={({ isActive }) => ({
+                fontSize: '0.95rem',
+                letterSpacing: '1px',
+                background: isActive
+                  ? 'rgba(255,255,255,0.9)'
+                  : 'rgba(255,255,255,0.08)',
+                backdropFilter: 'blur(6px)',
+                border: isActive ? 'none' : '1px solid rgba(255,255,255,0.12)',
+                transition: 'all 0.3s ease',
+              })}
+              to="/admin/coupon"
+            >
+              🏷️ 優惠券管理
+            </NavLink>
           </nav>
         </div>
       </header>
-      <main>
+      <main
+        style={{
+          backgroundColor: '#f5f7fa',
+          minHeight: 'calc(100vh - 140px - 70px)',
+        }}
+        className="py-4"
+      >
         <Outlet />
       </main>
       <footer
@@ -153,7 +207,7 @@ const AdminLayout = () => {
       >
         <p className="mb-0">© 2025 後臺管理系統 ・ All Rights Reserved</p>
       </footer>
-    </>
+    </div>
   );
 };
 export default AdminLayout;

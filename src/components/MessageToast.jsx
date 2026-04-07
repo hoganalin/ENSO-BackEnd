@@ -4,7 +4,7 @@ export default function MessageToast() {
   const messages = useSelector((state) => state.message);
   return (
     <>
-      <div className="position-fixed top-0 end-0 p-3">
+      <div className="position-fixed top-0 end-0 p-3" style={{ zIndex: 1055 }}>
         {messages.map((message) => (
           <div
             key={message.id}

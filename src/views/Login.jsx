@@ -43,12 +43,9 @@ export default function Login({ getData, setIsAuth }) {
       ).toUTCString()};path=/`;
       //設定axios的預設headers
       axios.defaults.headers.common.Authorization = `${token}`;
-      //載入產品資料
-      // getData();
-      //更新登入狀態為true
-      // setIsAuth(true);
-      //導航頁面到後台產品列表
-      navigate('/admin/product');
+
+      //導航頁面到後台首頁
+      navigate('/admin');
     } catch {
       showError('提交表單失敗');
     }
@@ -83,8 +80,6 @@ export default function Login({ getData, setIsAuth }) {
               placeholder="Password"
               name="password"
               {...register('password', { required: '請輸入密碼' })}
-              // value={formData.password}
-              // onChange={handleInputChange}
             />
             <label htmlFor="floatingPassword">Password</label>
             {errors.password && (
