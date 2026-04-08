@@ -26,6 +26,13 @@ function ProtectedRoute({ children }) {
       return;
     }
 
+    // 🏆 展示模式：若偵測到 demo token，直接放行不打 API
+    if (token === 'enso-demo-token') {
+      setIsAuth(true);
+      setLoading(false);
+      return;
+    }
+
     axios.defaults.headers.common.Authorization = token;
 
     const checkLogin = async () => {

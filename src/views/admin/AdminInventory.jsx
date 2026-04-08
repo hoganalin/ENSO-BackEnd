@@ -177,58 +177,58 @@ function AdminInventory() {
   return (
     <div className="container">
       {/* 標題 */}
-      <div className="px-3 mb-4">
+      <div className="px-3 mb-4 text-center text-md-start">
         <h2 className="fw-bolder text-dark mb-0">庫存管理中心</h2>
       </div>
 
       {/* KPI 卡片 */}
       <div className="row g-3 mb-4 px-3">
-        <div className="col-md-4">
-          <div className="card border-0 shadow-sm rounded-4 p-4">
-            <div className="d-flex align-items-center gap-3">
+        <div className="col-4">
+          <div className="card border-0 shadow-sm rounded-4 p-2 p-md-4">
+            <div className="d-flex align-items-center gap-2">
               <div
-                className="rounded-3 p-3"
+                className="rounded-3 p-2 d-none d-md-block"
                 style={{ background: 'rgba(13,110,253,0.1)' }}
               >
                 <i className="bi bi-box-seam fs-4 text-primary"></i>
               </div>
               <div>
-                <div className="text-muted small">本頁商品數</div>
-                <div className="fs-3 fw-bold text-dark">{products.length}</div>
+                <div className="text-muted" style={{ fontSize: '0.7rem' }}>本頁商品數</div>
+                <div className="fs-5 fs-md-3 fw-bold text-dark">{products.length}</div>
               </div>
             </div>
           </div>
         </div>
-        <div className="col-md-4">
-          <div className="card border-0 shadow-sm rounded-4 p-4">
-            <div className="d-flex align-items-center gap-3">
+        <div className="col-4">
+          <div className="card border-0 shadow-sm rounded-4 p-2 p-md-4">
+            <div className="d-flex align-items-center gap-2">
               <div
-                className="rounded-3 p-3"
+                className="rounded-3 p-2 d-none d-md-block"
                 style={{ background: 'rgba(255,193,7,0.12)' }}
               >
                 <i className="bi bi-exclamation-triangle fs-4 text-warning"></i>
               </div>
               <div>
-                <div className="text-muted small">
+                <div className="text-muted" style={{ fontSize: '0.7rem' }}>
                   低庫存（&lt;{LOW_STOCK_THRESHOLD}）
                 </div>
-                <div className="fs-3 fw-bold text-warning">{lowCount}</div>
+                <div className="fs-5 fs-md-3 fw-bold text-warning">{lowCount}</div>
               </div>
             </div>
           </div>
         </div>
-        <div className="col-md-4">
-          <div className="card border-0 shadow-sm rounded-4 p-4">
-            <div className="d-flex align-items-center gap-3">
+        <div className="col-4">
+          <div className="card border-0 shadow-sm rounded-4 p-2 p-md-4">
+            <div className="d-flex align-items-center gap-2">
               <div
-                className="rounded-3 p-3"
+                className="rounded-3 p-2 d-none d-md-block"
                 style={{ background: 'rgba(220,53,69,0.1)' }}
               >
                 <i className="bi bi-x-circle fs-4 text-danger"></i>
               </div>
               <div>
-                <div className="text-muted small">缺貨商品</div>
-                <div className="fs-3 fw-bold text-danger">{outCount}</div>
+                <div className="text-muted" style={{ fontSize: '0.7rem' }}>缺貨商品</div>
+                <div className="fs-5 fs-md-3 fw-bold text-danger">{outCount}</div>
               </div>
             </div>
           </div>
@@ -236,7 +236,7 @@ function AdminInventory() {
       </div>
 
       {/* 搜尋 + 篩選 */}
-      <div className="d-flex gap-3 mb-4 px-3">
+      <div className="d-flex flex-wrap gap-3 mb-4 px-3">
         <div
           className="position-relative flex-grow-1"
           style={{ maxWidth: '400px' }}
@@ -259,8 +259,7 @@ function AdminInventory() {
           )}
         </div>
         <select
-          className="form-select rounded-pill shadow-sm"
-          style={{ width: '200px' }}
+          className="form-select rounded-pill shadow-sm flex-shrink-0"
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
         >
@@ -280,10 +279,10 @@ function AdminInventory() {
                   圖片
                 </th>
                 <th className="border-0">商品名稱</th>
-                <th className="border-0">分類</th>
-                <th className="border-0 text-center">上架狀態</th>
+                <th className="border-0 d-none d-md-table-cell">分類</th>
+                <th className="border-0 text-center d-none d-md-table-cell">上架狀態</th>
                 <th className="border-0 text-center">現有庫存</th>
-                <th className="border-0 text-center">庫存狀態</th>
+                <th className="border-0 text-center d-none d-md-table-cell">庫存狀態</th>
                 <th className="border-0 text-center px-4">操作</th>
               </tr>
             </thead>
@@ -336,17 +335,17 @@ function AdminInventory() {
                           </div>
                         )}
                       </td>
-                      <td>
-                        <span className="fw-bold text-dark">
+                      <td style={{ maxWidth: '100px' }}>
+                        <span className="fw-bold text-dark d-block text-truncate" style={{ fontSize: '0.82rem' }}>
                           {product.title}
                         </span>
                       </td>
-                      <td>
+                      <td className="d-none d-md-table-cell">
                         <span className="badge bg-light text-secondary border rounded-pill px-3">
                           {product.category}
                         </span>
                       </td>
-                      <td className="text-center">
+                      <td className="text-center d-none d-md-table-cell">
                         {product.is_enabled ? (
                           <span className="badge bg-success-subtle text-success border border-success rounded-pill px-3">
                             已上架
@@ -362,19 +361,19 @@ function AdminInventory() {
                           {inv}
                         </span>
                       </td>
-                      <td className="text-center">
+                      <td className="text-center d-none d-md-table-cell">
                         <span
                           className={`badge bg-${badge.color}-subtle text-${badge.color} border border-${badge.color} rounded-pill px-3`}
                         >
                           {badge.label}
                         </span>
                       </td>
-                      <td className="text-center px-4">
+                      <td className="text-center px-2">
                         <button
-                          className="btn btn-outline-primary btn-sm rounded-pill px-3"
+                          className="btn btn-outline-primary btn-sm rounded-pill px-2 text-nowrap"
                           onClick={() => openAdjustModal(product)}
                         >
-                          <i className="bi bi-pencil-square me-1"></i>調整庫存
+                          <i className="bi bi-pencil-square me-1 d-none d-md-inline"></i>調整庫存
                         </button>
                       </td>
                     </tr>

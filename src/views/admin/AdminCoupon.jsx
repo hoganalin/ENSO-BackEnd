@@ -120,7 +120,7 @@ export default function AdminCoupon() {
   return (
     <div className="container py-4">
       {/* 頂部標題列 */}
-      <div className="d-flex justify-content-between align-items-center mb-4 px-3">
+      <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 px-3 gap-2">
         <h2 className="fw-bolder text-dark my-3">🏷️ 優惠券管理</h2>
         <button
           type="button"
@@ -134,15 +134,15 @@ export default function AdminCoupon() {
       {/* 優惠券列表卡片 */}
       <div className="card border-0 shadow-sm rounded-4 overflow-hidden mx-3">
         <div className="table-responsive">
-          <table className="table table-hover align-middle mb-0">
+          <table className="table table-sm table-hover align-middle mb-0">
             <thead style={{ backgroundColor: '#fcfcfd' }}>
               <tr className="text-secondary small fw-bold text-uppercase">
-                <th className="px-4 py-3 border-0">名稱</th>
-                <th className="border-0">優惠碼</th>
-                <th className="border-0">折扣 (%)</th>
-                <th className="border-0">到期日</th>
+                <th className="px-2 px-md-4 py-3 border-0">名稱</th>
+                <th className="border-0 d-none d-md-table-cell">優惠碼</th>
+                <th className="border-0" style={{ whiteSpace: 'nowrap' }}>折扣 (%)</th>
+                <th className="border-0 d-none d-md-table-cell">到期日</th>
                 <th className="border-0 text-center">狀態</th>
-                <th className="border-0 text-center px-4">操作</th>
+                <th className="border-0 text-center px-1 px-md-4">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -158,39 +158,45 @@ export default function AdminCoupon() {
               ) : (
                 coupons.map((coupon) => (
                   <tr key={coupon.id} className="border-bottom border-light">
-                    <td className="px-4 fw-bold text-dark">{coupon.title}</td>
-                    <td>
+                    <td className="px-2 px-md-4" style={{ maxWidth: '100px' }}>
+                      <span className="fw-bold text-dark d-block text-truncate" style={{ fontSize: '0.85rem' }}>
+                        {coupon.title}
+                      </span>
+                    </td>
+                    <td className="d-none d-md-table-cell">
                       <code className="bg-light px-2 py-1 rounded text-primary fw-bold">
                         {coupon.code}
                       </code>
                     </td>
-                    <td>{coupon.percent}%</td>
-                    <td className="text-muted">
+                    <td style={{ whiteSpace: 'nowrap', fontSize: '0.85rem' }}>{coupon.percent}%</td>
+                    <td className="text-muted d-none d-md-table-cell">
                       {formatDate(coupon.due_date)}
                     </td>
                     <td className="text-center">
                       {coupon.is_enabled ? (
-                        <span className="badge bg-success-subtle text-success border border-success rounded-pill px-3">
+                        <span className="badge bg-success-subtle text-success border border-success rounded-pill px-2" style={{ fontSize: '0.7rem' }}>
                           已啟用
                         </span>
                       ) : (
-                        <span className="badge bg-secondary-subtle text-secondary border border-secondary rounded-pill px-3">
+                        <span className="badge bg-secondary-subtle text-secondary border border-secondary rounded-pill px-2" style={{ fontSize: '0.7rem' }}>
                           未啟用
                         </span>
                       )}
                     </td>
-                    <td className="text-center px-4">
+                    <td className="text-center px-1 px-md-4">
                       <div className="btn-group shadow-sm rounded-pill overflow-hidden">
                         <button
                           type="button"
-                          className="btn btn-primary btn-sm px-3"
+                          className="btn btn-primary btn-sm px-2"
+                          style={{ fontSize: '0.75rem' }}
                           onClick={() => openModal('edit', coupon)}
                         >
                           編輯
                         </button>
                         <button
                           type="button"
-                          className="btn btn-outline-danger btn-sm px-3 border-0 border-start"
+                          className="btn btn-outline-danger btn-sm px-2 border-0 border-start"
+                          style={{ fontSize: '0.75rem' }}
                           onClick={() => handleDeleteCoupon(coupon.id)}
                         >
                           刪除

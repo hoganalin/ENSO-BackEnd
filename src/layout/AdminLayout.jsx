@@ -10,9 +10,24 @@ const API_PATH = import.meta.env.VITE_API_PATH;
 const AdminLayout = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useMessage();
+
   const logout = async () => {
     try {
-      const response = await axios.post(`${API_BASE}/logout`);
+      // 1. 取得當前的 token
+      const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('myToken='))
+        ?.split('=')[1];
+
+      // 2. 如果不是參觀者, Demo Token，才呼叫真實的後端登出 API
+      if (token !== 'enso-demo-token') {
+        await axios.post(`${API_BASE}/logout`);
+      }
+
+      // 3. 無論是真實登出或是參觀者登出，都必須在前端手動清除 Cookie
+      document.cookie =
+        'myToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      delete axios.defaults.headers.common.Authorization;
 
       showSuccess('登出成功');
       navigate('/login');
@@ -42,28 +57,34 @@ const AdminLayout = () => {
           }}
         />
         <div className="container position-relative" style={{ zIndex: 1 }}>
-          <div className="d-flex justify-content-between align-items-center pt-4 pb-2">
+          <div className="d-flex justify-content-between align-items-center pt-3 pt-md-4 pb-2">
             <div>
               <h1
                 className="m-0 fw-bold"
                 style={{
-                  fontSize: '1.75rem',
-                  letterSpacing: '2px',
+                  fontSize: 'clamp(1.1rem, 4vw, 1.75rem)',
+                  letterSpacing: '1px',
                 }}
               >
                 🌿 ENSO 後臺管理
               </h1>
-              <small className="text-white-50" style={{ letterSpacing: '1px' }}>
+              <small
+                className="text-white-50 d-none d-md-block"
+                style={{ letterSpacing: '1px' }}
+              >
                 專業線香營運數據監控系統
               </small>
             </div>
+
             <button
-              className="btn btn-outline-light rounded-pill px-4 py-2"
+              className="btn btn-outline-light rounded-pill"
               onClick={logout}
               style={{
                 backdropFilter: 'blur(8px)',
                 border: '1px solid rgba(255,255,255,0.3)',
                 transition: 'all 0.3s ease',
+                fontSize: '0.8rem',
+                padding: '4px 14px',
               }}
               onMouseEnter={(e) => {
                 e.target.style.background = 'rgba(255,255,255,0.15)';
@@ -76,114 +97,41 @@ const AdminLayout = () => {
             </button>
           </div>
 
-          <nav className="d-flex gap-2 pb-3 mt-2">
-            <NavLink
-              className={({ isActive }) =>
-                `text-decoration-none px-4 py-2 rounded-pill fw-bold ${
-                  isActive ? 'text-dark' : 'text-white-50'
-                }`
-              }
-              style={({ isActive }) => ({
-                fontSize: '0.95rem',
-                letterSpacing: '1px',
-                background: isActive
-                  ? 'rgba(255,255,255,0.9)'
-                  : 'rgba(255,255,255,0.08)',
-                backdropFilter: 'blur(6px)',
-                border: isActive ? 'none' : '1px solid rgba(255,255,255,0.12)',
-                transition: 'all 0.3s ease',
-              })}
-              to="/admin"
-              end
-              // 非常重要：確保只有精準匹配 /admin 才顯示 Active
-              // 網址是 /admin ➡️ 亮
-              // 網址是 /admin/product ➡️ 不亮（因為後面還有 /product，不算結束）
-            >
-              📈 總覽面板
-            </NavLink>
-
-            <NavLink
-              className={({ isActive }) =>
-                `text-decoration-none px-4 py-2 rounded-pill fw-bold ${
-                  isActive ? 'text-dark' : 'text-white-50'
-                }`
-              }
-              style={({ isActive }) => ({
-                fontSize: '0.95rem',
-                letterSpacing: '1px',
-                background: isActive
-                  ? 'rgba(255,255,255,0.9)'
-                  : 'rgba(255,255,255,0.08)',
-                backdropFilter: 'blur(6px)',
-                border: isActive ? 'none' : '1px solid rgba(255,255,255,0.12)',
-                transition: 'all 0.3s ease',
-              })}
-              to="/admin/product"
-            >
-              📦 產品列表
-            </NavLink>
-
-            <NavLink
-              className={({ isActive }) =>
-                `text-decoration-none px-4 py-2 rounded-pill fw-bold ${
-                  isActive ? 'text-dark' : 'text-white-50'
-                }`
-              }
-              style={({ isActive }) => ({
-                fontSize: '0.95rem',
-                letterSpacing: '1px',
-                background: isActive
-                  ? 'rgba(255,255,255,0.9)'
-                  : 'rgba(255,255,255,0.08)',
-                backdropFilter: 'blur(6px)',
-                border: isActive ? 'none' : '1px solid rgba(255,255,255,0.12)',
-                transition: 'all 0.3s ease',
-              })}
-              to="/admin/order"
-            >
-              📋 訂單列表
-            </NavLink>
-
-            <NavLink
-              className={({ isActive }) =>
-                `text-decoration-none px-4 py-2 rounded-pill fw-bold ${
-                  isActive ? 'text-dark' : 'text-white-50'
-                }`
-              }
-              style={({ isActive }) => ({
-                fontSize: '0.95rem',
-                letterSpacing: '1px',
-                background: isActive
-                  ? 'rgba(255,255,255,0.9)'
-                  : 'rgba(255,255,255,0.08)',
-                backdropFilter: 'blur(6px)',
-                border: isActive ? 'none' : '1px solid rgba(255,255,255,0.12)',
-                transition: 'all 0.3s ease',
-              })}
-              to="/admin/inventory"
-            >
-              📊 庫存管理
-            </NavLink>
-            <NavLink
-              className={({ isActive }) =>
-                `text-decoration-none px-4 py-2 rounded-pill fw-bold ${
-                  isActive ? 'text-dark' : 'text-white-50'
-                }`
-              }
-              style={({ isActive }) => ({
-                fontSize: '0.95rem',
-                letterSpacing: '1px',
-                background: isActive
-                  ? 'rgba(255,255,255,0.9)'
-                  : 'rgba(255,255,255,0.08)',
-                backdropFilter: 'blur(6px)',
-                border: isActive ? 'none' : '1px solid rgba(255,255,255,0.12)',
-                transition: 'all 0.3s ease',
-              })}
-              to="/admin/coupon"
-            >
-              🏷️ 優惠券管理
-            </NavLink>
+          <nav className="d-flex flex-wrap gap-1 gap-md-2 pb-3 mt-2">
+            {[
+              { to: '/admin', label: '📈 總覽面板', end: true },
+              { to: '/admin/product', label: '📦 產品列表' },
+              { to: '/admin/order', label: '📋 訂單列表' },
+              { to: '/admin/inventory', label: '📊 庫存管理' },
+              { to: '/admin/coupon', label: '🏷️ 優惠券管理' },
+              { to: '/admin/devices', label: '🌡️ 倉儲監管' },
+            ].map(({ to, label, end }) => (
+              <NavLink
+                key={to}
+                className={({ isActive }) =>
+                  `text-decoration-none rounded-pill fw-bold ${
+                    isActive ? 'text-dark' : 'text-white-50'
+                  }`
+                }
+                style={({ isActive }) => ({
+                  fontSize: '0.75rem',
+                  letterSpacing: '0.5px',
+                  padding: '5px 12px',
+                  background: isActive
+                    ? 'rgba(255,255,255,0.9)'
+                    : 'rgba(255,255,255,0.08)',
+                  backdropFilter: 'blur(6px)',
+                  border: isActive
+                    ? 'none'
+                    : '1px solid rgba(255,255,255,0.12)',
+                  transition: 'all 0.3s ease',
+                })}
+                to={to}
+                end={end}
+              >
+                {label}
+              </NavLink>
+            ))}
           </nav>
         </div>
       </header>

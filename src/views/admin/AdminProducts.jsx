@@ -99,7 +99,7 @@ function AdminProducts() {
   return (
     <div className="container" style={{ backgroundColor: '#f5f7fa' }}>
       {/* 標題列 */}
-      <div className="d-flex justify-content-between align-items-center mb-4 px-3">
+      <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 px-3 gap-2">
         <h2 className="fw-bolder text-dark my-3">商品管理中心</h2>
         <button
           type="button"
@@ -111,7 +111,7 @@ function AdminProducts() {
       </div>
 
       {/* 搜尋與篩選列 */}
-      <div className="d-flex gap-3 mb-4 px-3">
+      <div className="d-flex flex-wrap gap-3 mb-4 px-3">
         <div
           className="position-relative flex-grow-1"
           style={{ maxWidth: '400px' }}
@@ -134,8 +134,7 @@ function AdminProducts() {
           )}
         </div>
         <select
-          className="form-select rounded-pill shadow-sm"
-          style={{ width: '160px' }}
+          className="form-select rounded-pill shadow-sm flex-shrink-0"
           value={filterEnabled}
           onChange={(e) => setFilterEnabled(e.target.value)}
         >
@@ -148,17 +147,17 @@ function AdminProducts() {
       {/* 商品列表卡片 */}
       <div className="card border-0 shadow-sm rounded-4 overflow-hidden mx-3">
         <div className="table-responsive">
-          <table className="table table-hover align-middle mb-0">
+          <table className="table table-sm table-hover align-middle mb-0">
             <thead style={{ backgroundColor: '#fcfcfd' }}>
               <tr className="text-secondary small fw-bold text-uppercase">
-                <th className="px-4 py-3 border-0" style={{ width: '80px' }}>
+                <th className="px-2 px-md-4 py-3 border-0" style={{ width: '60px' }}>
                   圖片
                 </th>
-                <th className="border-0">分類</th>
+                <th className="border-0 d-none d-md-table-cell">分類</th>
                 <th className="border-0">商品名稱</th>
-                <th className="border-0 text-end">原價</th>
+                <th className="border-0 text-end d-none d-md-table-cell">原價</th>
                 <th className="border-0 text-end">售價</th>
-                <th className="border-0 text-center">上架狀態</th>
+                <th className="border-0 text-center d-none d-md-table-cell">上架狀態</th>
                 <th className="border-0 text-center px-4">操作</th>
               </tr>
             </thead>
@@ -177,36 +176,36 @@ function AdminProducts() {
               ) : (
                 filteredProducts.map((product) => (
                   <tr key={product.id} className="border-bottom border-light">
-                    <td className="px-4">
+                    <td className="px-2 px-md-4">
                       {product.imageUrl ? (
                         <img
                           src={product.imageUrl}
                           alt={product.title}
                           className="rounded-3 shadow-sm border"
                           style={{
-                            width: '52px',
-                            height: '52px',
+                            width: '40px',
+                            height: '40px',
                             objectFit: 'cover',
                           }}
                         />
                       ) : (
                         <div
                           className="rounded-3 bg-light border d-flex align-items-center justify-content-center text-muted"
-                          style={{ width: '52px', height: '52px' }}
+                          style={{ width: '40px', height: '40px' }}
                         >
                           <i className="bi bi-image"></i>
                         </div>
                       )}
                     </td>
-                    <td>
+                    <td className="d-none d-md-table-cell">
                       <span className="badge bg-light text-secondary border rounded-pill px-3">
                         {product.category}
                       </span>
                     </td>
-                    <td>
-                      <span className="fw-bold text-dark">{product.title}</span>
+                    <td style={{ maxWidth: '110px' }}>
+                      <span className="fw-bold text-dark d-block text-truncate">{product.title}</span>
                     </td>
-                    <td className="text-end text-muted">
+                    <td className="text-end text-muted d-none d-md-table-cell">
                       <small className="text-decoration-line-through">
                         ${currency(product.origin_price)}
                       </small>
@@ -214,7 +213,7 @@ function AdminProducts() {
                     <td className="text-end fw-bold text-dark">
                       ${currency(product.price)}
                     </td>
-                    <td className="text-center">
+                    <td className="text-center d-none d-md-table-cell">
                       {product.is_enabled ? (
                         <span className="badge bg-success-subtle text-success border border-success rounded-pill px-3">
                           已上架
@@ -225,21 +224,23 @@ function AdminProducts() {
                         </span>
                       )}
                     </td>
-                    <td className="text-center px-4">
+                    <td className="text-center px-1 px-md-4">
                       <div className="btn-group shadow-sm rounded-pill overflow-hidden">
                         <button
                           type="button"
-                          className="btn btn-primary btn-sm px-3"
+                          className="btn btn-primary btn-sm px-2 px-md-3"
+                          style={{ fontSize: '0.75rem' }}
                           onClick={() => openModal('edit', product)}
                         >
                           編輯
                         </button>
                         <button
                           type="button"
-                          className="btn btn-outline-danger btn-sm px-3 border-0 border-start"
+                          className="btn btn-outline-danger btn-sm px-2 px-md-3 border-0 border-start"
+                          style={{ fontSize: '0.75rem' }}
                           onClick={() => openModal('delete', product)}
                         >
-                          <i className="bi bi-trash"></i> 刪除
+                          刪除
                         </button>
                       </div>
                     </td>

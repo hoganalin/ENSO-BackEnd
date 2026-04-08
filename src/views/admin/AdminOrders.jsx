@@ -211,7 +211,7 @@ function AdminOrders() {
 
   return (
     <div className="container " style={{ backgroundColor: '#f5f7fa' }}>
-      <div className="d-flex justify-content-between align-items-center mb-4 px-3">
+      <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 px-3 gap-2">
         <div>
           <h2 className="fw-bolder text-dark my-3">訂單管理中心</h2>
         </div>
@@ -226,7 +226,7 @@ function AdminOrders() {
       </div>
 
       {/* 搜尋與篩選列 */}
-      <div className="d-flex gap-3 mb-4 px-3">
+      <div className="d-flex flex-wrap gap-3 mb-4 px-3">
         <div
           className="position-relative flex-grow-1"
           style={{ maxWidth: '400px' }}
@@ -249,8 +249,7 @@ function AdminOrders() {
           )}
         </div>
         <select
-          className="form-select rounded-pill shadow-sm"
-          style={{ width: '160px' }}
+          className="form-select rounded-pill shadow-sm flex-shrink-0"
           value={filterPaid}
           onChange={(e) => setFilterPaid(e.target.value)}
         >
@@ -262,13 +261,13 @@ function AdminOrders() {
 
       <div className="card border-0 shadow-sm rounded-4 overflow-hidden mx-3">
         <div className="table-responsive">
-          <table className="table table-hover align-middle mb-0">
+          <table className="table table-sm table-hover align-middle mb-0">
             <thead style={{ backgroundColor: '#fcfcfd' }}>
               <tr className="text-secondary small fw-bold text-uppercase">
-                <th className="px-4 py-3 border-0">訂單時間</th>
-                <th className="border-0">訂單編號</th>
+                <th className="px-4 py-3 border-0 d-none d-md-table-cell">訂單時間</th>
+                <th className="border-0 d-none d-lg-table-cell">訂單編號</th>
                 <th className="border-0">姓名 / Email</th>
-                <th className="border-0">地址</th>
+                <th className="border-0 d-none d-lg-table-cell">地址</th>
                 <th className="border-0">付款狀態</th>
                 <th className="text-end border-0">訂單金額</th>
                 <th className="text-center border-0 px-4">詳細</th>
@@ -289,7 +288,7 @@ function AdminOrders() {
               ) : (
                 filteredOrders.map((order) => (
                   <tr key={order.id} className="border-bottom border-light">
-                    <td className="px-4">
+                    <td className="px-4 d-none d-md-table-cell">
                       <span className="text-dark fw-medium small">
                         {formatDate(order.create_at).split(' ')[0]}
                       </span>
@@ -298,52 +297,51 @@ function AdminOrders() {
                         {formatDate(order.create_at).split(' ')[1]}
                       </small>
                     </td>
-                    <td>
+                    <td className="d-none d-lg-table-cell">
                       <span className="text-secondary small fw-medium">
                         {order.id}
                       </span>
                     </td>
-                    <td>
-                      <div className="d-flex flex-column">
-                        <span className="fw-bold text-dark">
-                          {order.user.name}
-                        </span>
-                        <small className="text-muted">{order.user.email}</small>
+                    <td style={{ maxWidth: '120px' }}>
+                      <div className="fw-bold text-dark text-truncate" style={{ fontSize: '0.85rem' }}>
+                        {order.user.name}
                       </div>
+                      <small className="text-muted d-none d-md-block text-truncate">{order.user.email}</small>
                     </td>
                     <td
-                      className="text-muted small"
+                      className="text-muted small d-none d-lg-table-cell"
                       style={{ maxWidth: '150px' }}
                     >
                       <div className="text-truncate">{order.user.address}</div>
                     </td>
                     <td>
                       {order.is_paid ? (
-                        <span className="badge bg-success-subtle text-success border border-success rounded-pill px-3">
+                        <span className="badge bg-success-subtle text-success border border-success rounded-pill px-2" style={{ fontSize: '0.7rem' }}>
                           已付款
                         </span>
                       ) : (
-                        <span className="badge bg-warning-subtle text-warning border border-warning rounded-pill px-3">
+                        <span className="badge bg-warning-subtle text-warning border border-warning rounded-pill px-2" style={{ fontSize: '0.7rem' }}>
                           未付款
                         </span>
                       )}
                     </td>
-                    <td className="text-end fw-bold text-dark h6">
+                    <td className="text-end fw-bold text-dark" style={{ fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
                       ${currency(order.total)}
                     </td>
-                    <td className="text-center px-4">
+                    <td className="text-center px-1 px-md-4">
                       <div className="btn-group shadow-sm rounded-pill overflow-hidden">
                         <button
-                          className="btn btn-primary btn-sm px-3"
+                          className="btn btn-primary btn-sm px-2"
+                          style={{ fontSize: '0.75rem' }}
                           onClick={() => openOrderModal(order)}
                         >
                           查看
                         </button>
                         <button
-                          className="btn btn-outline-danger btn-sm px-3 border-0 border-start"
+                          className="btn btn-outline-danger btn-sm px-2 border-0 border-start"
+                          style={{ fontSize: '0.75rem' }}
                           onClick={() => deleteOrder(order.id)}
                         >
-                          <i className="bi bi-trash"></i>
                           刪除
                         </button>
                       </div>

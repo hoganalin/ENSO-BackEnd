@@ -1,46 +1,64 @@
-# ENSO - Professional E-commerce Analytics & Admin Dashboard
+# ENSO 智慧倉儲與營運數據監控系統
 
-實作一個具備高度專業感的 **「ENSO 禪意線香」** 電商營運圖表與後台管理系統，專注於營收監控、客訴處理與營運指標分析。
-
-## 💡 核心亮點 (Key Highlights)
-- **數據視覺化 (Data Visualization)：** 採用 **Recharts** 實作 YoY (Year over Year) 營收對比圖、香種銷售佔比圓圖，將「線香」產品數據化列為營運決策依據。
-- **品牌格調 (Fine-tuned UI)：** 統一使用 **Inter** 現代字體、自定義質感卡片、漸層主屏色彩與毛玻璃導航欄，打造 Premium 視覺感受。
-- **決策驅動 (Decision-driven)：** 登入後直達「營運總覽」面板，模擬企業級營運長 (COO) 的使用經驗，具備「品牌格調提示」模組提供 AI 化的營運洞察。
-- **響應式技術 (RWD Strategy)：** 支援全裝置操作，確保管理員能隨時隨地監控營收與客訴狀況。
-
-## 🛠️ 技術棧 (Tech Stack)
-- **React 19**：使用最新 React 版本的併發模式與更佳的效能表現。
-- **React Router 7**：導入精準路徑匹配機制 (`end` match)，優化導覽列交互。
-- **Redux Toolkit**：集中化狀態管理，處理產品、訂單與使用者資訊。
-- **Recharts**：進階數據繪製，實作具有互動 Tooltip 的 AreaChart 與 PieChart。
-- **SweetAlert2**：提供專業級的系統回報與刪除確認互動。
-
-## 📈 Dashboard 設計邏輯
-專案針對線香電商特性，刻意設計了：
-1. **YoY 趨勢分析：** 追蹤季節性對香氛需求的波動（如冬日沈香需求提升）。
-2. **具備語境的客訴監控：** 如「香棒斷裂」、「氣味諮詢」，模擬真實電子商務場景的售後管理壓力測試。
-3. **商業智慧 (BI) 模組：** 品牌格調提示（Brand Tone Tips）將數據轉化為可執行的行銷建議。
+這不只是一個電商後台，而是一個結合**工業物聯網 (IoT)** 與**商業決策分析 (BI)** 的高價值資產管理系統。
+我將傳統的電商訂單系統，升級為具備「智慧倉儲監控」能力的前端營運儀表板，專門負責控管對環境極度敏感的頂級香氛（如芽莊沈香、老山檀香）資產。
 
 ---
 
-## 🚀 快速開始
+## 💡 核心亮點 (Key Highlights)
+
+- **🚀 實時 IoT 數據可視化 (Real-time IoT Dashboard)**
+  - 運用前方資料模擬技術（Custom Hook + clearInterval 內存優化），實作類似 **MQTT / WebSocket** 的高頻率即時溫濕度與煙霧數據流。
+  - 當數據異常時（如濕度超過 60%）自動觸發 `Alert` 危險警報狀態，展現實時前端交互處理能力。
+
+- **📊 商業決策思維與數據聚合 (Data Hierarchy & BI)**
+  - **總覽面板 (Overview)：** 給營運總監的第一視角，利用 `Recharts` 繪製 YoY 營收趨勢圖 (AreaChart) 與產品佔比 (PieChart)，並即時展示 A/B 倉加權平均狀態。
+  - **設備監管中心 (Diagnostic View)：** 給硬體維修工程師排查問題用。精細列出位於「沈香儲藏室」、「老山檀香架」等單一感測器的連線狀態 (Heartbeat)、測值與電池電量。
+
+- **✨ 現代化品牌格調 (Fine-tuned UI/UX)**
+  - 拋棄傳統僵硬的後台模板，統一採用 **Inter** 現代字體。
+  - 導入深色模式巧思、毛玻璃質感導航、與流暢的 Tailwind/Bootstrap 自定義 CSS 變數，打造符合 ENSO 高級香氛品牌定位的 Premium 體驗。
+
+---
+
+## 🛠️ 技術棧 (Tech Stack)
+
+此專案專注於發揮現代化前端框架的最大效能：
+
+- **核心架構：`React 19`** - 運用併發模式渲染，確保大量且高頻率的 IoT 圖表更新不會阻斷主執行緒。
+- **路由管理：`React Router 7`** - 導入深層嵌套路由機制，配合 `end` 屬性解決側邊列的精準路徑匹配 (Exact Match) 難題。
+- **資料可視化：`Recharts`** - 摒棄直接操作 Canvas，利用組件化的方式實心 SVG 圖表，大幅提昇維護性。
+- **響應式與切版：`Bootstrap 5` + `Vanilla CSS`** - 全設備兼容，確保儀表板在平板與手機端皆具高度易讀性 (Scannability)。
+- **操作回饋：`SweetAlert2` + `React-Toastify`** - 取代原生的 `alert`，提供專業且非阻斷式的使用者回饋。
+
+---
+
+## 📈 IoT 面板架構設計邏輯
+
+為解決傳統後台「資訊過載」的問題，本儀表板嚴格遵守**關注點分離 (Separation of Concerns)** 原則：
+
+1. **聚合型指標 (KPI)：** 頁面上方保留企業最在意的「總營收、客訴率、環境健康度」。
+2. **終端狀態偵測：** 設備列表能判別 `Online` 與 `Offline`，如果終端設備超過 30 秒沒有發送 MQTT Heartbeat 心跳包，即中斷連線並自動變灰，模擬真實工業場景。
+3. **即時日誌 (Live Log)：** 在總覽畫面右下角實作 Terminal 風格的即時訊息流，掌握倉庫各節點感回報狀態。
+
+---
+
+## 🚀 快速開始 (Quick Start)
 
 1. **Clone 專案：**
    ```bash
    git clone [your-repo-url]
    ```
-2. **安裝依賴：**
+2. **安裝依賴套件：**
    ```bash
    npm install
    ```
-3. **啟動開發伺服器：**
+3. **啟動 Vite 開發伺服器：**
    ```bash
    npm run dev
    ```
-4. **部屬 (GitHub Pages)：**
-   ```bash
-   npm run deploy
-   ```
+4. **準備迎接華麗的資料流動畫！** 訪問 `http://localhost:5173/#/admin`
 
 ---
-© 2025 ENSO Incense Admin Dashboard. All Rights Reserved.
+
+© 2025 ENSO Incense Smart Warehouse Dashboard. All Rights Reserved.

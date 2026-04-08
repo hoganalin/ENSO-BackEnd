@@ -4,7 +4,8 @@
       "Bash(grep -E \"\\\\.\\(js|jsx\\)$\")",
       "Bash(npm run:*)",
       "Skill(update-config)",
-      "Skill(update-config:*)"
+      "Skill(update-config:*)",
+      "Bash(grep -n \"modal-dialog-centered\\\\|modal-xl\\\\|modal-lg\\\\|overflow-hidden\" /c/Users/Rogan/OneDrive/文件/ENSO-BackEnd/src/views/admin/*.jsx)"
     ]
   }
 }
