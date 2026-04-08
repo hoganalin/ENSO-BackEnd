@@ -8,7 +8,7 @@
 ## 💡 核心亮點 (Key Highlights)
 
 - **🚀 實時 IoT 數據可視化 (Real-time IoT Dashboard)**
-  - 運用前方資料模擬技術（Custom Hook + clearInterval 內存優化），實作類似 **MQTT / WebSocket** 的高頻率即時溫濕度與煙霧數據流。
+  - 運用前端資料模擬技術（Custom Hook + clearInterval 內存優化），實作類似 **MQTT / WebSocket** 的高頻率即時溫濕度與煙霧數據流。
   - 當數據異常時（如濕度超過 60%）自動觸發 `Alert` 危險警報狀態，展現實時前端交互處理能力。
 
 - **📊 商業決策思維與數據聚合 (Data Hierarchy & BI)**
@@ -17,19 +17,28 @@
 
 - **✨ 現代化品牌格調 (Fine-tuned UI/UX)**
   - 拋棄傳統僵硬的後台模板，統一採用 **Inter** 現代字體。
-  - 導入深色模式巧思、毛玻璃質感導航、與流暢的 Tailwind/Bootstrap 自定義 CSS 變數，打造符合 ENSO 高級香氛品牌定位的 Premium 體驗。
+  - 導入深色模式巧思、毛玻璃質感導航、與流暢的 Bootstrap 自定義樣式，打造符合 ENSO 高級香氛品牌定位的 Premium 體驗。
+
+- **📱 完整響應式設計 (Fully Responsive)**
+  - 所有管理頁面支援手機瀏覽，無橫向捲動。
+  - 表格手機版自動隱藏次要欄位（`d-none d-md-table-cell`），保留核心操作欄位。
+  - 卡片在手機以 2 欄排列，標題字體使用 `clamp()` 隨螢幕自動縮放。
 
 ---
 
 ## 🛠️ 技術棧 (Tech Stack)
 
-此專案專注於發揮現代化前端框架的最大效能：
-
-- **核心架構：`React 19`** - 運用併發模式渲染，確保大量且高頻率的 IoT 圖表更新不會阻斷主執行緒。
-- **路由管理：`React Router 7`** - 導入深層嵌套路由機制，配合 `end` 屬性解決側邊列的精準路徑匹配 (Exact Match) 難題。
-- **資料可視化：`Recharts`** - 摒棄直接操作 Canvas，利用組件化的方式實心 SVG 圖表，大幅提昇維護性。
-- **響應式與切版：`Bootstrap 5` + `Vanilla CSS`** - 全設備兼容，確保儀表板在平板與手機端皆具高度易讀性 (Scannability)。
-- **操作回饋：`SweetAlert2` + `React-Toastify`** - 取代原生的 `alert`，提供專業且非阻斷式的使用者回饋。
+| 類別 | 套件 / 版本 |
+|------|------------|
+| 框架 | React 19 + Vite 7 |
+| 路由 | React Router 7（Hash Router） |
+| 狀態管理 | Redux Toolkit |
+| HTTP | Axios（JWT Cookie 攔截器） |
+| UI | Bootstrap 5 + Bootstrap Icons |
+| 表單 | React Hook Form |
+| 圖表 | Recharts |
+| 通知 | SweetAlert2 |
+| 部署 | gh-pages |
 
 ---
 
@@ -38,26 +47,116 @@
 為解決傳統後台「資訊過載」的問題，本儀表板嚴格遵守**關注點分離 (Separation of Concerns)** 原則：
 
 1. **聚合型指標 (KPI)：** 頁面上方保留企業最在意的「總營收、客訴率、環境健康度」。
-2. **終端狀態偵測：** 設備列表能判別 `Online` 與 `Offline`，如果終端設備超過 30 秒沒有發送 MQTT Heartbeat 心跳包，即中斷連線並自動變灰，模擬真實工業場景。
-3. **即時日誌 (Live Log)：** 在總覽畫面右下角實作 Terminal 風格的即時訊息流，掌握倉庫各節點感回報狀態。
+2. **終端狀態偵測：** 設備列表能判別 `Online` 與 `Offline`，模擬真實 MQTT Heartbeat 心跳包中斷的工業場景。
+3. **即時日誌 (Live Log)：** 在總覽畫面右下角實作 Terminal 風格的即時訊息流，掌握倉庫各節點回報狀態。
 
 ---
 
 ## 🚀 快速開始 (Quick Start)
 
-1. **Clone 專案：**
-   ```bash
-   git clone [your-repo-url]
-   ```
-2. **安裝依賴套件：**
-   ```bash
-   npm install
-   ```
-3. **啟動 Vite 開發伺服器：**
-   ```bash
-   npm run dev
-   ```
-4. **準備迎接華麗的資料流動畫！** 訪問 `http://localhost:5173/#/admin`
+### 環境需求
+- Node.js 18+
+- npm 9+
+
+### 安裝與啟動
+
+```bash
+# 1. Clone 專案
+git clone [your-repo-url]
+
+# 2. 安裝依賴
+npm install
+
+# 3. 建立環境變數檔
+# 在根目錄建立 .env，填入以下內容：
+# VITE_API_BASE=https://ec-course-api.hexschool.io/v2
+# VITE_API_PATH=your-api-path
+
+# 4. 啟動開發伺服器
+npm run dev
+```
+
+訪問 `http://localhost:5173/#/login`
+
+### 指令說明
+
+```bash
+npm run dev      # 啟動開發伺服器（Vite HMR）
+npm run build    # 打包正式版本
+npm run preview  # 本地預覽正式版本
+npm run lint     # ESLint 檢查
+npm run deploy   # 部署至 GitHub Pages（自動執行 build）
+```
+
+---
+
+## 📁 專案結構
+
+```
+src/
+├── assets/
+│   ├── index.css               # 全域字體、scrollbar 樣式
+│   ├── style.css               # 登入頁樣式
+│   └── utils/filter.js         # currency() 數字格式化
+├── components/
+│   ├── FullPageLoading.jsx      # 全螢幕 loading overlay
+│   ├── MessageToast.jsx         # Toast 通知元件
+│   ├── Pagination.jsx           # 分頁元件
+│   ├── ProductModal.jsx         # 商品新增/編輯/刪除 Modal
+│   └── ProtectedRoute.jsx       # JWT 驗證路由守衛
+├── hooks/
+│   └── useMessage.js            # showSuccess / showError hook
+├── layout/
+│   ├── AdminLayout.jsx          # 後台框架（Header + Nav + Footer）
+│   └── FrontendLayout.jsx       # 前台框架
+├── router.jsx                   # Hash Router 路由設定
+├── service/
+│   ├── api.js                   # Axios 實例（JWT 攔截器）
+│   ├── adminOrders.js           # 訂單 CRUD API
+│   └── adminProducts.js         # 商品 CRUD + 圖片上傳 API
+├── slices/messageSlice.js       # Toast Redux slice（自動 3 秒清除）
+├── store/store.js               # Redux store
+├── utils/validation.js          # React Hook Form 共用驗證規則
+└── views/
+    ├── Login.jsx
+    ├── admin/
+    │   ├── AdminHome.jsx        # 總覽面板（KPI + 圖表 + IoT 日誌）
+    │   ├── AdminProducts.jsx    # 商品管理
+    │   ├── AdminOrders.jsx      # 訂單管理
+    │   ├── AdminInventory.jsx   # 庫存管理
+    │   ├── AdminCoupon.jsx      # 優惠券管理
+    │   └── AdminDevices.jsx     # 倉儲感測器監管
+    └── front/
+        └── NotFound.jsx
+```
+
+---
+
+## 🔐 API 與認證
+
+所有後台 API 使用 `src/service/api.js` 的 `apiAuth` Axios 實例：
+
+- **Request 攔截器**：自動從 Cookie（`myToken` → fallback `hexToken`）讀取 JWT 並注入 `Authorization` header
+- **Response 攔截器**：401 → 自動導向 `#/login`；5xx → 顯示錯誤 alert
+
+```js
+import { apiAuth } from '../service/api';
+const res = await apiAuth.get(`/api/${API_PATH}/admin/products`);
+```
+
+---
+
+## 🌐 部署
+
+正式環境 base path 設定於 `vite.config.js`：
+
+```js
+base: '/vite-reacthomework-finalweek-backEnd/'
+```
+
+```bash
+npm run deploy  # build → 推送至 gh-pages branch
+```
 
 ---
 
