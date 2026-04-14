@@ -84,69 +84,84 @@ function ExportModal({ onClose }) {
   };
 
   return (
-    <ModalWrapper onClose={onClose} title="📊 歷史數據導出">
+    <ModalWrapper onClose={onClose} title="數據文存導出 / ARCHIVAL EXPORT">
       {done ? (
-        <div className="text-center py-4">
-          <div style={{ fontSize: '3rem' }}>✅</div>
-          <h5 className="fw-bold mt-3 text-success">導出成功！</h5>
-          <p className="text-muted small">
-            最近 {range} 天的感測器數據已準備完成，瀏覽器即將開始下載。
+        <div className="text-center py-16 animate-in fade-in zoom-in duration-700">
+          <div className="text-6xl text-[#3A4D39] mb-8 font-serif opacity-30">♢</div>
+          <h5 className="font-serif text-2xl font-medium text-[#111111] mb-4">文存封裝圓滿</h5>
+          <p className="text-sm opacity-40 font-serif italic mb-12">
+            最近 {range} 天的感測紀錄已成功轉換為數位封裝。
           </p>
-          <button className="btn btn-dark rounded-pill px-4 mt-2" onClick={onClose}>
-            關閉
+          <button 
+            className="px-12 py-3 bg-[#111111] text-white text-[0.7rem] uppercase tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-500"
+            onClick={onClose}
+          >
+            退出文卷 / EXIT
           </button>
         </div>
       ) : (
-        <>
-          <div className="mb-3">
-            <label className="form-label fw-semibold text-dark small">時間範圍</label>
-            <div className="d-flex gap-2" style={{ flexWrap: 'nowrap' }}>
-              {[
-                { v: '7', l: '最近 7 天' },
-                { v: '30', l: '最近 30 天' },
-                { v: '90', l: '最近 3 個月' },
-              ].map(({ v, l }) => (
-                <button
-                  key={v}
-                  className={`btn btn-sm rounded-pill flex-grow-1 px-1 ${
-                    range === v ? 'btn-dark' : 'btn-outline-secondary'
-                  }`}
-                  style={{ fontSize: '0.78rem', whiteSpace: 'nowrap' }}
-                  onClick={() => setRange(v)}
-                >
-                  {l}
-                </button>
-              ))}
-            </div>
+        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <section>
+             <label className="text-[0.65rem] uppercase tracking-[0.4em] font-black text-[#111111]/30 block mb-6">溯源週期 / TIME SPAN</label>
+             <div className="grid grid-cols-3 gap-px bg-[#D1C7B7]/20 border border-[#D1C7B7]/20">
+               {[
+                 { v: '7', l: '七日 / WEEKLY' },
+                 { v: '30', l: '三十日 / MONTHLY' },
+                 { v: '90', l: '季報 / QUARTERLY' },
+               ].map(({ v, l }) => (
+                 <button
+                   key={v}
+                   className={`py-4 text-[0.6rem] font-black tracking-widest transition-all duration-500 ${
+                     range === v ? 'bg-[#111111] text-white' : 'bg-transparent text-[#111111]/40 hover:bg-[#111111]/5 hover:text-[#111111]'
+                   }`}
+                   onClick={() => setRange(v)}
+                 >
+                   {l}
+                 </button>
+               ))}
+             </div>
+          </section>
+
+          <section>
+             <label className="text-[0.65rem] uppercase tracking-[0.4em] font-black text-[#111111]/30 block mb-6">封裝格式 / DATA TYPE</label>
+             <div className="flex gap-8">
+               {['csv', 'json', 'xlsx'].map((f) => (
+                 <label key={f} className="flex items-center gap-4 cursor-pointer group">
+                   <div className="relative">
+                      <input
+                        type="radio"
+                        className="sr-only peer"
+                        name="format"
+                        checked={format === f}
+                        onChange={() => setFormat(f)}
+                      />
+                      <div className="w-5 h-5 border border-[#D1C7B7] peer-checked:border-[#111111] peer-checked:bg-[#111111] transition-all duration-500"></div>
+                      <div className="absolute inset-1 bg-white scale-0 peer-checked:scale-100 transition-transform duration-500 origin-center"></div>
+                   </div>
+                   <span className="text-[0.65rem] uppercase tracking-[0.3em] font-bold opacity-30 group-hover:opacity-100 transition-opacity">.{f} FORMAT</span>
+                 </label>
+               ))}
+             </div>
+          </section>
+
+          <div className="p-6 bg-[#FAF9F6] border-l border-[#984443] flex items-center justify-between">
+            <span className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40 italic">
+              將匯出 5 個節點之核心文存數據
+            </span>
+            <span className="text-xs font-serif italic text-[#984443]">{range} DAYS RANGE</span>
           </div>
-          <div className="mb-4">
-            <label className="form-label fw-semibold text-dark small">檔案格式</label>
-            <div className="d-flex gap-2">
-              {['csv', 'json', 'xlsx'].map((f) => (
-                <button
-                  key={f}
-                  className={`btn btn-sm rounded-pill px-3 ${format === f ? 'btn-primary' : 'btn-outline-secondary'}`}
-                  onClick={() => setFormat(f)}
-                >
-                  .{f.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="p-3 rounded-3 mb-4" style={{ background: '#f8f9fa', border: '1px solid #dee2e6' }}>
-            <small className="text-muted">
-              📋 將導出 <strong>5 個感測器</strong>，共 <strong>{range} 天</strong> 的數據紀錄，格式為 <strong>.{format.toUpperCase()}</strong>
-            </small>
-          </div>
-          <div className="d-flex justify-content-end gap-2">
-            <button className="btn btn-outline-secondary rounded-pill px-4" onClick={onClose}>取消</button>
-            <button className="btn btn-dark rounded-pill px-4" onClick={handleExport} disabled={exporting}>
-              {exporting ? (
-                <><span className="spinner-border spinner-border-sm me-2" />導出中...</>
-              ) : '確認導出'}
+
+          <div className="pt-8 flex justify-end gap-6 items-center border-t border-[#D1C7B7]/10">
+            <button className="text-[0.65rem] uppercase tracking-[0.4em] font-bold opacity-20 hover:opacity-100 transition-opacity" onClick={onClose}>撤回 / CANCEL</button>
+            <button 
+              className="px-12 py-4 bg-[#111111] text-white text-[0.7rem] uppercase tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-700 disabled:opacity-20"
+              onClick={handleExport}
+              disabled={exporting}
+            >
+              {exporting ? '文卷封裝中...' : '開始導出 · EXECUTE'}
             </button>
           </div>
-        </>
+        </div>
       )}
     </ModalWrapper>
   );
@@ -178,66 +193,79 @@ function ConfigModal({ sensor, onClose, onSave }) {
   const isSmoke = sensor.type === '煙霧偵測器';
 
   return (
-    <ModalWrapper onClose={onClose} title={`⚙️ 感測器配置 — ${sensor.id}`}>
+    <ModalWrapper onClose={onClose} title={`裝置參數調律 — ${sensor.id}`}>
       {saved ? (
-        <div className="text-center py-4">
-          <div style={{ fontSize: '3rem' }}>✅</div>
-          <h5 className="fw-bold mt-3 text-success">配置已儲存！</h5>
-          <p className="text-muted small">感測器 {sensor.id} 的設定已成功更新。</p>
-          <button className="btn btn-dark rounded-pill px-4 mt-2" onClick={onClose}>關閉</button>
+        <div className="text-center py-16 animate-in fade-in zoom-in duration-700">
+          <div className="text-6xl text-[#3A4D39] mb-8 font-serif opacity-30">♢</div>
+          <h5 className="font-serif text-2xl font-medium text-[#111111] mb-4">參數同步完成</h5>
+          <p className="text-sm opacity-40 font-serif italic mb-12">智網節點 {sensor.id} 已完成零時參數對應。</p>
+          <button className="px-12 py-3 bg-[#111111] text-white text-[0.7rem] uppercase tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-500" onClick={onClose}>退出 / EXIT</button>
         </div>
       ) : (
-        <>
-          <div className="mb-3 p-3 rounded-3" style={{ background: '#f8f9fa' }}>
-            <div className="d-flex gap-3 flex-wrap">
-              <small className="text-muted">📍 {sensor.location}</small>
-              <small className="text-muted">🔧 {sensor.type}</small>
+        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="p-8 bg-[#FAF9F6] grid grid-cols-2 gap-12 border border-[#D1C7B7]/20">
+            <div>
+              <span className="text-[0.55rem] uppercase tracking-[0.4em] font-black opacity-30 block mb-2">安置區域 / LOCATION</span>
+              <span className="text-sm font-serif italic text-[#111111]">{sensor.location}</span>
+            </div>
+            <div className="text-right">
+              <span className="text-[0.55rem] uppercase tracking-[0.4em] font-black opacity-30 block mb-2">裝置類別 / GENRE</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-[#111111]">{sensor.type}</span>
             </div>
           </div>
 
           {isSmoke ? (
-            <div className="alert alert-info small mb-3">
-              煙霧偵測器目前僅支援回報頻率調整，溫濕度閾值不適用。
+            <div className="p-6 border-l border-[#984443] bg-[#FAF9F6] italic text-xs leading-relaxed opacity-60">
+              煙霧偵測器目前僅支援回報頻率調校，其餘閾值由系統自動定序演算法進行即時監控。
             </div>
           ) : (
-            <div className="row g-3 mb-3">
-              <div className="col-6">
-                <label className="form-label small fw-semibold">溫度下限 (°C)</label>
-                <input type="number" className="form-control form-control-sm" value={form.alertMin} onChange={handle('alertMin')} />
-              </div>
-              <div className="col-6">
-                <label className="form-label small fw-semibold">溫度上限 (°C)</label>
-                <input type="number" className="form-control form-control-sm" value={form.alertMax} onChange={handle('alertMax')} />
-              </div>
-              <div className="col-6">
-                <label className="form-label small fw-semibold">濕度下限 (%)</label>
-                <input type="number" className="form-control form-control-sm" value={form.humidityMin} onChange={handle('humidityMin')} />
-              </div>
-              <div className="col-6">
-                <label className="form-label small fw-semibold">濕度上限 (%)</label>
-                <input type="number" className="form-control form-control-sm" value={form.humidityMax} onChange={handle('humidityMax')} />
-              </div>
+            <div className="grid grid-cols-2 gap-x-12 gap-y-10">
+              <section className="space-y-4">
+                <label className="text-[0.65rem] uppercase tracking-[0.4em] font-black text-[#984443] block px-1">溫度警戒線 (°C)</label>
+                <div className="flex gap-4 items-center">
+                   <input type="number" className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-lg font-serif focus:outline-none focus:border-[#111111] transition-all" value={form.alertMin} onChange={handle('alertMin')} />
+                   <span className="opacity-10 text-[0.65rem]">TO</span>
+                   <input type="number" className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-lg font-serif focus:outline-none focus:border-[#111111] transition-all" value={form.alertMax} onChange={handle('alertMax')} />
+                </div>
+              </section>
+              <section className="space-y-4">
+                <label className="text-[0.65rem] uppercase tracking-[0.4em] font-black text-[#111111]/30 block px-1">濕度警戒線 (%)</label>
+                <div className="flex gap-4 items-center">
+                   <input type="number" className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-lg font-serif focus:outline-none focus:border-[#111111] transition-all" value={form.humidityMin} onChange={handle('humidityMin')} />
+                   <span className="opacity-10 text-[0.65rem]">TO</span>
+                   <input type="number" className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-lg font-serif focus:outline-none focus:border-[#111111] transition-all" value={form.humidityMax} onChange={handle('humidityMax')} />
+                </div>
+              </section>
             </div>
           )}
 
-          <div className="mb-4">
-            <label className="form-label small fw-semibold">回報頻率（每 X 分鐘）</label>
-            <input
-              type="range" className="form-range" min="1" max="30" step="1"
-              value={form.updateInterval} onChange={handle('updateInterval')}
-            />
-            <div className="text-center">
-              <span className="badge bg-primary rounded-pill">每 {form.updateInterval} 分鐘</span>
+          <section>
+            <div className="flex justify-between items-end mb-6 px-1">
+              <label className="text-[0.65rem] uppercase tracking-[0.4em] font-black text-[#111111]/30">物聯傳輸頻率 / SYNC RATE</label>
+              <span className="text-sm font-serif italic text-[#984443]">每一{form.updateInterval}分鐘同步一次</span>
             </div>
-          </div>
+            <div className="relative pt-2">
+               <input
+                 type="range" className="w-full h-[1px] bg-[#D1C7B7] appearance-none cursor-pointer accent-[#111111] relative z-10" min="1" max="30" step="1"
+                 value={form.updateInterval} onChange={handle('updateInterval')}
+               />
+               <div className="absolute top-[9px] left-0 w-full flex justify-between px-1 pointer-events-none">
+                  {[...Array(7)].map((_, i) => <span key={i} className="w-[1px] h-2 bg-[#D1C7B7]/40"></span>)}
+               </div>
+            </div>
+          </section>
 
-          <div className="d-flex justify-content-end gap-2">
-            <button className="btn btn-outline-secondary rounded-pill px-4" onClick={onClose}>取消</button>
-            <button className="btn btn-primary rounded-pill px-4" onClick={handleSave} disabled={saving}>
-              {saving ? <><span className="spinner-border spinner-border-sm me-2" />儲存中...</> : '儲存配置'}
+          <div className="pt-8 flex justify-end gap-6 items-center border-t border-[#D1C7B7]/10">
+            <button className="text-[0.65rem] uppercase tracking-[0.4em] font-bold opacity-20 hover:opacity-100 transition-opacity" onClick={onClose}>撤回</button>
+            <button 
+              className="px-12 py-4 bg-[#111111] text-white text-[0.7rem] uppercase tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-700 disabled:opacity-20"
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? '同步協議中...' : '儲存調律 · ARCHIVE'}
             </button>
           </div>
-        </>
+        </div>
       )}
     </ModalWrapper>
   );
@@ -249,80 +277,83 @@ function CalibrateModal({ sensor, onClose }) {
 
   const handleStart = () => {
     setStep(1);
-    setTimeout(() => setStep(2), 2000);
+    setTimeout(() => setStep(2), 2500);
   };
 
-  const steps = ['確認校準', '校準中', '校準完成'];
+  const steps = ['儀軌確認', '精準校律', '圓滿完成'];
 
   return (
-    <ModalWrapper onClose={onClose} title={`🔧 感測器校準 — ${sensor.id}`}>
-      {/* 進度條 */}
-      <div className="d-flex align-items-center mb-4 gap-2">
+    <ModalWrapper onClose={onClose} title={`裝置零位校準 — ${sensor.id}`}>
+      <div className="flex justify-between items-center mb-16 relative">
+        <div className="absolute top-[12px] left-0 w-full h-[1px] bg-[#D1C7B7]/20 z-0"></div>
         {steps.map((s, i) => (
-          <React.Fragment key={s}>
-            <div className="d-flex flex-column align-items-center" style={{ flex: 1 }}>
-              <div
-                className={`rounded-circle d-flex align-items-center justify-content-center fw-bold mb-1`}
-                style={{
-                  width: 28, height: 28, fontSize: '0.7rem',
-                  background: i <= step ? '#0d6efd' : '#dee2e6',
-                  color: i <= step ? '#fff' : '#adb5bd',
-                }}
-              >
+          <div key={s} className="relative z-10 flex flex-col items-center bg-white px-4">
+             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[0.6rem] font-bold transition-all duration-1000 ${
+                  i <= step ? 'bg-[#984443] text-white shadow-lg shadow-[#984443]/20' : 'bg-[#FAF9F6] border border-[#D1C7B7]/40 text-[#111111]/20'
+             }`}>
                 {i < step ? '✓' : i + 1}
-              </div>
-              <small style={{ fontSize: '0.65rem', color: i <= step ? '#0d6efd' : '#adb5bd', whiteSpace: 'nowrap' }}>{s}</small>
-            </div>
-            {i < steps.length - 1 && (
-              <div style={{ height: 2, flex: 2, background: i < step ? '#0d6efd' : '#dee2e6', marginBottom: 16 }} />
-            )}
-          </React.Fragment>
+             </div>
+             <span className={`text-[0.6rem] mt-3 tracking-[0.3em] font-black uppercase whitespace-nowrap ${i <= step ? 'text-[#111111]' : 'opacity-10'}`}>
+                {s}
+             </span>
+          </div>
         ))}
       </div>
 
-      {step === 0 && (
-        <>
-          <div className="p-3 rounded-3 mb-4" style={{ background: '#fff8e1', border: '1px solid #ffe082' }}>
-            <small className="text-warning-emphasis fw-semibold">⚠️ 注意事項</small>
-            <ul className="small text-muted mb-0 mt-2 ps-3">
-              <li>校準過程中感測器將暫停數據回報（約 2 分鐘）</li>
-              <li>請確認環境溫度約在 22°C-25°C 之間</li>
-              <li>校準後數據將自動重新基線化</li>
-            </ul>
-          </div>
-          <div className="mb-4 p-3 rounded-3" style={{ background: '#f8f9fa' }}>
-            <div className="row g-2">
-              <div className="col-6"><small className="text-muted">感測器</small><div className="fw-semibold small">{sensor.id}</div></div>
-              <div className="col-6"><small className="text-muted">位置</small><div className="fw-semibold small">{sensor.location}</div></div>
-              <div className="col-6"><small className="text-muted">型號</small><div className="fw-semibold small">{sensor.type}</div></div>
-              <div className="col-6"><small className="text-muted">當前數值</small><div className="fw-semibold small text-primary">{sensor.lastValue}</div></div>
+      <div className="mt-4 animate-in fade-in duration-700">
+        {step === 0 && (
+          <div className="space-y-10">
+            <div className="p-8 bg-[#FAF9F6] border border-[#D1C7B7]/20 space-y-4">
+              <div className="text-[0.65rem] uppercase tracking-[0.4em] text-[#984443] font-black italic">⚠️ 智網校準儀軌 / PROTOCOL</div>
+              <ul className="space-y-3 text-xs font-serif italic opacity-60 leading-relaxed px-4 list-disc marker:text-[#984443]">
+                <li>啟動校準後，節點將暫停傳輸約 150 秒以進行硬體重定序。</li>
+                <li>請確保安置環境處於沈香標準溫度 (22°C ± 0.5°C) 之靜態壓力下。</li>
+                <li>此操作將重寫裝置基線，非專業工程師請謹慎決策。</li>
+              </ul>
+            </div>
+            <div className="grid grid-cols-1 border border-[#D1C7B7]/10 divide-y divide-[#D1C7B7]/10">
+              <div className="flex justify-between p-6">
+                <span className="text-[0.65rem] uppercase tracking-[0.4em] font-black opacity-20">當前回傳測值 / LIVE</span>
+                <span className="text-xl font-serif text-[#111111]">{sensor.lastValue}</span>
+              </div>
+              <div className="flex justify-between p-6">
+                <span className="text-[0.65rem] uppercase tracking-[0.4em] font-black opacity-20">節點安置地點 / LOCATION</span>
+                <span className="text-sm font-serif italic text-[#111111]">{sensor.location}</span>
+              </div>
+            </div>
+            <div className="flex justify-end gap-6 pt-4 items-center">
+              <button className="text-[0.65rem] uppercase tracking-[0.4em] font-bold opacity-20 hover:opacity-100 transition-opacity" onClick={onClose}>撤回</button>
+              <button 
+                className="px-12 py-4 bg-[#111111] text-white text-[0.7rem] uppercase tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-700 disabled:opacity-20"
+                onClick={handleStart}
+                disabled={sensor.status === 'Offline'}
+              >
+                {sensor.status === 'Offline' ? '節點離線 · OFFLINE' : '啟動校準 · CALIBRATE'}
+              </button>
             </div>
           </div>
-          <div className="d-flex justify-content-end gap-2">
-            <button className="btn btn-outline-secondary rounded-pill px-4" onClick={onClose}>取消</button>
-            <button className="btn btn-primary rounded-pill px-4" onClick={handleStart} disabled={sensor.status === 'Offline'}>
-              {sensor.status === 'Offline' ? '裝置離線中' : '開始校準'}
-            </button>
+        )}
+
+        {step === 1 && (
+          <div className="text-center py-20 flex flex-col items-center">
+            <div className="relative mb-12">
+               <div className="w-16 h-16 border border-[#D1C7B7]/30 rounded-full animate-ping opacity-20"></div>
+               <div className="absolute inset-0 w-16 h-16 border-2 border-[#111111] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <h6 className="font-serif italic text-2xl text-[#111111] mb-4">精準校律進行中...</h6>
+            <p className="text-xs opacity-40 font-black tracking-widest uppercase">Base alignment in progress. Do not disconnect.</p>
           </div>
-        </>
-      )}
+        )}
 
-      {step === 1 && (
-        <div className="text-center py-4">
-          <div className="spinner-border text-primary mb-3" style={{ width: '3rem', height: '3rem' }} />
-          <h6 className="fw-bold">校準中，請稍候…</h6>
-          <p className="text-muted small">系統正在重新基線化感測器數值，<br />此過程約需 30 秒至 2 分鐘。</p>
-        </div>
-      )}
-
-      {step === 2 && (
-        <div className="text-center py-4">
-          <div style={{ fontSize: '3rem' }}>✅</div>
-          <h5 className="fw-bold mt-3 text-success">校準完成！</h5>
-          <p className="text-muted small">感測器 {sensor.id} 已完成重新校準，數據已恢復回報。</p>
-          <button className="btn btn-dark rounded-pill px-4 mt-2" onClick={onClose}>關閉</button>
-        </div>
-      )}
+        {step === 2 && (
+          <div className="text-center py-16 animate-in zoom-in fade-in duration-1000">
+            <div className="text-6xl text-[#3A4D39] mb-10 font-serif opacity-30">♢</div>
+            <h5 className="font-serif text-3xl font-medium text-[#111111] mb-4">校準儀軌圓滿</h5>
+            <p className="text-sm opacity-40 italic font-serif mb-12">感測器 {sensor.id} 已完成零位基線化處理。</p>
+            <button className="px-16 py-4 bg-[#111111] text-white text-[0.7rem] uppercase tracking-[0.4em] font-black hover:bg-[#984443] transition-colors" onClick={onClose}>退出協議 · EXIT</button>
+          </div>
+        )}
+      </div>
     </ModalWrapper>
   );
 }
@@ -331,19 +362,20 @@ function CalibrateModal({ sensor, onClose }) {
 function ModalWrapper({ title, onClose, children }) {
   return (
     <div
-      className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-      style={{ background: 'rgba(0,0,0,0.5)', zIndex: 9999 }}
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-12"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div
-        className="bg-white rounded-4 shadow-lg p-4"
-        style={{ width: '100%', maxWidth: '480px', margin: '0 16px', maxHeight: '90vh', overflowY: 'auto' }}
-      >
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h5 className="fw-bold mb-0 text-dark" style={{ fontSize: '1rem' }}>{title}</h5>
-          <button className="btn-close" onClick={onClose} />
+      <div className="absolute inset-0 bg-[#111111]/90 backdrop-blur-md animate-in fade-in duration-500"></div>
+      <div className="relative bg-white w-full max-w-2xl shadow-2xl rounded-sm overflow-hidden border border-[#D1C7B7]/30 flex flex-col animate-in zoom-in fade-in duration-700">
+        <div className="p-8 border-b border-[#D1C7B7]/10 flex justify-between items-center bg-[#FAF9F6]">
+          <h5 className="text-[0.65rem] uppercase tracking-[0.5em] font-black text-[#111111] opacity-40">{title}</h5>
+          <button className="text-[#111111] opacity-20 hover:opacity-100 transition-opacity" onClick={onClose}>
+            <span className="text-2xl font-light">✕</span>
+          </button>
         </div>
-        {children}
+        <div className="p-12 overflow-y-auto custom-scrollbar">
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -352,7 +384,7 @@ function ModalWrapper({ title, onClose, children }) {
 /* ───────── 主元件 ───────── */
 const AdminDevices = () => {
   const [sensors, setSensors] = useState(INITIAL_SENSORS);
-  const [modal, setModal] = useState(null); // { type: 'export'|'config'|'calibrate', sensor? }
+  const [modal, setModal] = useState(null);
 
   const openExport = () => setModal({ type: 'export' });
   const openConfig = (sensor) => setModal({ type: 'config', sensor });
@@ -364,121 +396,156 @@ const AdminDevices = () => {
   };
 
   return (
-    <div className="container-fluid px-4 py-4">
-      {/* Modal 渲染 */}
+    <div className="min-h-screen bg-[#FAF9F6] px-6 py-12 font-sans text-[#111111]">
       {modal?.type === 'export' && <ExportModal onClose={closeModal} />}
       {modal?.type === 'config' && <ConfigModal sensor={modal.sensor} onClose={closeModal} onSave={handleSaveConfig} />}
       {modal?.type === 'calibrate' && <CalibrateModal sensor={modal.sensor} onClose={closeModal} />}
 
-      <div className="d-flex flex-column flex-md-row justify-content-md-between align-items-center mb-4 gap-3">
-        <h2 className="fw-bold mb-0 text-dark text-center text-md-start">🌡️ 智慧倉儲感測系統</h2>
-        <div className="d-flex gap-2 flex-wrap justify-content-center">
-          <button className="btn btn-outline-dark rounded-pill px-4 shadow-sm text-nowrap" onClick={openExport}>
-            歷史數據導出
-          </button>
-          <button
-            className="btn btn-primary rounded-pill px-4 shadow-sm text-nowrap"
-            onClick={() => openConfig(sensors[0])}
-          >
-            感測器配置
-          </button>
+      {/* Header Section */}
+      <div className="max-w-7xl mx-auto mb-20">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[#D1C7B7] pb-10 relative">
+          <div className="absolute -bottom-[1px] left-0 w-24 h-[1px] bg-[#984443]"></div>
+          <div>
+            <div className="text-[0.65rem] uppercase tracking-[0.6em] text-[#984443] font-bold mb-4 opacity-80">
+              Administrative / Smart Network
+            </div>
+            <h2 className="font-serif text-5xl font-medium tracking-tight text-[#111111]">
+              物聯監儀<span className="text-[0.5em] ml-4 opacity-20 font-sans tracking-widest uppercase">DEVICE NETWORK MONITOR</span>
+            </h2>
+          </div>
+          <div className="flex gap-4">
+             <button 
+               className="group relative px-8 py-4 overflow-hidden transition-all duration-300 border border-[#D1C7B7] hover:border-[#111111]"
+               onClick={openExport}
+             >
+               <span className="relative text-[0.65rem] uppercase tracking-[0.3em] font-bold text-[#111111]/40 group-hover:text-[#111111] transition-colors">
+                  數據文存導出 · EXPORT
+               </span>
+             </button>
+             <button 
+               className="group relative px-8 py-4 overflow-hidden transition-all duration-700 bg-[#111111] shadow-xl hover:shadow-[#984443]/20"
+               onClick={() => openConfig(sensors[0])}
+             >
+               <span className="relative text-[0.65rem] uppercase tracking-[0.3em] font-bold text-white">
+                  全域配置 · CONFIG
+               </span>
+             </button>
+          </div>
         </div>
       </div>
 
-      <div className="row g-4">
-        <div className="col-lg-12">
-          <div className="card custom-card shadow-sm border-0 bg-white">
-            <div className="card-body p-0">
-              <div className="table-responsive">
-                <table className="table table-sm table-hover align-middle mb-0">
-                  <thead className="bg-light">
-                    <tr className="small text-uppercase fw-bold text-muted">
-                      <th className="px-2 px-md-4 py-3">感測器 ID</th>
-                      <th className="d-none d-md-table-cell">安置區域</th>
-                      <th>連線狀態</th>
-                      <th>當前測值</th>
-                      <th className="d-none d-md-table-cell">電量狀態</th>
-                      <th className="text-center">操作</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sensors.map((sensor) => (
-                      <tr key={sensor.id}>
-                        <td className="px-2 px-md-4 py-2" style={{ maxWidth: '90px' }}>
-                          <div className="fw-bold text-dark text-truncate" style={{ fontSize: '0.8rem' }}>{sensor.id}</div>
-                          <small className="text-muted d-none d-md-block">{sensor.type}</small>
-                        </td>
-                        <td className="fw-medium text-secondary d-none d-md-table-cell">{sensor.location}</td>
-                        <td>
-                          {sensor.status === 'Online' ? (
-                            <span className="badge bg-success-subtle text-success border border-success rounded-pill px-2" style={{ fontSize: '0.7rem' }}>
-                              <span className="d-inline-block bg-success rounded-circle me-1" style={{ width: '6px', height: '6px' }} />
-                              正常
-                            </span>
-                          ) : (
-                            <span className="badge bg-danger-subtle text-danger border border-danger rounded-pill px-2" style={{ fontSize: '0.7rem' }}>
-                              <span className="d-inline-block bg-danger rounded-circle me-1" style={{ width: '6px', height: '6px' }} />
-                              異常
-                            </span>
-                          )}
-                        </td>
-                        <td style={{ whiteSpace: 'nowrap' }}>
-                          <span
-                            className={`fw-bold mb-0 ${sensor.status === 'Offline' ? 'text-muted' : 'text-primary'}`}
-                            style={{ fontSize: '0.85rem' }}
-                          >
-                            {sensor.lastValue}
-                          </span>
-                        </td>
-                        <td className="d-none d-md-table-cell">
-                          <div className="d-flex align-items-center" style={{ width: '60px' }}>
-                            <div className="progress flex-grow-1" style={{ height: '6px', borderRadius: '10px' }}>
-                              <div
-                                className={`progress-bar ${sensor.battery < 20 ? 'bg-danger' : 'bg-primary'}`}
-                                style={{ width: `${sensor.battery}%` }}
-                              />
-                            </div>
-                          </div>
-                        </td>
-                        <td className="text-center px-1 px-md-3">
-                          <div className="d-flex gap-1 justify-content-center">
-                            <button
-                              className="btn btn-outline-primary btn-sm rounded-pill px-2"
-                              style={{ fontSize: '0.75rem' }}
-                              onClick={() => openCalibrate(sensor)}
-                            >
-                              校準
-                            </button>
-                            <button
-                              className="btn btn-outline-secondary btn-sm rounded-pill px-2"
-                              style={{ fontSize: '0.75rem' }}
-                              onClick={() => openConfig(sensor)}
-                            >
-                              設定
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+      <div className="max-w-7xl mx-auto grid grid-cols-1 gap-12 mb-24">
+        {/* Device Table Section */}
+        <div className="overflow-x-auto px-1">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-[#D1C7B7]/30 text-[0.6rem] uppercase tracking-[0.3em] font-bold text-[#111111]/40">
+                <th className="px-4 py-8">節點辨識 / NODE ID</th>
+                <th className="px-4 py-8 hidden md:table-cell">安置區域 / LOCATION</th>
+                <th className="px-4 py-8 text-center">連線狀態 / STATUS</th>
+                <th className="px-4 py-8">回傳測值 / TELEMETRY</th>
+                <th className="px-4 py-8 hidden md:table-cell">能源存量 / POWER</th>
+                <th className="px-4 py-8 text-right">核定操作 / ACTION</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#D1C7B7]/10">
+              {sensors.map((sensor) => (
+                <tr key={sensor.id} className="hover:bg-[#111111]/[0.02] transition-colors duration-500 group">
+                  <td className="px-4 py-10">
+                    <div className="font-mono text-sm tracking-tighter font-bold text-[#111111] group-hover:text-[#984443] transition-colors">
+                      {sensor.id}
+                    </div>
+                    <div className="text-[0.6rem] opacity-30 uppercase tracking-widest mt-2">{sensor.type}</div>
+                  </td>
+                  <td className="px-4 py-10 hidden md:table-cell">
+                    <div className="text-sm font-serif italic text-[#111111]/60">
+                      {sensor.location}
+                    </div>
+                  </td>
+                  <td className="px-4 py-10 text-center">
+                    <div className="flex flex-col items-center gap-1">
+                      <span className={`w-1.5 h-1.5 rounded-full ${sensor.status === 'Online' ? 'bg-[#3A4D39]' : 'bg-[#984443] animate-pulse'}`}></span>
+                      <span className={`text-[0.55rem] uppercase tracking-[0.2em] font-bold ${sensor.status === 'Online' ? 'text-[#3A4D39]' : 'text-[#984443]'}`}>
+                        {sensor.status === 'Online' ? 'Connected' : 'Disconnected'}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-10">
+                    <span className={`font-serif text-2xl font-medium tracking-tighter ${sensor.status === 'Offline' ? 'opacity-10' : 'text-[#111111]'}`}>
+                      {sensor.lastValue}
+                    </span>
+                  </td>
+                  <td className="px-4 py-10 hidden md:table-cell">
+                    <div className="flex items-center gap-4">
+                       <div className="w-16 h-[1px] bg-[#D1C7B7]/30 overflow-hidden relative">
+                         <div 
+                           className={`absolute left-0 top-0 h-full transition-all duration-1000 ${sensor.battery < 20 ? 'bg-[#984443]' : 'bg-[#111111]'}`}
+                           style={{ width: `${sensor.battery}%` }}
+                         />
+                       </div>
+                       <span className="text-xs font-mono opacity-20">{sensor.battery}%</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-10 text-right">
+                    <div className="inline-flex gap-8">
+                      <button
+                        className="text-[0.65rem] uppercase tracking-[0.3em] font-bold text-[#111111]/30 hover:text-[#111111] transition-colors duration-300"
+                        onClick={() => openCalibrate(sensor)}
+                      >
+                        校準 / CAL
+                      </button>
+                      <button
+                        className="text-[0.65rem] uppercase tracking-[0.3em] font-bold text-[#111111]/30 hover:text-[#111111] transition-colors duration-300"
+                        onClick={() => openConfig(sensor)}
+                      >
+                        配置 / SET
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
-        <div className="col-md-12">
-          <div className="p-4 rounded-4" style={{ backgroundColor: '#e9ecef', border: '1px dashed #ced4da' }}>
-            <div className="d-flex align-items-center mb-2">
-              <span className="badge bg-dark me-2">PRO Tips</span>
-              <h6 className="fw-bold mb-0 text-dark">數據一致性說明</h6>
-            </div>
-            <p className="text-muted small mb-0">
-              此分頁顯示的是分布於倉庫各角落的實體節點數據。總覽面板 (Overview) 顯示的 A / B
-              倉數值，是由此處感測器數據進行即時加權平均計算後得出。
-              所有溫溼度變動均符合沈香保存之標準閾值 (22°C-25°C / 45%-55%)。
-            </p>
-          </div>
+        {/* Curator's Note Section - Editorial Style */}
+        <div className="mt-12 group">
+           <div className="bg-[#111111] p-px">
+              <div className="bg-[#FAF9F6] p-16 relative overflow-hidden flex flex-col md:flex-row gap-16">
+                 {/* Decorative Kumiko-like accent */}
+                 <div className="absolute top-0 right-0 w-32 h-32 opacity-[0.03] pointer-events-none">
+                   <svg viewBox="0 0 100 100" fill="none" stroke="#111111" strokeWidth="0.5">
+                     <path d="M0,0 L100,100 M100,0 L0,100 M50,0 L50,100 M0,50 L100,50" />
+                   </svg>
+                 </div>
+                 
+                 <div className="md:w-1/4">
+                    <div className="text-[0.65rem] uppercase tracking-[0.6em] text-[#984443] font-black mb-6">Curator's Note</div>
+                    <div className="w-12 h-px bg-[#111111]/20 mb-8"></div>
+                    <h5 className="font-serif text-2xl leading-snug text-[#111111]">數據一致性與環境標準說明</h5>
+                 </div>
+
+                 <div className="flex-grow space-y-8 max-w-3xl">
+                    <p className="text-sm font-serif italic leading-relaxed text-[#111111]/60">
+                      此監控面板匯錄分布於工坊各處之實體感測節點數據。首頁總覽 (Overview) 所視之 A / B 倉數值，
+                      乃是由此處節點數據經由物聯網閘道器 (Gateway) 進行即時權重校對後得出，以確保環境數據之絕對精準。
+                    </p>
+                    <div className="grid grid-cols-2 gap-12 pt-8 border-t border-[#D1C7B7]/30">
+                       <div className="space-y-4">
+                          <span className="text-[0.55rem] uppercase tracking-[0.4em] font-black opacity-30">溫度保存閾值 / TEMP</span>
+                          <div className="font-serif text-lg">22°C - 25°C</div>
+                       </div>
+                       <div className="space-y-4">
+                          <span className="text-[0.55rem] uppercase tracking-[0.4em] font-black opacity-30">濕度保存閾值 / HUMID</span>
+                          <div className="font-serif text-lg">45% - 55%</div>
+                       </div>
+                    </div>
+                    <p className="text-[0.65rem] opacity-30 italic font-serif">
+                       任何毫釐之差皆會觸發系統警示，以守護時光之香火。
+                    </p>
+                 </div>
+              </div>
+           </div>
         </div>
       </div>
     </div>

@@ -1,54 +1,44 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   getCoupons,
   createCoupon,
   updateCoupon,
   deleteCoupon,
 } from '../../service/coupon';
-import * as bootstrap from 'bootstrap';
 import useMessage from '../../hooks/useMessage';
 import FullPageLoading from '../../components/FullPageLoading';
 import Swal from 'sweetalert2';
+
 //日期轉換輔助函式
-//將後端傳來的時間戳轉換成前端可讀的日期格式
 const formatDate = (timestamp) => {
+  if (!timestamp) return '';
   return new Date(timestamp * 1000).toISOString().split('T')[0];
 };
-//將前端的日期格式轉換成後端可讀的時間戳
-//當建立優惠券送出時，會把這串數字傳給後台存起來。
+
 const toTimeStamp = (dateString) => {
   return Math.floor(new Date(dateString).getTime() / 1000);
 };
-//定義coupon初始資料結構
+
 const InitialCoupon = {
   title: '',
   is_enabled: 0,
   percent: 100,
-  due_date: Math.floor(Date.now() / 1000), //預設是當天
+  due_date: Math.floor(Date.now() / 1000),
   code: '',
 };
+
 export default function AdminCoupon() {
   const [coupons, setCoupons] = useState([]);
   const [tempCoupon, setTempCoupon] = useState(InitialCoupon);
-  const [isNewCoupon, setIsNewCoupon] = useState(false); //判斷新增還是編輯
+  const [isNewCoupon, setIsNewCoupon] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { showSuccess, showError } = useMessage();
 
-  //彈出視窗
-  const modalRef = useRef(null);
-  const couponModal = useRef(null);
-  //初始化modal
   useEffect(() => {
-    couponModal.current = new bootstrap.Modal(modalRef.current);
     fetchCoupons();
-    //當這個組件『消失』(卸載 Unmount) 在畫面上時，執行這段內容。
-    return () => {
-      if (couponModal.current) {
-        couponModal.current?.dispose();
-        // 釋放記憶體
-      }
-    };
   }, []);
+
   const fetchCoupons = async () => {
     setIsLoading(true);
     try {
@@ -60,7 +50,7 @@ export default function AdminCoupon() {
       setIsLoading(false);
     }
   };
-  //打開moal的邏輯
+
   const openModal = (status, coupon) => {
     if (status === 'new') {
       setTempCoupon(InitialCoupon);
@@ -69,7 +59,11 @@ export default function AdminCoupon() {
       setTempCoupon(coupon);
       setIsNewCoupon(false);
     }
-    couponModal.current.show();
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   const handleUpdateCoupon = async () => {
@@ -77,30 +71,32 @@ export default function AdminCoupon() {
     try {
       if (isNewCoupon) {
         await createCoupon({ data: tempCoupon });
-        showSuccess('新增成功');
+        showSuccess('已建立優惠券');
       } else {
         await updateCoupon(tempCoupon.id, { data: tempCoupon });
-        showSuccess('更新成功');
+        showSuccess('資料已更新');
       }
+      setIsModalOpen(false);
+      fetchCoupons();
     } catch (error) {
-      showError(error.response.data.message || error.message);
+      showError(error.response?.data?.message || error.message);
     } finally {
       setIsLoading(false);
-      fetchCoupons();
-      couponModal.current.hide();
     }
   };
 
   const handleDeleteCoupon = async (id) => {
     const result = await Swal.fire({
       title: '確定要刪除這張優惠券嗎？',
-      text: '刪除後將無法還原！',
+      text: '此操作將使相關促銷活動失效。',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: '是的，刪除它！',
+      confirmButtonColor: '#984443',
+      cancelButtonColor: '#111111',
+      confirmButtonText: '確定刪除',
       cancelButtonText: '取消',
+      background: '#FAF9F6',
+      color: '#111111'
     });
 
     if (!result.isConfirmed) return;
@@ -108,7 +104,7 @@ export default function AdminCoupon() {
     setIsLoading(true);
     try {
       await deleteCoupon(id);
-      showSuccess('已刪除優惠券');
+      showSuccess('優惠券已移除');
       fetchCoupons();
     } catch (error) {
       showError(error.response?.data?.message || '刪除失敗');
@@ -118,88 +114,117 @@ export default function AdminCoupon() {
   };
 
   return (
-    <div className="container py-4">
-      {/* 頂部標題列 */}
-      <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 px-3 gap-2">
-        <h2 className="fw-bolder text-dark my-3">🏷️ 優惠券管理</h2>
-        <button
-          type="button"
-          className="btn btn-primary rounded-pill px-4"
-          onClick={() => openModal('new')}
-        >
-          <i className="bi bi-plus-lg"></i>建立新優惠券
-        </button>
+    <div className="min-h-screen bg-[#FAF9F6] px-6 py-12 font-sans text-[#111111]">
+      <FullPageLoading isLoading={isLoading} />
+
+      {/* Header Section */}
+      <div className="max-w-7xl mx-auto mb-20">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[#D1C7B7] pb-10 relative">
+          <div className="absolute -bottom-[1px] left-0 w-24 h-[1px] bg-[#984443]"></div>
+          <div>
+            <div className="text-[0.65rem] uppercase tracking-[0.6em] text-[#984443] font-bold mb-4 opacity-80">
+              Administrative / Promotions
+            </div>
+            <h2 className="font-serif text-5xl font-medium tracking-tight text-[#111111]">
+              酬賓優惠<span className="text-[0.5em] ml-4 opacity-20 font-sans tracking-widest uppercase">COUPON MANAGEMENT</span>
+            </h2>
+          </div>
+          <button
+            className="group relative px-10 py-4 overflow-hidden transition-all duration-700 hover:shadow-2xl"
+            onClick={() => openModal('new')}
+          >
+            <div className="absolute inset-0 bg-[#111111] translate-y-full group-hover:translate-y-0 transition-transform duration-700"></div>
+            <div className="absolute inset-0 border border-[#111111]"></div>
+            <span className="relative text-[0.7rem] uppercase tracking-[0.4em] font-bold text-[#111111] group-hover:text-[#FAF9F6] transition-colors duration-700">
+              簽署新優惠 · ISSUE
+            </span>
+          </button>
+        </div>
       </div>
 
-      {/* 優惠券列表卡片 */}
-      <div className="card border-0 shadow-sm rounded-4 overflow-hidden mx-3">
-        <div className="table-responsive">
-          <table className="table table-sm table-hover align-middle mb-0">
-            <thead style={{ backgroundColor: '#fcfcfd' }}>
-              <tr className="text-secondary small fw-bold text-uppercase">
-                <th className="px-2 px-md-4 py-3 border-0">名稱</th>
-                <th className="border-0 d-none d-md-table-cell">優惠碼</th>
-                <th className="border-0" style={{ whiteSpace: 'nowrap' }}>折扣 (%)</th>
-                <th className="border-0 d-none d-md-table-cell">到期日</th>
-                <th className="border-0 text-center">狀態</th>
-                <th className="border-0 text-center px-1 px-md-4">操作</th>
+      {/* Summary Stats */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-24">
+        <div className="p-8 border-l border-[#D1C7B7]/30 hover:border-[#111111] transition-colors duration-500">
+           <span className="text-[0.6rem] uppercase tracking-widest font-bold opacity-30 block mb-2">現行優惠總數</span>
+           <span className="text-4xl font-serif text-[#111111]">{coupons.length} <small className="text-xs font-sans opacity-20 font-normal">Active</small></span>
+        </div>
+        <div className="p-8 border-l border-[#D1C7B7]/30 hover:border-[#3A4D39] transition-colors duration-500">
+           <span className="text-[0.6rem] uppercase tracking-widest font-bold opacity-30 block mb-2">折扣效應評核</span>
+           <span className="text-4xl font-serif text-[#3A4D39]">85% <small className="text-xs font-sans opacity-20 font-normal">Average</small></span>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto">
+        {/* Table Area */}
+        <div className="overflow-x-auto mb-20 px-1">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-[#D1C7B7]/30 text-[0.6rem] uppercase tracking-[0.3em] font-bold text-[#111111]/40">
+                <th className="px-4 py-8">活動標題 / DESC</th>
+                <th className="px-4 py-8 hidden md:table-cell">優惠代碼 / CODE</th>
+                <th className="px-4 py-8">折扣權重 / VALUE</th>
+                <th className="px-4 py-8 hidden md:table-cell">有效期限 / EXPIRY</th>
+                <th className="px-4 py-8 text-center">狀態 / STATUS</th>
+                <th className="px-4 py-8 text-right">核定操作 / ACTION</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-[#D1C7B7]/10">
               {coupons.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="text-center text-muted py-5">
-                    <div className="py-4">
-                      <i className="bi bi-ticket-perforated fs-1 d-block mb-2 opacity-50"></i>
-                      目前沒有優惠券
+                  <td colSpan="6" className="px-4 py-32 text-center text-[#111111]/20 italic font-serif text-lg">
+                    <div className="flex flex-col items-center gap-6">
+                      <div className="w-12 h-[1px] bg-[#984443]/30"></div>
+                      目前尚無營運中之優惠文卷存檔
+                      <div className="w-12 h-[1px] bg-[#984443]/30"></div>
                     </div>
                   </td>
                 </tr>
               ) : (
                 coupons.map((coupon) => (
-                  <tr key={coupon.id} className="border-bottom border-light">
-                    <td className="px-2 px-md-4" style={{ maxWidth: '100px' }}>
-                      <span className="fw-bold text-dark d-block text-truncate" style={{ fontSize: '0.85rem' }}>
+                  <tr key={coupon.id} className="hover:bg-[#111111]/[0.02] transition-colors duration-500 group">
+                    <td className="px-4 py-10">
+                      <div className="font-serif text-lg text-[#111111] group-hover:text-[#984443] transition-colors duration-500">
                         {coupon.title}
-                      </span>
+                      </div>
+                      <div className="text-[0.65rem] opacity-20 font-mono tracking-tighter mt-1">REF: {coupon.id.slice(-10)}</div>
                     </td>
-                    <td className="d-none d-md-table-cell">
-                      <code className="bg-light px-2 py-1 rounded text-primary fw-bold">
+                    <td className="px-4 py-10 hidden md:table-cell">
+                      <code className="text-[0.85rem] font-mono font-bold text-[#111111] tracking-widest bg-[#FAF9F6] border border-[#D1C7B7]/40 px-3 py-1 group-hover:border-[#111111] transition-colors">
                         {coupon.code}
                       </code>
                     </td>
-                    <td style={{ whiteSpace: 'nowrap', fontSize: '0.85rem' }}>{coupon.percent}%</td>
-                    <td className="text-muted d-none d-md-table-cell">
-                      {formatDate(coupon.due_date)}
+                    <td className="px-4 py-10">
+                       <span className="text-2xl font-serif text-[#111111]">
+                         {coupon.percent}
+                       </span>
+                       <span className="text-[0.6rem] uppercase tracking-widest font-black ml-2 opacity-20">Percent Off</span>
                     </td>
-                    <td className="text-center">
-                      {coupon.is_enabled ? (
-                        <span className="badge bg-success-subtle text-success border border-success rounded-pill px-2" style={{ fontSize: '0.7rem' }}>
-                          已啟用
-                        </span>
-                      ) : (
-                        <span className="badge bg-secondary-subtle text-secondary border border-secondary rounded-pill px-2" style={{ fontSize: '0.7rem' }}>
-                          未啟用
-                        </span>
-                      )}
+                    <td className="px-4 py-10 hidden md:table-cell">
+                      <span className="text-sm font-serif italic text-[#111111]/60">
+                        {formatDate(coupon.due_date)}
+                      </span>
                     </td>
-                    <td className="text-center px-1 px-md-4">
-                      <div className="btn-group shadow-sm rounded-pill overflow-hidden">
+                    <td className="px-4 py-10 text-center">
+                       <div className="flex flex-col items-center gap-1">
+                          <span className={`w-1.5 h-1.5 rounded-full ${coupon.is_enabled ? 'bg-[#3A4D39]' : 'bg-[#111111]/10'}`}></span>
+                          <span className={`text-[0.55rem] uppercase tracking-[0.2em] font-bold ${coupon.is_enabled ? 'text-[#3A4D39]' : 'opacity-10'}`}>
+                            {coupon.is_enabled ? 'Active' : 'Suspended'}
+                          </span>
+                       </div>
+                    </td>
+                    <td className="px-4 py-10 text-right">
+                      <div className="inline-flex gap-8">
                         <button
-                          type="button"
-                          className="btn btn-primary btn-sm px-2"
-                          style={{ fontSize: '0.75rem' }}
+                          className="text-[0.65rem] uppercase tracking-[0.3em] font-bold text-[#111111]/40 hover:text-[#111111] transition-colors"
                           onClick={() => openModal('edit', coupon)}
                         >
-                          編輯
+                          修訂
                         </button>
                         <button
-                          type="button"
-                          className="btn btn-outline-danger btn-sm px-2 border-0 border-start"
-                          style={{ fontSize: '0.75rem' }}
+                          className="text-[0.65rem] uppercase tracking-[0.3em] font-bold text-[#984443]/40 hover:text-[#984443] transition-colors"
                           onClick={() => handleDeleteCoupon(coupon.id)}
                         >
-                          刪除
+                          撤除
                         </button>
                       </div>
                     </td>
@@ -211,128 +236,135 @@ export default function AdminCoupon() {
         </div>
       </div>
 
-      {/* 優惠券 Modal */}
-      <div
-        className="modal fade"
-        id="couponModal"
-        tabIndex="-1"
-        ref={modalRef}
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content border-0 shadow-lg">
-            <div className="modal-header bg-dark text-white border-bottom-0 py-3">
-              <h5 className="modal-title fw-bold">
-                {isNewCoupon ? '✨ 建立新優惠券' : '📝 編輯優惠券'}
-              </h5>
-              <button
-                type="button"
-                className="btn-close btn-close-white"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body p-4">
-              <div className="row g-3">
-                <div className="col-12">
-                  <label className="form-label small fw-bold text-secondary">
-                    標題
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="請輸入標題"
-                    value={tempCoupon.title}
-                    onChange={(e) =>
-                      setTempCoupon({ ...tempCoupon, title: e.target.value })
-                    }
-                  />
+      {/* State-Driven Modal - Custom Implementation */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12">
+           <div className="absolute inset-0 bg-[#111111]/90 backdrop-blur-md animate-in fade-in duration-500" onClick={closeModal}></div>
+           
+           <div className="relative w-full max-w-4xl bg-[#FAF9F6] shadow-2xl overflow-hidden flex flex-col md:flex-row h-full max-h-[85vh] animate-in fade-in zoom-in duration-700">
+              {/* Sidebar Info */}
+              <div className="md:w-2/5 bg-[#111111] p-12 flex flex-col justify-between text-white border-r border-[#984443]/20">
+                <div>
+                   <div className="text-[0.65rem] uppercase tracking-[0.6em] text-[#984443] font-black mb-8">Accession Record</div>
+                   <h4 className="font-serif text-4xl font-medium leading-[1.1] mb-12">
+                     {isNewCoupon ? '建立新優惠活動' : '修訂優惠條款'}
+                     <span className="block text-xs mt-4 opacity-30 font-sans tracking-[0.2em] uppercase font-bold">Policy Alignment</span>
+                   </h4>
+                   <p className="text-sm italic font-serif leading-relaxed opacity-40">
+                      所有對外宣告之特權、優惠與代碼折抵，均需經過嚴格之文卷編印與簽核，方可生效於品牌範疇內。
+                   </p>
                 </div>
-                <div className="col-12">
-                  <label className="form-label small fw-bold text-secondary">
-                    優惠碼
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="請輸入優惠碼"
-                    value={tempCoupon.code}
-                    onChange={(e) =>
-                      setTempCoupon({ ...tempCoupon, code: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label small fw-bold text-secondary">
-                    到期日
-                  </label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    value={formatDate(tempCoupon.due_date)}
-                    onChange={(e) =>
-                      setTempCoupon({
-                        ...tempCoupon,
-                        due_date: toTimeStamp(e.target.value),
-                      })
-                    }
-                  />
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label small fw-bold text-secondary">
-                    折扣百分比 (%)
-                  </label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    placeholder="例如 80 代表 8 折"
-                    value={tempCoupon.percent}
-                    onChange={(e) =>
-                      setTempCoupon({
-                        ...tempCoupon,
-                        percent: Number(e.target.value),
-                      })
-                    }
-                  />
-                </div>
-                <div className="col-12 mt-3">
-                  <div className="form-check form-switch border rounded-3 p-3">
-                    <input
-                      className="form-check-input ms-0 me-2"
-                      type="checkbox"
-                      id="is_enabled"
-                      checked={!!tempCoupon.is_enabled}
-                      onChange={(e) =>
-                        setTempCoupon({
-                          ...tempCoupon,
-                          is_enabled: e.target.checked ? 1 : 0,
-                        })
-                      }
-                    />
-                    <label
-                      className="form-check-label fw-bold"
-                      htmlFor="is_enabled"
-                    >
-                      是否啟用優惠券
-                    </label>
-                  </div>
+
+                <div className="pt-12 border-t border-white/5">
+                   <button 
+                     className="text-[0.65rem] uppercase tracking-[0.4em] font-bold text-white/20 hover:text-white transition-all duration-300 flex items-center gap-4 group"
+                     onClick={closeModal}
+                   >
+                     <span className="w-8 h-[1px] bg-white/10 group-hover:w-12 group-hover:bg-[#984443] transition-all"></span>
+                     放棄修訂 / ABANDON
+                   </button>
                 </div>
               </div>
-            </div>
-            <div className="modal-footer border-top-0 p-3">
-              <button
-                type="button"
-                className="btn btn-outline-secondary px-4 me-2"
-                data-bs-dismiss="modal"
-              >
-                取消
-              </button>
-              <button
-                type="button"
-                className="btn btn-dark px-4"
+
+              {/* Form Content */}
+              <div className="flex-grow p-12 overflow-y-auto custom-scrollbar bg-white">
+                <div className="max-w-md mx-auto space-y-12">
+                   {/* Title Input */}
+                   <section className="space-y-4">
+                      <label className="text-[0.65rem] uppercase tracking-[0.4em] font-black text-[#111111]/30 block px-1">活動名錄 / NOMENCLATURE</label>
+                      <input
+                        type="text"
+                        className="w-full bg-transparent border-b border-[#D1C7B7] py-4 text-2xl font-serif text-[#111111] focus:outline-none focus:border-[#111111] transition-all placeholder:opacity-10"
+                        placeholder="請輸入活動標題..."
+                        value={tempCoupon.title}
+                        onChange={(e) => setTempCoupon({ ...tempCoupon, title: e.target.value })}
+                      />
+                   </section>
+
+                   {/* Code Input */}
+                   <section className="space-y-4">
+                      <label className="text-[0.65rem] uppercase tracking-[0.4em] font-black text-[#111111]/30 block px-1">優惠代碼 / UNIQUE CIPHER</label>
+                      <input
+                        type="text"
+                        className="w-full bg-transparent border-b border-[#D1C7B7] py-4 text-lg font-mono font-bold text-[#984443] focus:outline-none focus:border-[#984443] transition-all uppercase placeholder:opacity-5"
+                        placeholder="SUMMER2024"
+                        value={tempCoupon.code}
+                        onChange={(e) => setTempCoupon({ ...tempCoupon, code: e.target.value })}
+                      />
+                   </section>
+
+                   <div className="grid grid-cols-2 gap-12">
+                      {/* Date Input */}
+                      <section className="space-y-4">
+                         <label className="text-[0.65rem] uppercase tracking-[0.4em] font-black text-[#111111]/30 block px-1">有效截期 / EXPIRY</label>
+                         <input
+                           type="date"
+                           className="w-full bg-transparent border-b border-[#D1C7B7]/40 py-2 text-sm font-serif focus:outline-none focus:border-[#111111] transition-all"
+                           value={formatDate(tempCoupon.due_date)}
+                           onChange={(e) => setTempCoupon({ ...tempCoupon, due_date: toTimeStamp(e.target.value) })}
+                         />
+                      </section>
+                      {/* Percent Input */}
+                      <section className="space-y-4">
+                         <label className="text-[0.65rem] uppercase tracking-[0.4em] font-black text-[#111111]/30 block px-1">折扣權重 / VALUE</label>
+                         <div className="relative group">
+                            <input
+                              type="number"
+                              className="w-full bg-transparent border-b border-[#D1C7B7]/40 py-2 text-sm font-mono text-[#111111] focus:outline-none focus:border-[#111111] transition-all"
+                              placeholder="80"
+                              value={tempCoupon.percent}
+                              onChange={(e) => setTempCoupon({ ...tempCoupon, percent: Number(e.target.value) })}
+                            />
+                            <span className="absolute right-0 bottom-2 text-xs opacity-20">% OFF</span>
+                         </div>
+                      </section>
+                   </div>
+
+                   {/* Toggle Status */}
+                   <section className="pt-8 border-t border-[#D1C7B7]/10">
+                      <label className="flex items-center gap-6 cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={!!tempCoupon.is_enabled}
+                            onChange={(e) => setTempCoupon({ ...tempCoupon, is_enabled: e.target.checked ? 1 : 0 })}
+                          />
+                          <div className="w-14 h-7 bg-[#FAF9F6] border border-[#D1C7B7] group-hover:border-[#111111] peer-checked:bg-[#111111] peer-checked:border-[#111111] transition-all duration-700"></div>
+                          <div className="absolute left-1.5 top-1.5 w-4 h-4 bg-[#D1C7B7] peer-checked:bg-white peer-checked:translate-x-7 transition-all duration-700"></div>
+                        </div>
+                        <div className="flex flex-col">
+                           <span className="text-[0.65rem] uppercase tracking-[0.2em] font-black text-[#111111] opacity-40 group-hover:opacity-100 transition-opacity">
+                             生效宣告 · PUBLISH
+                           </span>
+                           <span className="text-[0.55rem] opacity-20 italic">將此優惠文草正式發佈於大眾檢閱與使用</span>
+                        </div>
+                      </label>
+                   </section>
+
+                   <div className="pt-16">
+                      <button 
+                         className="w-full group relative py-6 bg-[#111111] overflow-hidden transition-all duration-700 shadow-2xl"
+                         onClick={handleUpdateCoupon}
+                      >
+                         <div className="absolute inset-0 bg-[#984443] translate-y-full group-hover:translate-y-0 transition-transform duration-700"></div>
+                         <span className="relative text-[0.7rem] uppercase tracking-[0.6em] font-black text-white">
+                           {isNewCoupon ? '正式發佈 · ENACT' : '儲存變更 · ARCHIVE'}
+                         </span>
+                      </button>
+                   </div>
+                </div>
+              </div>
+           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+ercase tracking-[0.2em] font-bold hover:bg-[#984443] transition-all duration-300"
                 onClick={handleUpdateCoupon}
               >
-                🚀 確認{isNewCoupon ? '建立' : '更新'}
+                {isNewCoupon ? '正式發佈' : '儲存變更'}
               </button>
             </div>
           </div>

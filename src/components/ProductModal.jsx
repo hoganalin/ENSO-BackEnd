@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react';
-
 import useMessage from '../hooks/useMessage';
 import {
   createAdminProduct,
@@ -12,20 +11,16 @@ export default function ProductModal({
   modalType,
   templateProduct,
   closeModal,
-  productModalRef,
-
   getData,
 }) {
   const { showSuccess, showError } = useMessage();
   const fileInputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  //tempData.scenes「整理成固定長度 3 的字串陣列」
+  // Normalizer to ensure scenes array etc.
   const normalizer = (value) => {
     if (Array.isArray(value)) {
-      return value
-        .slice(0, 3)
-        .map((scene) => (scene == null ? '' : String(scene)));
+      return value.slice(0, 3).map((scene) => (scene == null ? '' : String(scene)));
     }
     return ['', '', ''];
   };
@@ -34,7 +29,7 @@ export default function ProductModal({
     ...templateProduct,
     scenes: normalizer(templateProduct?.scenes),
   }));
-  //新增useEffect
+
   useEffect(() => {
     setTempData({
       ...templateProduct,
@@ -42,116 +37,31 @@ export default function ProductModal({
     });
   }, [templateProduct]);
 
-  const resetTempData = () => {
-    setTempData({
-      ...templateProduct,
-      scenes: normalizer(templateProduct?.scenes),
-    });
+  if (!modalType) return null;
+
+  const handleInputChange = (e) => {
+    const { name, value, checked, type } = e.target;
+    setTempData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
   };
-  //處理副圖的url
+
   const handleImageChange = (index, value) => {
-    setTempData((prevData) => {
-      const newImages = [...prevData.imagesUrl];
-      newImages[index] = value;
-
-      // 填寫最後一個空輸入框時，自動新增空白輸入框
-      if (
-        value !== '' &&
-        index === newImages.length - 1 &&
-        newImages.length < 5
-      ) {
-        newImages.push('');
-      }
-
-      // 清空輸入框時，移除最後的空白輸入框
-      if (
-        value === '' &&
-        newImages.length > 1 &&
-        newImages[newImages.length - 1] === ''
-      ) {
-        newImages.pop();
-      }
-
-      return { ...prevData, imagesUrl: newImages };
-    });
-  };
-
-  //新增附圖
-  const handleAddImage = () => {
-    setTempData((prevData) => {
-      const newImages = [...prevData.imagesUrl]; //複製圖片陣列
+    const newImages = [...(tempData.imagesUrl || [])];
+    newImages[index] = value;
+    if (value !== '' && index === newImages.length - 1 && newImages.length < 5) {
       newImages.push('');
-      //處理特定索引值的圖片網址
-      return { ...prevData, imagesUrl: newImages }; //回傳陣列, 把imagesUrl更新
-    });
-  };
-  //刪除附圖
-  const handleRemoveImage = () => {
-    setTempData((prevData) => {
-      const newImages = [...prevData.imagesUrl]; //複製圖片陣列
-      newImages.pop();
-      return { ...prevData, imagesUrl: newImages }; //回傳陣列, 把imagesUrl更新
-    });
-  };
-  // 建立一個清空檔案欄位的 function
-  const resetFileInput = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''; // 將 value 設為空字串即可清空顯示的檔名
     }
+    setTempData({ ...tempData, imagesUrl: newImages });
   };
 
   const handleSceneChange = (index, value) => {
-    setTempData((prevData) => {
-      const nextScenes = normalizer(prevData.scenes); //preData指的是上一個state值, 是物件,格式為templateProduct
-      nextScenes[index] = value; //把第 index 格改成使用者剛輸入的 value。
-      return { ...prevData, scenes: nextScenes }; //回傳新的 state 物件,其他欄位不變，只更新 scenes。
-    });
+    const nextScenes = [...tempData.scenes];
+    nextScenes[index] = value;
+    setTempData({ ...tempData, scenes: nextScenes });
   };
 
-  //更新產品資料 (新增或者編輯)
-  const updateProductData = async (id) => {
-    const payload = {
-      ...tempData,
-      origin_price: Number(tempData.origin_price),
-      price: Number(tempData.price),
-      is_enabled: tempData.is_enabled ? 1 : 0,
-      scenes: normalizer(tempData.scenes),
-      imagesUrl: tempData.imagesUrl.filter((url) => url !== ''),
-    };
-    setIsLoading(true);
-    try {
-      const response =
-        modalType === 'edit'
-          ? await updateAdminProduct(id, payload)
-          : await createAdminProduct(payload);
-      getData();
-      showSuccess(response.data.message || '操作成功');
-      resetTempData();
-      closeModal();
-    } catch (error) {
-      showError(error.response?.data?.message || '操作失敗');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  //刪除產品資料
-  const deleteProduct = async (id) => {
-    setIsLoading(true);
-    try {
-      await deleteAdminProduct(id);
-      getData();
-      resetTempData();
-      closeModal();
-      showSuccess('產品已刪除');
-    } catch (error) {
-      showError(error.response?.data?.message || '刪除失敗');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  //上傳圖片檔案
   const uploadImage = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -161,396 +71,282 @@ export default function ProductModal({
     try {
       const response = await uploadAdminImage(formData);
       setTempData((pre) => ({ ...pre, imageUrl: response.data.imageUrl }));
-      resetFileInput();
     } catch (error) {
-      showError(error.response?.data?.message || '圖片上傳失敗');
+      showError('圖片上傳失敗');
     } finally {
       setIsLoading(false);
     }
   };
-  //宣告modal 的欄位綁定值
-  const modalHandleInputChange = (e) => {
-    const { name, value, checked, type } = e.target;
-    setTempData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+
+  const handleSubmit = async () => {
+    const payload = {
+      ...tempData,
+      origin_price: Number(tempData.origin_price),
+      price: Number(tempData.price),
+      is_enabled: tempData.is_enabled ? 1 : 0,
+      scenes: normalizer(tempData.scenes),
+    };
+    setIsLoading(true);
+    try {
+      if (modalType === 'edit') await updateAdminProduct(tempData.id, payload);
+      else await createAdminProduct(payload);
+      getData();
+      showSuccess('操作成功');
+      closeModal();
+    } catch (error) {
+      showError('操作失敗');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsLoading(true);
+    try {
+      await deleteAdminProduct(tempData.id);
+      getData();
+      showSuccess('產品已刪除');
+      closeModal();
+    } catch (error) {
+      showError('刪除失敗');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div
-      className="modal fade"
-      id="productModal"
-      tabIndex="-1"
-      aria-labelledby="productModalLabel"
-      aria-hidden="true"
-      ref={productModalRef}
-    >
-      <div className="modal-dialog modal-xl">
-        <div className="modal-content">
-          <div
-            className={`modal-header bg-${modalType === 'delete' ? 'danger' : 'dark'} text-white`}
-          >
-            <h1
-              className="modal-title fs-5 text-white fw-bold"
-              id="productModalLabel"
-            >
-              {modalType === 'delete'
-                ? '刪除'
-                : modalType === 'edit'
-                  ? '編輯'
-                  : '新增'}
-              產品
-            </h1>
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              onClick={() => {
-                resetTempData();
-                closeModal();
-              }}
-            ></button>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 transition-kyoto">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-[#111111]/40 backdrop-blur-sm"
+        onClick={closeModal}
+      />
+      
+      {/* Modal Container */}
+      <div className="relative bg-[#FAF9F6] w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl rounded-sm border border-[#D1C7B7] flex flex-col">
+        {/* Header */}
+        <div className={`sticky top-0 z-10 px-8 py-6 flex items-center justify-between border-b border-[#D1C7B7] bg-[#FAF9F6]`}>
+          <div>
+            <h2 className="font-serif text-2xl font-medium text-[#111111] tracking-tight">
+              {modalType === 'delete' ? '確認刪除' : modalType === 'edit' ? '編錄商物' : '新闢商物'}
+            </h2>
+            <p className="text-[0.6rem] uppercase tracking-[0.3em] opacity-40 mt-1">
+              {modalType === 'delete' ? 'Removal Confirmation' : 'Product Registry Update'}
+            </p>
           </div>
-          <div className="modal-body">
-            {modalType === 'delete' ? (
-              <p className="text-danger">是否真的要刪除{tempData.title}</p>
-            ) : (
-              <div className="row">
-                <div className="col-sm-4">
-                  <div className="mb-2">
-                    <div className="mb-3">
-                      <label htmlFor="fileUpload" className="form-label">
-                        上傳圖片
-                      </label>
-                      <input
-                        className="form-control"
-                        type="file"
-                        name="file-to-upload"
-                        id="fileUpload"
-                        accept=".jpg,.jpeg,.png"
-                        onChange={(e) => uploadImage(e)}
-                        ref={fileInputRef} //綁定ref
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label htmlFor="imageUrl" className="form-label">
-                        輸入圖片網址
-                      </label>
-                      <input
-                        type="text"
-                        id="imageUrl"
-                        name="imageUrl"
-                        className="form-control"
-                        placeholder="請輸入圖片連結"
-                        value={tempData.imageUrl || ''}
-                        onChange={(e) => modalHandleInputChange(e)}
-                      />
-                    </div>
-                    {tempData.imageUrl && (
-                      <img
-                        src={tempData.imageUrl}
-                        className="img-fluid"
-                        alt="主圖"
-                      />
-                    )}
-                  </div>
-                  {tempData.imagesUrl &&
-                    tempData.imagesUrl.map((url, index) => (
-                      <div key={index}>
-                        <label
-                          htmlFor={`imgUrl_${index}`}
-                          className="form-label"
-                        >
-                          輸入圖片網址
-                        </label>
-                        <input
-                          id={`imgUrl_${index}`}
-                          type="text"
-                          className="form-control"
-                          onChange={(e) =>
-                            handleImageChange(index, e.target.value)
-                          }
-                          placeholder={`圖片網址${index + 1}`}
-                          value={url}
-                        />
-                        {url && (
-                          <img src={url} className="img-fluid" alt="副圖" />
-                        )}
-                      </div>
-                    ))}
-                  {tempData.imagesUrl &&
-                    tempData.imagesUrl.length < 5 &&
-                    tempData.imagesUrl[tempData.imagesUrl.length - 1] !==
-                      '' && (
-                      <button
-                        className="btn btn-outline-primary btn-sm d-block w-100"
-                        onClick={handleAddImage}
-                      >
-                        新增圖片
-                      </button>
-                    )}
-                  {tempData.imagesUrl && tempData.imagesUrl.length > 1 && (
-                    <button
-                      className="btn btn-outline-danger btn-sm d-block w-100"
-                      onClick={handleRemoveImage}
-                    >
-                      刪除圖片
-                    </button>
-                  )}
-                </div>
-                <div className="col-sm-8">
-                  <div className="row">
-                    <div className="mb-3">
-                      <label htmlFor="title" className="form-label">
-                        標題
-                      </label>
-                      <input
-                        type="text"
-                        id="title"
-                        name="title"
-                        className="form-control"
-                        placeholder="請輸入標題"
-                        value={tempData.title || ''}
-                        onChange={(e) => modalHandleInputChange(e)}
-                      />
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="mb-3 col-md-6">
-                      <label htmlFor="category" className="form-label">
-                        分類
-                      </label>
-                      <input
-                        type="text"
-                        id="category"
-                        name="category"
-                        className="form-control"
-                        placeholder="分類"
-                        value={tempData.category || ''}
-                        onChange={(e) => modalHandleInputChange(e)}
-                      />
-                    </div>
-                    <div className="mb-3 col-md-6">
-                      <label htmlFor="unit" className="form-label">
-                        單位
-                      </label>
-                      <input
-                        type="text"
-                        id="unit"
-                        name="unit"
-                        className="form-control"
-                        placeholder="單位"
-                        value={tempData.unit || ''}
-                        onChange={(e) => modalHandleInputChange(e)}
-                      />
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="mb-3 col-md-6">
-                      <label htmlFor="origin_price" className="form-label">
-                        原價
-                      </label>
-                      <input
-                        min="0"
-                        type="number"
-                        id="origin_price"
-                        name="origin_price"
-                        className="form-control"
-                        placeholder="原價"
-                        value={tempData.origin_price}
-                        onChange={(e) => modalHandleInputChange(e)}
-                      />
-                    </div>
-                    <div className="mb-3 col-md-6">
-                      <label htmlFor="price" className="form-label">
-                        售價
-                      </label>
-                      <input
-                        type="number"
-                        id="price"
-                        name="price"
-                        className="form-control"
-                        placeholder="售價"
-                        min="0"
-                        value={tempData.price || ''}
-                        onChange={(e) => modalHandleInputChange(e)}
-                      />
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="mb-3 col-md-6">
-                      <label htmlFor="inventory" className="form-label">
-                        庫存數量
-                      </label>
-                      <input
-                        type="number"
-                        id="inventory"
-                        name="inventory"
-                        className="form-control"
-                        placeholder="庫存數量"
-                        min="0"
-                        value={tempData.inventory ?? ''}
-                        onChange={(e) => modalHandleInputChange(e)}
-                      />
-                    </div>
-                  </div>
-                  <hr />
+          <button onClick={closeModal} className="text-[#111111] opacity-30 hover:opacity-100 transition-kyoto">
+            <span className="text-2xl font-light">✕</span>
+          </button>
+        </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="description" className="form-label">
-                      產品描述
-                    </label>
-                    <textarea
-                      name="description"
-                      id="description"
-                      className="form-control"
-                      placeholder="請輸入產品描述"
-                      value={tempData.description || ''}
-                      onChange={(e) => modalHandleInputChange(e)}
-                    ></textarea>
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="content" className="form-label">
-                      說明內容
-                    </label>
-                    <textarea
-                      name="content"
-                      id="content"
-                      className="form-control"
-                      placeholder="請輸入說明內容"
-                      value={tempData.content || ''}
-                      onChange={(e) => modalHandleInputChange(e)}
-                    ></textarea>
-                  </div>
-                  {/* 客製化, 新增香煙特性 */}
-                  <div className="mb-3">
-                    <label htmlFor="feature" className="form-label">
-                      香煙特性
-                    </label>
-                    <textarea
-                      name="feature"
-                      id="feature"
-                      className="form-control"
-                      placeholder="請輸入香煙特性"
-                      value={tempData.feature || ''}
-                      onChange={(e) => modalHandleInputChange(e)}
-                    ></textarea>
-                  </div>
-                  {/* 客製化,新增適合場景 */}
-                  <div className="mb-3">
-                    <label className="form-label">適合場景</label>
-                    <div className="row g-2">
-                      {normalizer(tempData.scenes).map((scene, index) => (
-                        <div className="col-md-4" key={index}>
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder={`適合場景 ${index + 1}`}
-                            value={scene}
-                            onChange={(e) =>
-                              handleSceneChange(index, e.target.value)
-                            }
-                          />
-                        </div>
-                      ))}
+        {/* Body */}
+        <div className="p-8">
+          {modalType === 'delete' ? (
+            <div className="py-12 flex flex-col items-center text-center">
+              <span className="text-4xl text-[#984443] mb-6 animate-pulse">♢</span>
+              <p className="font-serif text-xl mb-2 text-[#111111]">確定要將此產品從目錄中移除嗎？</p>
+              <p className="text-sm opacity-50 italic">「{tempData.title}」</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+              {/* Image Column */}
+              <div className="lg:col-span-4 space-y-6">
+                <div>
+                  <label className="block text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40 mb-3">商品影像 (Primary)</label>
+                  <div className="group relative w-full aspect-square bg-white border border-[#D1C7B7] rounded-sm overflow-hidden flex items-center justify-center shadow-inner">
+                    {tempData.imageUrl ? (
+                      <img src={tempData.imageUrl} alt="Preview" className="w-full h-full object-cover p-2" />
+                    ) : (
+                      <span className="text-[0.6rem] opacity-20">NO IMAGE</span>
+                    )}
+                    <input 
+                      type="file" 
+                      className="absolute inset-0 opacity-0 cursor-pointer" 
+                      onChange={uploadImage}
+                      ref={fileInputRef}
+                    />
+                    <div className="absolute inset-0 bg-[#111111]/0 group-hover:bg-[#111111]/5 transition-kyoto flex items-center justify-center">
+                       <span className="opacity-0 group-hover:opacity-100 text-[0.6rem] uppercase tracking-widest text-[#111111] font-bold bg-[#FAF9F6] px-3 py-1.5 shadow-sm border border-[#D1C7B7]">更換影像</span>
                     </div>
                   </div>
-                  {/* 客製化,新增香味基調 */}
-                  <div className="mb-3">
-                    <label className="form-label">香味基調</label>
-                    <div className="row g-2">
-                      <div className="col-md-4">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="前調 Top"
-                          name="top_smell"
-                          id="top_smell"
-                          value={tempData.top_smell || ''}
-                          onChange={(e) => modalHandleInputChange(e)}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="中調 Heart"
-                          name="heart_smell"
-                          id="heart_smell"
-                          value={tempData.heart_smell || ''}
-                          onChange={(e) => modalHandleInputChange(e)}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="基調 Base"
-                          name="base_smell"
-                          id="base_smell"
-                          value={tempData.base_smell || ''}
-                          onChange={(e) => modalHandleInputChange(e)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mb-3">
-                    <div className="form-check">
-                      <input
-                        name="is_enabled"
-                        id="is_enabled"
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={tempData.is_enabled || false}
-                        onChange={(e) => modalHandleInputChange(e)}
-                      />
-                      <label className="form-check-label " htmlFor="is_enabled">
-                        是否啟用
-                      </label>
-                    </div>
-                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <label className="block text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">附加影像集 (Gallery)</label>
+                  {(tempData.imagesUrl || ['']).map((url, idx) => (
+                    <input
+                      key={idx}
+                      type="text"
+                      className="w-full bg-white border border-[#D1C7B7] rounded-sm py-2 px-3 text-xs focus:ring-1 focus:ring-[#111111] outline-none transition-kyoto placeholder:opacity-30 italic"
+                      placeholder={`影像網址 #${idx + 1}`}
+                      value={url}
+                      onChange={(e) => handleImageChange(idx, e.target.value)}
+                    />
+                  ))}
                 </div>
               </div>
-            )}
-          </div>
-          <div className="modal-footer">
-            {modalType === 'delete' ? (
-              <button
-                type="button"
-                className="btn btn-danger"
-                disabled={isLoading}
-                onClick={() => deleteProduct(tempData.id)}
-              >
-                {isLoading ? '刪除中...' : '刪除'}
-              </button>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary"
-                  data-bs-dismiss="modal"
-                  onClick={() => {
-                    resetTempData();
-                    closeModal();
-                  }}
-                >
-                  取消
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  disabled={isLoading}
-                  onClick={() => updateProductData(tempData.id)}
-                >
-                  {isLoading ? '儲存中...' : '確認'}
-                </button>
-              </>
-            )}
-          </div>
+
+              {/* Info Column */}
+              <div className="lg:col-span-8 space-y-8">
+                <div className="grid grid-cols-1 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">商物標題</label>
+                    <input
+                      type="text"
+                      name="title"
+                      className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-lg font-serif outline-none focus:border-[#111111] transition-kyoto placeholder:opacity-30"
+                      placeholder="請輸入商物名稱..."
+                      value={tempData.title || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">分類</label>
+                    <input
+                      type="text"
+                      name="category"
+                      className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-sm outline-none focus:border-[#111111] transition-kyoto"
+                      value={tempData.category || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">編制單位</label>
+                    <input
+                      type="text"
+                      name="unit"
+                      className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-sm outline-none focus:border-[#111111] transition-kyoto"
+                      value={tempData.unit || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-8">
+                  <div className="space-y-2">
+                    <label className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">原價</label>
+                    <input
+                      type="number"
+                      name="origin_price"
+                      className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-sm outline-none focus:border-[#111111] transition-kyoto"
+                      value={tempData.origin_price}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">售價</label>
+                    <input
+                      type="number"
+                      name="price"
+                      className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-sm outline-none focus:border-[#111111] transition-kyoto"
+                      value={tempData.price}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">當前庫存</label>
+                    <input
+                      type="number"
+                      name="inventory"
+                      className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-sm outline-none focus:border-[#111111] transition-kyoto"
+                      value={tempData.inventory ?? ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="text-[0.6rem] uppercase tracking-[0.4em] font-bold opacity-20 border-b border-[#D1C7B7]/30 pb-2">香道特性與場景</h4>
+                  
+                  <div className="space-y-2">
+                    <label className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">產品總覽 (Description)</label>
+                    <textarea
+                      name="description"
+                      rows="2"
+                      className="w-full bg-white border border-[#D1C7B7] rounded-sm p-4 text-xs outline-none focus:border-[#111111] transition-kyoto"
+                      value={tempData.description || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    {tempData.scenes.map((scene, idx) => (
+                      <div key={idx} className="space-y-1">
+                        <label className="text-[0.6rem] uppercase tracking-[0.2em] opacity-40">合宜場合 {idx + 1}</label>
+                        <input
+                          type="text"
+                          className="w-full bg-white border border-[#D1C7B7] rounded-sm p-2 text-[0.7rem] outline-none focus:border-[#111111]"
+                          value={scene}
+                          onChange={(e) => handleSceneChange(idx, e.target.value)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-1">
+                        <label className="text-[0.6rem] uppercase tracking-[0.2em] opacity-40 font-bold text-[#111111]">基調 Top</label>
+                        <input type="text" name="top_smell" className="w-full bg-[#111111]/5 border-none p-2 text-[0.7rem] outline-none" value={tempData.top_smell || ''} onChange={handleInputChange} />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[0.6rem] uppercase tracking-[0.2em] opacity-40 font-bold text-[#984443]">中調 Heart</label>
+                        <input type="text" name="heart_smell" className="w-full bg-[#111111]/5 border-none p-2 text-[0.7rem] outline-none" value={tempData.heart_smell || ''} onChange={handleInputChange} />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[0.6rem] uppercase tracking-[0.2em] opacity-40 font-bold text-[#735C00]">末調 Base</label>
+                        <input type="text" name="base_smell" className="w-full bg-[#111111]/5 border-none p-2 text-[0.7rem] outline-none" value={tempData.base_smell || ''} onChange={handleInputChange} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        name="is_enabled"
+                        className="sr-only"
+                        checked={tempData.is_enabled || false}
+                        onChange={handleInputChange}
+                      />
+                      <div className={`w-10 h-5 rounded-full transition-kyoto ${tempData.is_enabled ? 'bg-[#3A4D39]' : 'bg-[#D1C7B7]'}`}></div>
+                      <div className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-kyoto ${tempData.is_enabled ? 'translate-x-5' : 'translate-x-0'}`}></div>
+                    </div>
+                    <span className="text-[0.65rem] uppercase tracking-[0.3em] font-bold opacity-60 group-hover:opacity-100 transition-kyoto">
+                      {tempData.is_enabled ? '公開上架中' : '暫時封存'}
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="sticky bottom-0 z-10 p-8 border-t border-[#D1C7B7] bg-[#FAF9F6] flex justify-end gap-4">
+          <button
+            onClick={closeModal}
+            className="px-8 py-2 text-[0.7rem] uppercase tracking-[0.2em] border border-[#D1C7B7] hover:bg-[#111111] hover:text-[#FAF9F6] transition-kyoto rounded-sm"
+          >
+            取消
+          </button>
+          <button
+            onClick={modalType === 'delete' ? handleDelete : handleSubmit}
+            disabled={isLoading}
+            className={`px-10 py-2 text-[0.7rem] uppercase tracking-[0.2em] rounded-sm transition-kyoto shadow-sm ${
+              modalType === 'delete' 
+                ? 'bg-[#984443] text-white hover:bg-[#803332]' 
+                : 'bg-[#111111] text-white hover:bg-[#984443]'
+            } disabled:opacity-30`}
+          >
+            {isLoading ? '處理中...' : '確認執行'}
+          </button>
         </div>
       </div>
     </div>
   );
 }
+
