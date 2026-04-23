@@ -33,6 +33,11 @@ const getStockBadge = (inventory) => {
 const REASON_PRESETS = [
   '進貨入庫',
   '盤點調整',
+  '退貨回補',
+  '損壞報廢',
+  '出貨扣減',
+];
+
 function AdminInventory() {
   const { showSuccess, showError } = useMessage();
   const [products, setProducts] = useState([]);
@@ -526,27 +531,6 @@ function AdminInventory() {
         </div>
       )}
     </div>
-  );
-}
-
-export default AdminInventory;
-                className="px-12 py-3 bg-[#111111] text-[#FAF9F6] text-[0.7rem] uppercase tracking-[0.3em] font-bold hover:bg-[#984443] transition-all disabled:opacity-50 shadow-xl" 
-                    onClick={handleAdjust}
-                    disabled={adjustLoading || !adjustQty || parseInt(adjustQty) <= 0}
-                  >
-                    {adjustLoading ? '調律中...' : '奉納儲入'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default AdminInventory;
   );
 }
 

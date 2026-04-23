@@ -535,22 +535,3 @@ function AdminOrders() {
 }
 
 export default AdminOrders;
-2 text-[0.7rem] uppercase tracking-[0.2em] font-bold shadow-sm transition-all duration-300 ${
-                  tempOrder?.is_paid 
-                    ? 'border border-[#984443] text-[#984443] hover:bg-[#984443] hover:text-white' 
-                    : 'bg-[#3A4D39] text-white hover:bg-[#111111]'
-                }`}
-                onClick={() => updatePaymentStatus(tempOrder)}
-              >
-                {tempOrder?.is_paid ? '標記為未付款' : '確認已收款'}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <FullPageLoading isLoading={loading} />
-    </div>
-  );
-}
-
-export default AdminOrders;

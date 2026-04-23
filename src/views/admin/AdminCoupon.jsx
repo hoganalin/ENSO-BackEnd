@@ -361,17 +361,3 @@ export default function AdminCoupon() {
     </div>
   );
 }
-ercase tracking-[0.2em] font-bold hover:bg-[#984443] transition-all duration-300"
-                onClick={handleUpdateCoupon}
-              >
-                {isNewCoupon ? '正式發佈' : '儲存變更'}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <FullPageLoading isLoading={isLoading} />
-    </div>
-  );
-}
