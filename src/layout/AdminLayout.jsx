@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { to: '/admin/inventory', label: '庫存' },
   { to: '/admin/coupon', label: '札記' },
   { to: '/admin/devices', label: '監管' },
+  { to: '/admin/agent', label: '使者' },
 ];
 
 const AdminLayout = () => {
@@ -101,7 +102,9 @@ const AdminLayout = () => {
         </div>
 
         {/* 手機版導覽下拉 */}
-        <div className={`md:hidden overflow-hidden transition-all duration-500 ${isNavOpen ? 'max-h-64 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+        {/* max-h-[32rem] = 512px，足以容納 7+ 個 nav item（每個 ~50px + gap + padding）。
+            之前用 max-h-64 (256px) 會把最後 3 個（札記／監管／使者）切掉。 */}
+        <div className={`md:hidden overflow-hidden transition-all duration-500 ${isNavOpen ? 'max-h-[32rem] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
           <nav className="flex flex-col gap-2 py-4 border-t border-[#D1C7B7]/30">
             {NAV_ITEMS.map(({ to, label, end }) => (
               <NavLink
@@ -142,7 +145,5 @@ const AdminLayout = () => {
     </div>
   );
 };
-
-export default AdminLayout;
 
 export default AdminLayout;
