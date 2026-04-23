@@ -12,6 +12,7 @@ import {
   deleteAdminOrder,
   deleteAllAdminOrders,
 } from '../../service/adminOrders';
+import { getOrderPaymentMethod, getCategoryMeta } from '../../utils/paymentMethods';
 
 function AdminOrders() {
   const { showError, showSuccess } = useMessage();
@@ -270,6 +271,7 @@ function AdminOrders() {
                   <th className="px-4 py-6 font-bold">訂單時間</th>
                   <th className="px-4 py-6 font-bold hidden lg:table-cell">訂單編號</th>
                   <th className="px-4 py-6 font-bold">客戶情資</th>
+                  <th className="px-4 py-6 font-bold">付款方式</th>
                   <th className="px-4 py-6 font-bold">付款狀態</th>
                   <th className="px-4 py-6 font-bold text-right">訂單總額</th>
                   <th className="px-4 py-6 font-bold text-center">細節檢索</th>
@@ -278,7 +280,7 @@ function AdminOrders() {
               <tbody className="divide-y divide-[#D1C7B7]/10">
                 {filteredOrders.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="px-4 py-32 text-center text-[#111111]/20 italic font-serif text-lg">
+                    <td colSpan="7" className="px-4 py-32 text-center text-[#111111]/20 italic font-serif text-lg">
                       <div className="flex flex-col items-center gap-6">
                         <div className="w-12 h-[1px] bg-[#984443]/30"></div>
                         目前無任何交易紀錄
@@ -287,7 +289,10 @@ function AdminOrders() {
                     </td>
                   </tr>
                 ) : (
-                  filteredOrders.map((order) => (
+                  filteredOrders.map((order) => {
+                    const paymentMethod = getOrderPaymentMethod(order);
+                    const catMeta = getCategoryMeta(paymentMethod);
+                    return (
                     <tr key={order.id} className="hover:bg-[#111111]/[0.02] transition-colors duration-500 group">
                       <td className="px-4 py-8">
                         <div className="font-medium text-[#111111] text-sm mb-1">
@@ -309,10 +314,29 @@ function AdminOrders() {
                         <div className="text-[0.65rem] opacity-40 italic">{order.user.email}</div>
                       </td>
                       <td className="px-4 py-8">
+                        {paymentMethod ? (
+                          <div className="flex flex-col gap-1">
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-[0.65rem] font-bold rounded border w-fit ${catMeta?.colorClass ?? ''}`}
+                            >
+                              <i className={`bi ${paymentMethod.icon}`}></i>
+                              {paymentMethod.shortLabel}
+                            </span>
+                            {order.user.merchant_trade_no && (
+                              <span className="text-[0.55rem] font-mono opacity-40 tracking-tight">
+                                {order.user.merchant_trade_no}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-[0.65rem] opacity-20 italic">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-8">
                         <div className="flex items-center gap-3">
                           <div className={`w-1.5 h-1.5 rounded-full ${order.is_paid ? 'bg-[#3A4D39]' : 'bg-[#984443] animate-pulse'}`}></div>
                           <span className={`text-[0.65rem] uppercase tracking-[0.2em] font-bold ${order.is_paid ? 'text-[#3A4D39]' : 'text-[#984443]'}`}>
-                            {order.is_paid ? 'PAID' : 'UNPAID'}
+                            {order.is_paid ? 'PAID' : order.user.is_paid_mock ? 'MOCK PAID' : 'UNPAID'}
                           </span>
                         </div>
                       </td>
@@ -329,7 +353,8 @@ function AdminOrders() {
                         </button>
                       </td>
                     </tr>
-                  ))
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -424,6 +449,44 @@ function AdminOrders() {
                       {watch('message') || '本案件目前無備註說明。'}
                     </div>
                   </section>
+
+                  {/* 金流資訊：只有 mock 綠界訂單才有 paid_method */}
+                  {(() => {
+                    const pm = getOrderPaymentMethod(tempOrder);
+                    const cm = getCategoryMeta(pm);
+                    if (!pm) return null;
+                    return (
+                      <section>
+                        <label className="text-[0.6rem] uppercase tracking-widest text-[#111111]/40 block mb-3 font-bold">金流資訊 / ECPAY</label>
+                        <div className="p-6 bg-white border border-[#D1C7B7]/40 space-y-2 text-sm">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[#111111]/50">付款方式</span>
+                            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-[0.65rem] font-bold rounded border ${cm?.colorClass ?? ''}`}>
+                              <i className={`bi ${pm.icon}`}></i>
+                              {pm.label}
+                            </span>
+                          </div>
+                          {tempOrder?.user?.merchant_trade_no && (
+                            <div className="flex items-center justify-between">
+                              <span className="text-[#111111]/50">商店交易編號</span>
+                              <span className="font-mono text-xs">{tempOrder.user.merchant_trade_no}</span>
+                            </div>
+                          )}
+                          {tempOrder?.user?.check_mac_value && (
+                            <div className="flex items-center justify-between">
+                              <span className="text-[#111111]/50">CheckMacValue</span>
+                              <span className="font-mono text-[10px] opacity-50 truncate max-w-[200px]" title={tempOrder.user.check_mac_value}>{tempOrder.user.check_mac_value.slice(0, 16)}…</span>
+                            </div>
+                          )}
+                          {tempOrder?.user?.is_paid_mock && !tempOrder?.is_paid && (
+                            <div className="mt-2 pt-2 border-t border-[#D1C7B7]/30 text-[0.65rem] text-amber-700 italic">
+                              ⓘ 此訂單的金流為 demo 模擬，未真實收款；HexSchool 的 is_paid 仍為 false，可在下方手動更新。
+                            </div>
+                          )}
+                        </div>
+                      </section>
+                    );
+                  })()}
                 </div>
 
                 {/* Right Side: Product Matrix */}

@@ -5,12 +5,13 @@ import { createHashRouter, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminLayout from './layout/AdminLayout';
 import FrontendLayout from './layout/FrontendLayout';
+import AdminCoupon from './views/admin/AdminCoupon';
 import AdminDevices from './views/admin/AdminDevices';
 import AdminHome from './views/admin/AdminHome';
 import AdminInventory from './views/admin/AdminInventory';
 import AdminOrders from './views/admin/AdminOrders';
+import AdminPaymentLedger from './views/admin/AdminPaymentLedger';
 import AdminProducts from './views/admin/AdminProducts';
-import AdminCoupon from './views/admin/AdminCoupon';
 import NotFound from './views/front/NotFound';
 import Login from './views/Login';
 const router = createHashRouter([
@@ -60,6 +61,10 @@ const router = createHashRouter([
       {
         path: 'devices',
         element: <AdminDevices />,
+      },
+      {
+        path: 'payment-ledger',
+        element: <AdminPaymentLedger />,
       },
     ],
   },

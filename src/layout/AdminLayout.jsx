@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { to: '/admin/order', label: '帳冊' },
   { to: '/admin/inventory', label: '庫存' },
   { to: '/admin/coupon', label: '札記' },
+  { to: '/admin/payment-ledger', label: '金流' },
   { to: '/admin/devices', label: '監管' },
   { to: '/admin/agent', label: '使者' },
 ];
