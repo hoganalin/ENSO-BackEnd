@@ -203,7 +203,7 @@ function AdminOrders() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[#D1C7B7] pb-10 relative">
           <div className="absolute -bottom-[1px] left-0 w-24 h-[1px] bg-[#984443]"></div>
           <div>
-            <div className="text-[0.65rem] uppercase tracking-[0.6em] text-[#984443] font-bold mb-4 opacity-80">
+            <div className="text-[0.75rem] uppercase tracking-[0.6em] text-[#984443] font-bold mb-4 opacity-80">
               Administrative / Records
             </div>
             <h2 className="font-serif text-5xl font-medium tracking-tight text-[#111111]">
@@ -216,7 +216,7 @@ function AdminOrders() {
           >
             <div className="absolute inset-0 border border-[#984443]/30 group-hover:border-[#984443] transition-colors"></div>
             <div className="absolute inset-0 bg-[#984443] translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-            <span className="relative text-[0.65rem] uppercase tracking-[0.4em] font-bold text-[#984443] group-hover:text-white transition-colors">
+            <span className="relative text-[0.75rem] uppercase tracking-[0.4em] font-bold text-[#984443] group-hover:text-white transition-colors">
               清空所有訂單
             </span>
           </button>
@@ -242,13 +242,13 @@ function AdminOrders() {
           </div>
           
           <div className="flex items-center gap-6">
-            <span className="text-[0.6rem] uppercase tracking-[0.3em] font-bold opacity-30">Status</span>
+            <span className="text-[0.75rem] uppercase tracking-[0.3em] font-bold opacity-30">Status</span>
             <div className="flex gap-4">
               {['all', 'paid', 'unpaid'].map((status) => (
                 <button
                   key={status}
                   onClick={() => setFilterPaid(status)}
-                  className={`text-[0.65rem] uppercase tracking-[0.2em] font-bold px-4 py-1.5 transition-kyoto rounded-full border ${
+                  className={`text-[0.75rem] uppercase tracking-[0.2em] font-bold px-4 py-1.5 transition-kyoto rounded-full border ${
                     filterPaid === status 
                       ? 'bg-[#111111] text-white border-[#111111]' 
                       : 'border-[#D1C7B7] text-[#111111]/40 hover:border-[#111111]'
@@ -267,7 +267,7 @@ function AdminOrders() {
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-[#D1C7B7]/30 text-[0.6rem] uppercase tracking-[0.3em] font-bold text-[#111111]/40">
+                <tr className="border-b border-[#D1C7B7]/30 text-[0.75rem] uppercase tracking-[0.3em] font-bold text-[#111111]/40">
                   <th className="px-4 py-6 font-bold">訂單時間</th>
                   <th className="px-4 py-6 font-bold hidden lg:table-cell">訂單編號</th>
                   <th className="px-4 py-6 font-bold">客戶情資</th>
@@ -298,12 +298,12 @@ function AdminOrders() {
                         <div className="font-medium text-[#111111] text-sm mb-1">
                           {formatDate(order.create_at).split(' ')[0]}
                         </div>
-                        <div className="text-[0.6rem] opacity-30 uppercase tracking-tighter">
+                        <div className="text-[0.75rem] opacity-30 uppercase tracking-tighter">
                           {formatDate(order.create_at).split(' ')[1]}
                         </div>
                       </td>
                       <td className="px-4 py-8 hidden lg:table-cell">
-                        <span className="text-[0.65rem] opacity-30 font-mono tracking-tighter border-l border-[#D1C7B7] pl-4">
+                        <span className="text-[0.75rem] opacity-30 font-mono tracking-tighter border-l border-[#D1C7B7] pl-4">
                           {order.id.slice(0, 8)}...
                         </span>
                       </td>
@@ -311,31 +311,31 @@ function AdminOrders() {
                         <div className="font-serif text-base text-[#111111] mb-1">
                           {order.user.name}
                         </div>
-                        <div className="text-[0.65rem] opacity-40 italic">{order.user.email}</div>
+                        <div className="text-[0.75rem] opacity-40 italic">{order.user.email}</div>
                       </td>
                       <td className="px-4 py-8">
                         {paymentMethod ? (
                           <div className="flex flex-col gap-1">
                             <span
-                              className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-[0.65rem] font-bold rounded border w-fit ${catMeta?.colorClass ?? ''}`}
+                              className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-[0.75rem] font-bold rounded border w-fit ${catMeta?.colorClass ?? ''}`}
                             >
                               <i className={`bi ${paymentMethod.icon}`}></i>
                               {paymentMethod.shortLabel}
                             </span>
                             {order.user.merchant_trade_no && (
-                              <span className="text-[0.55rem] font-mono opacity-40 tracking-tight">
+                              <span className="text-[0.75rem] font-mono opacity-40 tracking-tight">
                                 {order.user.merchant_trade_no}
                               </span>
                             )}
                           </div>
                         ) : (
-                          <span className="text-[0.65rem] opacity-20 italic">—</span>
+                          <span className="text-[0.75rem] opacity-20 italic">—</span>
                         )}
                       </td>
                       <td className="px-4 py-8">
                         <div className="flex items-center gap-3">
                           <div className={`w-1.5 h-1.5 rounded-full ${order.is_paid ? 'bg-[#3A4D39]' : 'bg-[#984443] animate-pulse'}`}></div>
-                          <span className={`text-[0.65rem] uppercase tracking-[0.2em] font-bold ${order.is_paid ? 'text-[#3A4D39]' : 'text-[#984443]'}`}>
+                          <span className={`text-[0.75rem] uppercase tracking-[0.2em] font-bold ${order.is_paid ? 'text-[#3A4D39]' : 'text-[#984443]'}`}>
                             {order.is_paid ? 'PAID' : order.user.is_paid_mock ? 'MOCK PAID' : 'UNPAID'}
                           </span>
                         </div>
@@ -346,7 +346,7 @@ function AdminOrders() {
                       </td>
                       <td className="px-4 py-8 text-center">
                         <button
-                          className="px-6 py-2 text-[0.6rem] uppercase tracking-[0.3em] font-bold text-[#111111]/40 border border-[#D1C7B7]/40 hover:border-[#111111] hover:text-[#111111] transition-all duration-300"
+                          className="px-6 py-2 text-[0.75rem] uppercase tracking-[0.3em] font-bold text-[#111111]/40 border border-[#D1C7B7]/40 hover:border-[#111111] hover:text-[#111111] transition-all duration-300"
                           onClick={() => openOrderModal(order)}
                         >
                           檢視
@@ -375,11 +375,11 @@ function AdminOrders() {
             {/* Modal Header - Dark themed for contrast */}
             <div className="bg-[#111111] p-10 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-[#984443]/30">
               <div className="mb-6 md:mb-0">
-                <div className="text-[0.6rem] uppercase tracking-[0.6em] text-[#984443] font-bold mb-3">Order Specification</div>
+                <div className="text-[0.75rem] uppercase tracking-[0.6em] text-[#984443] font-bold mb-3">Order Specification</div>
                 <h3 className="font-serif text-3xl text-white mb-2">
                   交易情資明細
                 </h3>
-                <div className="flex items-center gap-4 text-[0.65rem] text-white/40 font-mono">
+                <div className="flex items-center gap-4 text-[0.75rem] text-white/40 font-mono">
                   <span>ID: {tempOrder?.id}</span>
                   <span className="w-1 h-1 rounded-full bg-white/20"></span>
                   <span className="uppercase tracking-widest">{tempOrder && formatDate(tempOrder.create_at)}</span>
@@ -401,12 +401,12 @@ function AdminOrders() {
                   <section>
                     <div className="flex items-center gap-4 mb-8">
                        <div className="w-8 h-[1px] bg-[#984443]"></div>
-                       <h6 className="text-[0.65rem] uppercase tracking-[0.4em] text-[#111111] font-bold">收件情資書</h6>
+                       <h6 className="text-[0.75rem] uppercase tracking-[0.4em] text-[#111111] font-bold">收件情資書</h6>
                     </div>
                     
                     <div className="space-y-8">
                       <div className="group">
-                        <label className="text-[0.6rem] uppercase tracking-widest text-[#111111]/40 block mb-2 font-bold group-focus-within:text-[#984443] transition-colors">姓名 / FULL NAME</label>
+                        <label className="text-[0.75rem] uppercase tracking-widest text-[#111111]/40 block mb-2 font-bold group-focus-within:text-[#984443] transition-colors">姓名 / FULL NAME</label>
                         <input
                           type="text"
                           className={`w-full bg-transparent border-b border-[#D1C7B7] py-2 text-lg font-serif focus:outline-none focus:border-[#111111] transition-all ${errors.user?.name ? 'border-[#984443]' : ''}`}
@@ -414,7 +414,7 @@ function AdminOrders() {
                         />
                       </div>
                       <div className="group">
-                        <label className="text-[0.6rem] uppercase tracking-widest text-[#111111]/40 block mb-2 font-bold group-focus-within:text-[#984443] transition-colors">聯絡電話 / CONTACT</label>
+                        <label className="text-[0.75rem] uppercase tracking-widest text-[#111111]/40 block mb-2 font-bold group-focus-within:text-[#984443] transition-colors">聯絡電話 / CONTACT</label>
                         <input
                           type="tel"
                           className="w-full bg-transparent border-b border-[#D1C7B7] py-2 font-mono text-sm focus:outline-none focus:border-[#111111] transition-all"
@@ -422,7 +422,7 @@ function AdminOrders() {
                         />
                       </div>
                       <div className="group">
-                        <label className="text-[0.6rem] uppercase tracking-widest text-[#111111]/40 block mb-2 font-bold group-focus-within:text-[#984443] transition-colors">地址 / SHIPPING ADDRESS</label>
+                        <label className="text-[0.75rem] uppercase tracking-widest text-[#111111]/40 block mb-2 font-bold group-focus-within:text-[#984443] transition-colors">地址 / SHIPPING ADDRESS</label>
                         <input
                           type="text"
                           className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-sm focus:outline-none focus:border-[#111111] transition-all"
@@ -430,7 +430,7 @@ function AdminOrders() {
                         />
                       </div>
                       <div className="group">
-                        <label className="text-[0.6rem] uppercase tracking-widest text-[#111111]/40 block mb-2 font-bold group-focus-within:text-[#984443] transition-colors">電子郵件 / EMAIL</label>
+                        <label className="text-[0.75rem] uppercase tracking-widest text-[#111111]/40 block mb-2 font-bold group-focus-within:text-[#984443] transition-colors">電子郵件 / EMAIL</label>
                         <input
                           type="email"
                           className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-sm italic focus:outline-none focus:border-[#111111] transition-all"
@@ -441,7 +441,7 @@ function AdminOrders() {
                   </section>
 
                   <section>
-                    <label className="text-[0.6rem] uppercase tracking-widest text-[#111111]/40 block mb-3 font-bold">客戶留言 / MESSAGE</label>
+                    <label className="text-[0.75rem] uppercase tracking-widest text-[#111111]/40 block mb-3 font-bold">客戶留言 / MESSAGE</label>
                     <div className="p-6 bg-white border border-[#D1C7B7]/40 font-serif text-sm italic relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-8 h-8 opacity-5">
                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H15.017C14.4647 8 14.017 8.44772 14.017 9V12C14.017 12.5523 13.5693 13 13.017 13H11.017C10.4647 13 10.017 12.5523 10.017 12V9C10.017 7.34315 11.3601 6 13.017 6H19.017C20.6738 6 22.017 7.34315 22.017 9V15C22.017 17.1111 21.0503 19.0667 19.5397 20.4038C19.3444 20.5772 19.1222 20.7259 18.882 20.8385L18.017 21H14.017ZM3.017 21L3.017 18C3.017 16.8954 3.91243 16 5.017 16H8.017C8.56928 16 9.017 15.5523 9.017 15V9C9.017 8.44772 8.56928 8 8.017 8H4.017C3.46472 8 3.017 8.44772 3.017 9V12C3.017 12.5523 2.56928 13 2.017 13H0.017C-0.535282 13 -1.017 12.5523 -1.017 12V9C-1.017 7.34315 0.326142 6 2.017 6H8.017C9.67386 6 11.017 7.34315 11.017 9V15C11.017 17.1111 10.0503 19.0667 8.53974 20.4038C8.3444 20.5772 8.12216 20.7259 7.88203 20.8385L7.017 21H3.017Z"/></svg>
@@ -457,11 +457,11 @@ function AdminOrders() {
                     if (!pm) return null;
                     return (
                       <section>
-                        <label className="text-[0.6rem] uppercase tracking-widest text-[#111111]/40 block mb-3 font-bold">金流資訊 / ECPAY</label>
+                        <label className="text-[0.75rem] uppercase tracking-widest text-[#111111]/40 block mb-3 font-bold">金流資訊 / ECPAY</label>
                         <div className="p-6 bg-white border border-[#D1C7B7]/40 space-y-2 text-sm">
                           <div className="flex items-center justify-between">
                             <span className="text-[#111111]/50">付款方式</span>
-                            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-[0.65rem] font-bold rounded border ${cm?.colorClass ?? ''}`}>
+                            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-[0.75rem] font-bold rounded border ${cm?.colorClass ?? ''}`}>
                               <i className={`bi ${pm.icon}`}></i>
                               {pm.label}
                             </span>
@@ -475,11 +475,11 @@ function AdminOrders() {
                           {tempOrder?.user?.check_mac_value && (
                             <div className="flex items-center justify-between">
                               <span className="text-[#111111]/50">CheckMacValue</span>
-                              <span className="font-mono text-[10px] opacity-50 truncate max-w-[200px]" title={tempOrder.user.check_mac_value}>{tempOrder.user.check_mac_value.slice(0, 16)}…</span>
+                              <span className="font-mono text-[12px] opacity-50 truncate max-w-[200px]" title={tempOrder.user.check_mac_value}>{tempOrder.user.check_mac_value.slice(0, 16)}…</span>
                             </div>
                           )}
                           {tempOrder?.user?.is_paid_mock && !tempOrder?.is_paid && (
-                            <div className="mt-2 pt-2 border-t border-[#D1C7B7]/30 text-[0.65rem] text-amber-700 italic">
+                            <div className="mt-2 pt-2 border-t border-[#D1C7B7]/30 text-[0.75rem] text-amber-700 italic">
                               ⓘ 此訂單的金流為 demo 模擬，未真實收款；HexSchool 的 is_paid 仍為 false，可在下方手動更新。
                             </div>
                           )}
@@ -492,9 +492,9 @@ function AdminOrders() {
                 {/* Right Side: Product Matrix */}
                 <div className="lg:col-span-8 flex flex-col">
                   <div className="flex justify-between items-center mb-10 pb-4 border-b border-[#D1C7B7]/30">
-                     <h6 className="text-[0.65rem] uppercase tracking-[0.4em] text-[#111111] font-bold">商品明細清冊</h6>
+                     <h6 className="text-[0.75rem] uppercase tracking-[0.4em] text-[#111111] font-bold">商品明細清冊</h6>
                      <button
-                        className="text-[0.6rem] uppercase tracking-[0.2em] font-bold text-[#984443] hover:text-[#111111] transition-colors flex items-center gap-2"
+                        className="text-[0.75rem] uppercase tracking-[0.2em] font-bold text-[#984443] hover:text-[#111111] transition-colors flex items-center gap-2"
                         onClick={handleSubmit(modifyOrder)}
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-[#984443]"></span>
@@ -513,14 +513,14 @@ function AdminOrders() {
                         </div>
                         <div className="flex-grow flex flex-col justify-between py-1">
                           <div>
-                            <div className="text-[0.6rem] uppercase tracking-widest text-[#984443] font-bold mb-2">{item.product.category}</div>
+                            <div className="text-[0.75rem] uppercase tracking-widest text-[#984443] font-bold mb-2">{item.product.category}</div>
                             <h4 className="font-serif text-xl text-[#111111] mb-1">{item.product.title}</h4>
-                            <div className="text-[0.7rem] opacity-30 font-mono italic">UNIT PRICE: ${currency(item.product.price)}</div>
+                            <div className="text-[0.75rem] opacity-30 font-mono italic">UNIT PRICE: ${currency(item.product.price)}</div>
                           </div>
                           
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                              <span className="text-[0.6rem] uppercase tracking-widest opacity-40 font-bold">Quantity</span>
+                              <span className="text-[0.75rem] uppercase tracking-widest opacity-40 font-bold">Quantity</span>
                               <div className="flex items-center border border-[#D1C7B7] rounded-sm bg-white overflow-hidden">
                                 <input
                                   type="number"
@@ -530,7 +530,7 @@ function AdminOrders() {
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="text-[0.6rem] uppercase opacity-30 font-bold tracking-widest mb-1">Subtotal</div>
+                              <div className="text-[0.75rem] uppercase opacity-30 font-bold tracking-widest mb-1">Subtotal</div>
                               <div className="font-serif text-lg font-medium text-[#111111]">
                                 ${currency((watch(`products.${id}.qty`) || 0) * item.product.price)}
                               </div>
@@ -544,10 +544,10 @@ function AdminOrders() {
                   <div className="mt-auto pt-16 border-t border-[#111111] border-opacity-10">
                     <div className="flex flex-col md:flex-row justify-between items-end gap-12">
                       <div className="order-2 md:order-1">
-                        <div className="text-[0.6rem] uppercase tracking-widest text-[#111111]/40 mb-3 font-bold">Status Update</div>
+                        <div className="text-[0.75rem] uppercase tracking-widest text-[#111111]/40 mb-3 font-bold">Status Update</div>
                         <button
                           type="button"
-                          className={`px-10 py-3 text-[0.65rem] uppercase tracking-[0.3em] font-bold shadow-sm transition-all duration-500 border ${
+                          className={`px-10 py-3 text-[0.75rem] uppercase tracking-[0.3em] font-bold shadow-sm transition-all duration-500 border ${
                             tempOrder?.is_paid 
                               ? 'border-[#984443] text-[#984443] hover:bg-[#984443] hover:text-white' 
                               : 'bg-[#3A4D39] border-[#3A4D39] text-white hover:bg-[#111111] hover:border-[#111111]'
@@ -559,7 +559,7 @@ function AdminOrders() {
                       </div>
                       
                       <div className="text-right order-1 md:order-2">
-                        <div className="text-[0.65rem] uppercase tracking-[0.4em] text-[#984443] mb-2 font-bold opacity-80">Total Valuation</div>
+                        <div className="text-[0.75rem] uppercase tracking-[0.4em] text-[#984443] mb-2 font-bold opacity-80">Total Valuation</div>
                         <div className="font-serif text-6xl font-medium text-[#111111] tracking-tighter">
                           <span className="text-xl opacity-20 align-top mr-4 mt-2 inline-block">NT$</span>
                           {currency(totalPrice)}
@@ -575,14 +575,14 @@ function AdminOrders() {
             <div className="p-8 bg-white border-t border-[#D1C7B7]/30 flex justify-between items-center">
               <button
                 type="button"
-                className="px-8 py-2 text-[0.6rem] uppercase tracking-[0.4em] font-bold text-[#111111]/30 hover:text-[#984443] transition-colors"
+                className="px-8 py-2 text-[0.75rem] uppercase tracking-[0.4em] font-bold text-[#111111]/30 hover:text-[#984443] transition-colors"
                 onClick={() => deleteOrder(tempOrder.id)}
               >
                 刪除此筆記錄 / DELETE
               </button>
               <button
                 type="button"
-                className="px-12 py-3 bg-[#111111] text-white text-[0.6rem] uppercase tracking-[0.4em] font-bold hover:bg-[#984443] transition-all duration-500 shadow-xl"
+                className="px-12 py-3 bg-[#111111] text-white text-[0.75rem] uppercase tracking-[0.4em] font-bold hover:bg-[#984443] transition-all duration-500 shadow-xl"
                 onClick={() => setIsModalOpen(false)}
               >
                 關閉情資 / CLOSE

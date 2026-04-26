@@ -168,7 +168,7 @@ function AdminInventory() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-[#D1C7B7] pb-10 relative">
           <div className="absolute -bottom-[1px] left-0 w-24 h-[1px] bg-[#984443]"></div>
           <div>
-            <div className="text-[0.65rem] uppercase tracking-[0.6em] text-[#984443] font-bold mb-4 opacity-80">
+            <div className="text-[0.75rem] uppercase tracking-[0.6em] text-[#984443] font-bold mb-4 opacity-80">
               Administrative / Warehouse
             </div>
             <h2 className="font-serif text-5xl font-medium tracking-tight text-[#111111]">
@@ -177,7 +177,7 @@ function AdminInventory() {
           </div>
           <div className="flex gap-12">
             <div className="text-right">
-              <span className="block text-[0.6rem] uppercase tracking-widest font-bold opacity-30 mb-1">Catalog Size</span>
+              <span className="block text-[0.75rem] uppercase tracking-widest font-bold opacity-30 mb-1">Catalog Size</span>
               <span className="text-2xl font-serif italic text-[#111111]">{products.length} <small className="text-xs opacity-40 font-sans not-italic">Items</small></span>
             </div>
           </div>
@@ -193,12 +193,12 @@ function AdminInventory() {
                  <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                </svg>
             </div>
-            <span className="block text-[0.6rem] uppercase tracking-[0.4em] font-bold text-[#111111]/40 mb-3">當前儲備總量</span>
+            <span className="block text-[0.75rem] uppercase tracking-[0.4em] font-bold text-[#111111]/40 mb-3">當前儲備總量</span>
             <div className="flex items-baseline gap-4">
               <span className="text-6xl font-serif text-[#111111]">{products.length}</span>
-              <span className="text-[0.65rem] uppercase tracking-widest opacity-20 font-bold">Total SKUs</span>
+              <span className="text-[0.75rem] uppercase tracking-widest opacity-20 font-bold">Total SKUs</span>
             </div>
-            <div className="mt-8 pt-6 border-t border-[#D1C7B7]/10 text-[0.6rem] opacity-40 italic">
+            <div className="mt-8 pt-6 border-t border-[#D1C7B7]/10 text-[0.75rem] opacity-40 italic">
                數據同步於本分頁檢索紀錄
             </div>
           </div>
@@ -209,12 +209,12 @@ function AdminInventory() {
                  <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                </svg>
             </div>
-            <span className="block text-[0.6rem] uppercase tracking-[0.4em] font-bold text-[#735C00]/60 mb-3">低庫存警戒線</span>
+            <span className="block text-[0.75rem] uppercase tracking-[0.4em] font-bold text-[#735C00]/60 mb-3">低庫存警戒線</span>
             <div className="flex items-baseline gap-4">
               <span className="text-6xl font-serif text-[#735C00]">{lowCount}</span>
-              <span className="text-[0.65rem] uppercase tracking-widest opacity-20 font-bold">Low Stock</span>
+              <span className="text-[0.75rem] uppercase tracking-widest opacity-20 font-bold">Low Stock</span>
             </div>
-            <div className="mt-8 pt-6 border-t border-[#D1C7B7]/10 text-[0.6rem] text-[#735C00]/40 italic">
+            <div className="mt-8 pt-6 border-t border-[#D1C7B7]/10 text-[0.75rem] text-[#735C00]/40 italic">
                存量低於 {LOW_STOCK_THRESHOLD} 件之品項
             </div>
           </div>
@@ -225,12 +225,12 @@ function AdminInventory() {
                  <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                </svg>
             </div>
-            <span className="block text-[0.6rem] uppercase tracking-[0.4em] font-bold text-[#984443]/60 mb-3">缺貨品項統計</span>
+            <span className="block text-[0.75rem] uppercase tracking-[0.4em] font-bold text-[#984443]/60 mb-3">缺貨品項統計</span>
             <div className="flex items-baseline gap-4">
               <span className="text-6xl font-serif text-[#984443]">{outCount}</span>
-              <span className="text-[0.65rem] uppercase tracking-widest opacity-20 font-bold">Out of Stock</span>
+              <span className="text-[0.75rem] uppercase tracking-widest opacity-20 font-bold">Out of Stock</span>
             </div>
-            <div className="mt-8 pt-6 border-t border-[#D1C7B7]/10 text-[0.6rem] text-[#984443]/40 italic">
+            <div className="mt-8 pt-6 border-t border-[#D1C7B7]/10 text-[0.75rem] text-[#984443]/40 italic">
                當前存量為零，需即刻補貨
             </div>
           </div>
@@ -254,7 +254,7 @@ function AdminInventory() {
           </div>
           
           <div className="flex items-center gap-6 whitespace-nowrap">
-            <span className="text-[0.6rem] uppercase tracking-[0.3em] font-bold opacity-30">Inventory View</span>
+            <span className="text-[0.75rem] uppercase tracking-[0.3em] font-bold opacity-30">Inventory View</span>
             <div className="flex gap-2">
               {[
                 { id: 'all', label: '全部顯示' },
@@ -264,7 +264,7 @@ function AdminInventory() {
                 <button
                   key={filter.id}
                   onClick={() => setFilterStatus(filter.id)}
-                  className={`text-[0.65rem] uppercase tracking-[0.2em] font-bold px-5 py-2 transition-kyoto border ${
+                  className={`text-[0.75rem] uppercase tracking-[0.2em] font-bold px-5 py-2 transition-kyoto border ${
                     filterStatus === filter.id 
                       ? 'bg-[#111111] text-white border-[#111111]' 
                       : 'border-[#D1C7B7]/40 text-[#111111]/40 hover:border-[#111111]'
@@ -281,7 +281,7 @@ function AdminInventory() {
         <div className="overflow-x-auto mb-20 px-1">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-[#D1C7B7]/30 text-[0.6rem] uppercase tracking-[0.3em] font-bold text-[#111111]/40">
+              <tr className="border-b border-[#D1C7B7]/30 text-[0.75rem] uppercase tracking-[0.3em] font-bold text-[#111111]/40">
                 <th className="px-4 py-8">縮圖</th>
                 <th className="px-4 py-8">商品名稱 / ID</th>
                 <th className="px-4 py-8 hidden md:table-cell">物資類別辨識</th>
@@ -314,7 +314,7 @@ function AdminInventory() {
                             <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center bg-[#FAF9F6]">
-                              <span className="text-[0.6rem] opacity-10 uppercase font-black tracking-tighter">No Image</span>
+                              <span className="text-[0.75rem] opacity-10 uppercase font-black tracking-tighter">No Image</span>
                             </div>
                           )}
                         </div>
@@ -323,15 +323,15 @@ function AdminInventory() {
                         <div className="font-serif text-lg text-[#111111] mb-1 group-hover:text-[#984443] transition-colors">
                           {product.title}
                         </div>
-                        <div className="text-[0.65rem] opacity-30 font-mono tracking-tighter uppercase">SKU: {product.id.slice(-10)}</div>
+                        <div className="text-[0.75rem] opacity-30 font-mono tracking-tighter uppercase">SKU: {product.id.slice(-10)}</div>
                       </td>
                       <td className="px-4 py-8 hidden md:table-cell">
-                        <span className="text-[0.65rem] uppercase tracking-widest font-bold opacity-30 italic">{product.category}</span>
+                        <span className="text-[0.75rem] uppercase tracking-widest font-bold opacity-30 italic">{product.category}</span>
                       </td>
                       <td className="px-4 py-8 text-center hidden md:table-cell">
                         <div className="flex flex-col items-center gap-1">
                           <span className={`w-1.5 h-1.5 rounded-full ${product.is_enabled ? 'bg-[#3A4D39]' : 'bg-[#111111]/20'}`}></span>
-                          <span className={`text-[0.55rem] uppercase tracking-[0.2em] font-bold ${product.is_enabled ? 'text-[#3A4D39]' : 'opacity-20'}`}>
+                          <span className={`text-[0.75rem] uppercase tracking-[0.2em] font-bold ${product.is_enabled ? 'text-[#3A4D39]' : 'opacity-20'}`}>
                             {product.is_enabled ? 'Active' : 'Draft'}
                           </span>
                         </div>
@@ -340,10 +340,10 @@ function AdminInventory() {
                         <span className={`font-serif text-3xl font-medium tracking-tighter ${st.color}`}>
                           {inv}
                         </span>
-                        <span className="text-[0.6rem] opacity-20 ml-2 font-sans align-top mt-2 inline-block">Units</span>
+                        <span className="text-[0.75rem] opacity-20 ml-2 font-sans align-top mt-2 inline-block">Units</span>
                       </td>
                       <td className="px-4 py-8 text-center hidden lg:table-cell">
-                        <span className={`px-4 py-1.5 text-[0.6rem] uppercase tracking-[0.2em] font-bold border ${st.color} ${st.bg.replace('/10', '/30')} border-transparent`}>
+                        <span className={`px-4 py-1.5 text-[0.75rem] uppercase tracking-[0.2em] font-bold border ${st.color} ${st.bg.replace('/10', '/30')} border-transparent`}>
                           {st.label}
                         </span>
                       </td>
@@ -353,7 +353,7 @@ function AdminInventory() {
                           onClick={() => openAdjustModal(product)}
                         >
                           <div className="absolute inset-0 border border-[#D1C7B7] group-hover:border-[#111111] transition-colors"></div>
-                          <span className="relative text-[0.65rem] uppercase tracking-[0.3em] font-bold text-[#111111]/40 group-hover:text-[#111111] transition-colors">
+                          <span className="relative text-[0.75rem] uppercase tracking-[0.3em] font-bold text-[#111111]/40 group-hover:text-[#111111] transition-colors">
                             庫存調律
                           </span>
                         </button>
@@ -380,7 +380,7 @@ function AdminInventory() {
             {/* Left Column: Artifact Status */}
             <div className="md:w-2/5 bg-[#111111] p-12 flex flex-col justify-between text-white border-r border-[#984443]/20">
               <div>
-                <div className="text-[0.65rem] uppercase tracking-[0.6em] text-[#984443] font-black mb-8">Stock Calibration</div>
+                <div className="text-[0.75rem] uppercase tracking-[0.6em] text-[#984443] font-black mb-8">Stock Calibration</div>
                 <h4 className="font-serif text-4xl font-medium leading-[1.1] mb-12">
                   庫存調律儀軌 
                   <span className="block text-xs mt-4 opacity-30 font-sans tracking-[0.2em] uppercase font-bold">Logistical Alignment</span>
@@ -388,12 +388,12 @@ function AdminInventory() {
                 
                 <div className="space-y-12">
                   <div className="group">
-                    <span className="text-[0.6rem] uppercase tracking-[0.4em] font-black text-[#984443] block mb-3">監理對象 / SUBJECT</span>
+                    <span className="text-[0.75rem] uppercase tracking-[0.4em] font-black text-[#984443] block mb-3">監理對象 / SUBJECT</span>
                     <span className="font-serif text-2xl text-white group-hover:text-[#984443] transition-colors duration-500">{selectedProduct?.title}</span>
                   </div>
                   
                   <div className="space-y-4">
-                    <span className="text-[0.6rem] uppercase tracking-[0.4em] font-black text-white/30 block mb-1">當前盈損評價</span>
+                    <span className="text-[0.75rem] uppercase tracking-[0.4em] font-black text-white/30 block mb-1">當前盈損評價</span>
                     <div className="flex items-baseline gap-4">
                       <span className={`text-6xl font-serif font-medium ${getStockBadge(selectedProduct?.inventory).color.replace('text-', 'text-opacity-100 text-')}`}>
                         {selectedProduct?.inventory ?? 0}
@@ -406,7 +406,7 @@ function AdminInventory() {
 
               <div className="pt-12 border-t border-white/5">
                 <button 
-                  className="text-[0.65rem] uppercase tracking-[0.4em] font-bold text-white/20 hover:text-white transition-all duration-300 flex items-center gap-4 group" 
+                  className="text-[0.75rem] uppercase tracking-[0.4em] font-bold text-white/20 hover:text-white transition-all duration-300 flex items-center gap-4 group" 
                   onClick={() => setShowModal(false)}
                 >
                   <span className="w-8 h-[1px] bg-white/10 group-hover:w-12 group-hover:bg-[#984443] transition-all"></span>
@@ -420,10 +420,10 @@ function AdminInventory() {
               <div className="max-w-md mx-auto space-y-12">
                 {/* Adjust Type Selection */}
                 <section>
-                  <label className="text-[0.65rem] uppercase tracking-[0.4em] font-black text-[#111111]/30 block mb-6">調用方向 / OPERATION</label>
+                  <label className="text-[0.75rem] uppercase tracking-[0.4em] font-black text-[#111111]/30 block mb-6">調用方向 / OPERATION</label>
                   <div className="flex gap-4">
                     <button
-                      className={`flex-1 py-4 text-[0.65rem] uppercase tracking-[0.3em] font-black transition-all duration-500 border ${
+                      className={`flex-1 py-4 text-[0.75rem] uppercase tracking-[0.3em] font-black transition-all duration-500 border ${
                         adjustType === 'add' ? 'bg-[#111111] text-white border-[#111111]' : 'bg-transparent text-[#111111]/30 border-[#D1C7B7]/40 hover:border-[#111111]'
                       }`}
                       onClick={() => setAdjustType('add')}
@@ -431,7 +431,7 @@ function AdminInventory() {
                       進貨入庫 / ADD
                     </button>
                     <button
-                      className={`flex-1 py-4 text-[0.65rem] uppercase tracking-[0.3em] font-black transition-all duration-500 border ${
+                      className={`flex-1 py-4 text-[0.75rem] uppercase tracking-[0.3em] font-black transition-all duration-500 border ${
                         adjustType === 'subtract' ? 'bg-[#984443] text-white border-[#984443]' : 'bg-transparent text-[#984443]/20 border-[#D1C7B7]/40 hover:border-[#984443]'
                       }`}
                       onClick={() => setAdjustType('subtract')}
@@ -444,7 +444,7 @@ function AdminInventory() {
                 {/* Quantity Input */}
                 <section>
                   <div className="flex justify-between items-end mb-4 px-1">
-                    <label className="text-[0.65rem] uppercase tracking-[0.4em] font-black text-[#111111]/30">量計員額 / UNITS</label>
+                    <label className="text-[0.75rem] uppercase tracking-[0.4em] font-black text-[#111111]/30">量計員額 / UNITS</label>
                     <div className="font-serif italic text-xs text-[#111111]/40">
                       預期圓滿： 
                       <span className={`ms-2 font-bold not-italic font-sans text-sm ${getStockBadge(previewInventory()).color}`}>
@@ -461,18 +461,18 @@ function AdminInventory() {
                       value={adjustQty}
                       onChange={(e) => setAdjustQty(e.target.value)}
                     />
-                    <div className="absolute right-0 bottom-6 text-[0.65rem] uppercase tracking-widest font-black opacity-10">QTY SPEC</div>
+                    <div className="absolute right-0 bottom-6 text-[0.75rem] uppercase tracking-widest font-black opacity-10">QTY SPEC</div>
                   </div>
                 </section>
 
                 {/* Adjustment Notes */}
                 <section>
-                  <label className="text-[0.65rem] uppercase tracking-[0.4em] font-black text-[#111111]/30 block mb-6">更動緣由 / REASONING</label>
+                  <label className="text-[0.75rem] uppercase tracking-[0.4em] font-black text-[#111111]/30 block mb-6">更動緣由 / REASONING</label>
                   <div className="flex flex-wrap gap-2 mb-8">
                     {REASON_PRESETS.map((preset) => (
                       <button
                         key={preset}
-                        className={`px-4 py-2 text-[0.6rem] uppercase tracking-widest font-bold border transition-all duration-300 ${
+                        className={`px-4 py-2 text-[0.75rem] uppercase tracking-widest font-bold border transition-all duration-300 ${
                           adjustNote === preset ? 'bg-[#111111] text-white border-[#111111]' : 'bg-transparent border-[#D1C7B7]/30 text-[#111111]/40 hover:border-[#111111] hover:text-[#111111]'
                         }`}
                         onClick={() => setAdjustNote(preset)}
@@ -493,10 +493,10 @@ function AdminInventory() {
                 {/* History Snippet */}
                 {productLogs.length > 0 && (
                   <section className="pt-12 border-t border-[#D1C7B7]/10">
-                    <label className="text-[0.55rem] uppercase tracking-[0.5em] font-black text-[#111111]/20 block mb-6">ARCHIVAL LOGS (LAST 5)</label>
+                    <label className="text-[0.75rem] uppercase tracking-[0.5em] font-black text-[#111111]/20 block mb-6">ARCHIVAL LOGS (LAST 5)</label>
                     <div className="space-y-4">
                       {productLogs.map((log) => (
-                        <div key={log.id} className="flex justify-between items-center text-[0.65rem] group/log">
+                        <div key={log.id} className="flex justify-between items-center text-[0.75rem] group/log">
                           <div className="flex items-center gap-4">
                             <span className={`font-bold tracking-widest ${log.type === 'add' ? 'text-[#3A4D39]' : 'text-[#984443]'}`}>
                               {log.type === 'add' ? '入庫' : '出庫'} / {log.quantity}
@@ -506,7 +506,7 @@ function AdminInventory() {
                                {log.note || '未見詳述'}
                             </span>
                           </div>
-                          <span className="opacity-20 font-mono text-[0.6rem]">{new Date(log.created_at).toLocaleDateString()}</span>
+                          <span className="opacity-20 font-mono text-[0.75rem]">{new Date(log.created_at).toLocaleDateString()}</span>
                         </div>
                       ))}
                     </div>
@@ -520,7 +520,7 @@ function AdminInventory() {
                     disabled={adjustLoading || !adjustQty || parseInt(adjustQty) <= 0}
                   >
                     <div className="absolute inset-0 bg-[#984443] translate-y-full group-hover:translate-y-0 transition-transform duration-700"></div>
-                    <span className="relative text-[0.7rem] uppercase tracking-[0.6em] font-black text-white">
+                    <span className="relative text-[0.75rem] uppercase tracking-[0.6em] font-black text-white">
                       {adjustLoading ? '進行封存調律中...' : '提交此案 · 奉納儲入'}
                     </span>
                   </button>

@@ -1,0 +1,1097 @@
+/* AdminAgent — 京都美學 dashboard，沿用 index.css 定義的 CSS var
+ * --washi #FAF9F6 (米白) / --sumi #111111 (墨)
+ * --bengala #984443 (弁柄赤) / --maki-e #735C00 (蒔繪金)
+ * --tatami #3A4D39 (榻榻米綠) / --sand #D1C7B7 (砂) */
+
+/* ===== Header ===== */
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--sand);
+}
+
+@media (min-width: 768px) {
+  .header {
+    gap: 1.5rem;
+    padding-bottom: 2rem;
+    margin-bottom: 3rem;
+  }
+}
+
+.title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.125rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.25rem;
+}
+
+@media (min-width: 768px) {
+  .title {
+    font-size: 2.25rem;
+    margin: 0 0 0.35rem;
+  }
+}
+
+.subtitle {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  opacity: 0.4;
+  font-style: italic;
+}
+
+@media (min-width: 768px) {
+  .subtitle {
+    font-size: 0.75rem;
+    letter-spacing: 0.4em;
+  }
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .headerRight {
+    gap: 0.75rem;
+  }
+}
+
+.liveDot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  background: white;
+  border: 1px solid rgba(152, 68, 67, 0.3);
+  color: var(--bengala);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+@media (min-width: 768px) {
+  .liveDot {
+    gap: 0.5rem;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.75rem;
+  }
+}
+
+.liveDotPing {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bengala);
+  position: relative;
+}
+
+.liveDotPing::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--bengala);
+  opacity: 0.5;
+  animation: pgPing 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes pgPing {
+  75%,
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.refreshBtn {
+  padding: 0.55rem 1.1rem;
+  background: transparent;
+  border: 1px solid var(--sand);
+  color: var(--sumi);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.refreshBtn:hover:not(:disabled) {
+  background: var(--sumi);
+  color: var(--washi);
+  border-color: var(--sumi);
+}
+
+.refreshBtn:disabled {
+  opacity: 0.4;
+  cursor: wait;
+}
+
+/* ===== KPI 卡片 ===== */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+@media (min-width: 640px) {
+  .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .kpiGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.kpiCard {
+  padding: 1.75rem;
+  background: white;
+  border: 1px solid var(--sand);
+  position: relative;
+  transition: border-color 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.kpiCard:hover {
+  border-color: var(--sumi);
+}
+
+.kpiCardDark {
+  background: var(--sumi);
+  color: var(--washi);
+  border: none;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+
+.kpiCardDark::after {
+  content: attr(data-glyph);
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 3.75rem;
+  opacity: 0.08;
+  line-height: 1;
+}
+
+.kpiLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  opacity: 0.5;
+}
+
+.kpiValue {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+  line-height: 1.1;
+}
+
+.kpiValueUnit {
+  font-size: 0.85rem;
+  opacity: 0.4;
+  margin-left: 0.35rem;
+  font-weight: 400;
+}
+
+.kpiFoot {
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+
+.kpiFootPassRate {
+  color: var(--tatami);
+  font-weight: 700;
+}
+
+.kpiFootPassRateLow {
+  color: var(--bengala);
+}
+
+/* ===== 一般 widget 卡片 ===== */
+.widget {
+  background: white;
+  border: 1px solid var(--sand);
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.widgetHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1.5rem;
+}
+
+.widgetTitle {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.widgetSub {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  opacity: 0.35;
+}
+
+.emptyState {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: rgba(17, 17, 17, 0.4);
+  font-size: 0.85rem;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  border: 1px dashed var(--sand);
+}
+
+/* ===== Grid 2-col 組合（Intent pie + Trace log） ===== */
+.twoColGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+
+@media (min-width: 1024px) {
+  .twoColGrid {
+    grid-template-columns: 5fr 7fr;
+  }
+}
+
+/* ===== Terminal-style Trace Log（呼應 AdminHome 的 MQTT log） ===== */
+.traceWidget {
+  background: var(--sumi);
+  color: var(--washi);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.traceWidget::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(152, 68, 67, 0.5),
+    transparent
+  );
+}
+
+.traceTitle {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5em;
+  opacity: 0.3;
+  margin: 0 0 1.75rem;
+  padding-left: 1rem;
+  border-left: 1px solid var(--bengala);
+}
+
+.traceList {
+  font-family: 'Menlo', 'Monaco', monospace;
+  font-size: 0.75rem;
+  line-height: 1.7;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.traceItem {
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.traceItem:last-child {
+  border-bottom: none;
+}
+
+.traceTime {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.75rem;
+}
+
+.traceKindTurn {
+  color: var(--tatami);
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+.traceKindHandoff {
+  color: var(--maki-e);
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+.traceKindEval {
+  color: var(--bengala);
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+.traceBody {
+  margin-top: 0.35rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.traceToolCall {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.1rem 0.5rem;
+  margin: 0.2rem 0.25rem 0 0;
+  color: var(--maki-e);
+  border-radius: 2px;
+  font-size: 0.75rem;
+}
+
+.traceDim {
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
+}
+
+/* ===== 待改善 cases（呼應 AdminHome 待辦事項） ===== */
+.caseList > *:not(:last-child) {
+  border-bottom: 1px solid rgba(209, 199, 183, 0.3);
+}
+
+.caseItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.1rem 0;
+  gap: 1rem;
+  cursor: default;
+  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.caseItem:hover {
+  padding-left: 0.5rem;
+}
+
+.caseBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.caseTitle {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  color: var(--sumi);
+  transition: color 0.3s ease;
+}
+
+.caseItem:hover .caseTitle {
+  color: var(--bengala);
+}
+
+.caseReason {
+  font-size: 0.75rem;
+  color: rgba(17, 17, 17, 0.55);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.caseMeta {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: rgba(17, 17, 17, 0.35);
+  margin-bottom: 0.35rem;
+}
+
+.caseTag {
+  padding: 0.35rem 0.85rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.caseTagHappy {
+  color: var(--tatami);
+  border-color: var(--tatami);
+}
+
+.caseTagEdge {
+  color: var(--maki-e);
+  border-color: var(--maki-e);
+}
+
+.caseTagSafety {
+  color: var(--bengala);
+  border-color: var(--bengala);
+}
+
+.caseTagHandoff {
+  color: var(--sumi);
+  border-color: var(--sumi);
+}
+
+/* ===== Error banner ===== */
+.errorBanner {
+  background: rgba(152, 68, 67, 0.08);
+  border: 1px solid var(--bengala);
+  color: var(--bengala);
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.errorBanner strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+}
+
+/* ====== Phase F: Funnel widget ====== */
+
+.funnelHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1.75rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.funnelSummary {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.funnelSummaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.funnelSummaryLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: rgba(17, 17, 17, 0.5);
+  font-family: 'Noto Serif JP', serif;
+}
+
+.funnelSummaryValue {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--sumi);
+}
+
+.funnelSummaryValue em {
+  font-style: normal;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: rgba(17, 17, 17, 0.55);
+  margin-left: 0.35rem;
+}
+
+.funnelStages {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.funnelStage {
+  display: grid;
+  grid-template-columns: 6rem 1fr 5rem;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.funnelStageLabel {
+  font-size: 0.75rem;
+  font-family: 'Noto Serif JP', serif;
+  color: rgba(17, 17, 17, 0.7);
+  letter-spacing: 0.12em;
+}
+
+.funnelStageBar {
+  position: relative;
+  height: 36px;
+  background: rgba(209, 199, 183, 0.3); /* --sand wash */
+  overflow: hidden;
+}
+
+.funnelStageFill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    var(--sumi) 0%,
+    var(--maki-e) 70%,
+    var(--bengala) 100%
+  );
+  transition: width 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.funnelStageCount {
+  position: absolute;
+  top: 50%;
+  left: 0.85rem;
+  transform: translateY(-50%);
+  font-weight: 600;
+  color: var(--washi);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  mix-blend-mode: screen;
+}
+
+.funnelStageRate {
+  text-align: right;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.85rem;
+  color: var(--bengala);
+  font-weight: 500;
+}
+
+.funnelEmptyNote {
+  text-align: center;
+  padding: 2rem 0;
+  font-size: 0.85rem;
+  color: rgba(17, 17, 17, 0.45);
+  font-family: 'Noto Serif JP', serif;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================================
+ * Phase L-2: Live Trace「加進 regression」按鈕 + Candidate Case Modal
+ *   - tracePromoteBtn: 放在 conversation_turn traceItem 右側，小型 outline 按鈕
+ *   - candidateModal*: 全螢幕 fixed overlay + 置中 card，延續京都色系
+ * ========================================================================== */
+
+.tracePromoteBtn {
+  display: inline-block;
+  margin-left: 0.75rem;
+  padding: 0.12rem 0.55rem;
+  background: transparent;
+  color: var(--maki-e);
+  border: 1px solid rgba(115, 92, 0, 0.5);
+  border-radius: 2px;
+  font-family: 'Menlo', 'Monaco', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tracePromoteBtn:hover {
+  background: rgba(115, 92, 0, 0.15);
+  color: #b38900;
+  border-color: var(--maki-e);
+}
+
+.tracePromoteBtn:active {
+  transform: translateY(1px);
+}
+
+/* ---- Modal ---- */
+
+.candidateModalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.55);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 9999;
+  animation: candidateFadeIn 0.15s ease;
+}
+
+@keyframes candidateFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.candidateModalContent {
+  background: var(--washi);
+  color: var(--sumi);
+  border-radius: 4px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: candidateSlideUp 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+@keyframes candidateSlideUp {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.candidateModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--sand);
+}
+
+.candidateModalTitle {
+  margin: 0;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.candidateModalClose {
+  background: transparent;
+  border: none;
+  color: rgba(17, 17, 17, 0.5);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.candidateModalClose:hover:not(:disabled) {
+  color: var(--sumi);
+}
+
+.candidateModalClose:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.candidateModalForm {
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.candidateModalSection {
+  margin-bottom: 1.1rem;
+}
+
+.candidateModalLabel {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(17, 17, 17, 0.55);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+  font-weight: 500;
+}
+
+.candidateModalValue {
+  font-size: 0.9rem;
+  color: var(--sumi);
+  padding: 0.3rem 0;
+}
+
+.candidateModalValueBlock {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--sumi);
+  background: rgba(209, 199, 183, 0.25);
+  border-left: 2px solid var(--maki-e);
+  padding: 0.6rem 0.85rem;
+  border-radius: 0 2px 2px 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.candidateModalInput,
+.candidateModalTextarea {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  border: 1px solid var(--sand);
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--sumi);
+  line-height: 1.55;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.candidateModalInput:focus,
+.candidateModalTextarea:focus {
+  outline: none;
+  border-color: var(--maki-e);
+  box-shadow: 0 0 0 2px rgba(115, 92, 0, 0.15);
+}
+
+.candidateModalTextarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.candidateModalError {
+  background: rgba(152, 68, 67, 0.12);
+  border: 1px solid rgba(152, 68, 67, 0.35);
+  color: var(--bengala);
+  padding: 0.55rem 0.85rem;
+  border-radius: 2px;
+  font-size: 0.82rem;
+  margin-bottom: 1rem;
+}
+
+.candidateModalSuccess {
+  background: rgba(58, 77, 57, 0.12);
+  border: 1px solid rgba(58, 77, 57, 0.35);
+  color: var(--tatami);
+  padding: 0.55rem 0.85rem;
+  border-radius: 2px;
+  font-size: 0.82rem;
+  margin-bottom: 1rem;
+}
+
+.candidateModalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--sand);
+}
+
+.candidateModalBtnPrimary,
+.candidateModalBtnSecondary {
+  padding: 0.55rem 1.4rem;
+  border-radius: 2px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.candidateModalBtnPrimary {
+  background: var(--sumi);
+  color: var(--washi);
+  border: 1px solid var(--sumi);
+}
+
+.candidateModalBtnPrimary:hover:not(:disabled) {
+  background: #2a2a2a;
+  border-color: #2a2a2a;
+}
+
+.candidateModalBtnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.candidateModalBtnSecondary {
+  background: transparent;
+  color: var(--sumi);
+  border: 1px solid var(--sand);
+}
+
+.candidateModalBtnSecondary:hover:not(:disabled) {
+  background: rgba(209, 199, 183, 0.3);
+}
+
+.candidateModalBtnSecondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+ * Phase L-3: Candidates Pool Panel
+ * ========================================================================== */
+
+.candidateTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--sand);
+}
+
+.candidateTab {
+  background: transparent;
+  border: 1px solid var(--sand);
+  color: rgba(17, 17, 17, 0.55);
+  padding: 0.4rem 0.85rem;
+  border-radius: 2px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.candidateTab:hover {
+  background: rgba(209, 199, 183, 0.25);
+  color: var(--sumi);
+}
+
+.candidateTabActive {
+  background: var(--sumi);
+  color: var(--washi);
+  border-color: var(--sumi);
+}
+
+.candidateTabActive:hover {
+  background: var(--sumi);
+  color: var(--washi);
+}
+
+.candidateTabCount {
+  font-size: 0.75rem;
+  opacity: 0.65;
+  font-variant-numeric: tabular-nums;
+}
+
+.candidateMsgError {
+  background: rgba(152, 68, 67, 0.1);
+  border: 1px solid rgba(152, 68, 67, 0.3);
+  color: var(--bengala);
+  padding: 0.55rem 0.85rem;
+  border-radius: 2px;
+  font-size: 0.82rem;
+  margin-bottom: 1rem;
+}
+
+.candidateList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.candidateCard {
+  background: #fff;
+  border: 1px solid var(--sand);
+  border-radius: 3px;
+  padding: 1rem 1.1rem;
+  transition: all 0.25s ease;
+}
+
+.candidateCard:hover {
+  border-color: rgba(115, 92, 0, 0.35);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.candidateMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+  font-size: 0.75rem;
+}
+
+.candidateAgentPill {
+  display: inline-block;
+  background: var(--sumi);
+  color: var(--washi);
+  padding: 0.15rem 0.55rem;
+  border-radius: 2px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.candidateMetaDim {
+  color: rgba(17, 17, 17, 0.45);
+  font-size: 0.75rem;
+}
+
+.candidateSourceBadge {
+  display: inline-block;
+  background: rgba(58, 77, 57, 0.12);
+  color: var(--tatami);
+  padding: 0.1rem 0.5rem;
+  border-radius: 2px;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  font-family: 'Menlo', 'Monaco', monospace;
+}
+
+.candidateTag {
+  display: inline-block;
+  background: rgba(209, 199, 183, 0.35);
+  color: rgba(17, 17, 17, 0.65);
+  padding: 0.1rem 0.5rem;
+  border-radius: 2px;
+  font-size: 0.75rem;
+  font-family: 'Menlo', 'Monaco', monospace;
+}
+
+.candidateStatus {
+  margin-left: auto;
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 2px;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.candidateStatus_proposed {
+  background: rgba(115, 92, 0, 0.15);
+  color: var(--maki-e);
+}
+
+.candidateStatus_approved {
+  background: rgba(58, 77, 57, 0.18);
+  color: var(--tatami);
+}
+
+.candidateStatus_exported {
+  background: rgba(17, 17, 17, 0.85);
+  color: var(--washi);
+}
+
+.candidateStatus_archived {
+  background: rgba(17, 17, 17, 0.08);
+  color: rgba(17, 17, 17, 0.45);
+}
+
+.candidateBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 0.95rem;
+}
+
+.candidateField {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.candidateFieldLabel {
+  flex: 0 0 56px;
+  font-size: 0.75rem;
+  color: rgba(17, 17, 17, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding-top: 0.1rem;
+  font-weight: 600;
+}
+
+.candidateFieldValue {
+  flex: 1;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--sumi);
+  word-break: break-word;
+}
+
+.candidateFieldValueDim {
+  flex: 1;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: rgba(17, 17, 17, 0.55);
+  word-break: break-word;
+  font-style: italic;
+}
+
+.candidateActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(209, 199, 183, 0.5);
+}
+
+.candidateBtnPrimary,
+.candidateBtnSecondary,
+.candidateBtnGhost {
+  padding: 0.4rem 0.9rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  font-family: inherit;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.candidateBtnPrimary {
+  background: var(--maki-e);
+  color: var(--washi);
+  border-color: var(--maki-e);
+  font-weight: 600;
+}
+
+.candidateBtnPrimary:hover {
+  background: #8a6d00;
+  border-color: #8a6d00;
+}
+
+.candidateBtnSecondary {
+  background: transparent;
+  color: var(--sumi);
+  border-color: var(--sumi);
+}
+
+.candidateBtnSecondary:hover {
+  background: var(--sumi);
+  color: var(--washi);
+}
+
+.candidateBtnGhost {
+  background: transparent;
+  color: rgba(17, 17, 17, 0.5);
+  border-color: var(--sand);
+}
+
+.candidateBtnGhost:hover {
+  background: rgba(209, 199, 183, 0.3);
+  color: var(--sumi);
+}

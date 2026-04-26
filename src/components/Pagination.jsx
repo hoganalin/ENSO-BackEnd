@@ -13,7 +13,7 @@ export default function Pagination({ pagination, onChangePage }) {
         type="button"
         disabled={!pagination.has_pre}
         onClick={(e) => handleClick(e, pagination.current_page - 1)}
-        className="text-[0.6rem] uppercase tracking-[0.4em] font-bold text-[#111111] opacity-30 hover:opacity-100 disabled:opacity-5 transition-kyoto flex items-center gap-4 group"
+        className="text-[0.75rem] uppercase tracking-[0.4em] font-bold text-[#111111] opacity-30 hover:opacity-100 disabled:opacity-5 transition-kyoto flex items-center gap-4 group"
       >
         <div className="w-8 h-[1px] bg-[#111111] scale-x-50 group-hover:scale-x-100 origin-right transition-transform duration-500"></div>
         PREV
@@ -28,7 +28,7 @@ export default function Pagination({ pagination, onChangePage }) {
               <button
                 type="button"
                 onClick={(e) => handleClick(e, pageNum)}
-                className={`relative py-2 text-[0.7rem] font-mono transition-kyoto ${
+                className={`relative py-2 text-[0.75rem] font-mono transition-kyoto ${
                   isActive 
                     ? 'text-[#111111] font-bold' 
                     : 'text-[#111111]/30 hover:text-[#111111]'
@@ -48,7 +48,7 @@ export default function Pagination({ pagination, onChangePage }) {
         type="button"
         disabled={!pagination.has_next}
         onClick={(e) => handleClick(e, pagination.current_page + 1)}
-        className="text-[0.6rem] uppercase tracking-[0.4em] font-bold text-[#111111] opacity-30 hover:opacity-100 disabled:opacity-5 transition-kyoto flex items-center gap-4 group"
+        className="text-[0.75rem] uppercase tracking-[0.4em] font-bold text-[#111111] opacity-30 hover:opacity-100 disabled:opacity-5 transition-kyoto flex items-center gap-4 group"
       >
         NEXT
         <div className="w-8 h-[1px] bg-[#111111] scale-x-50 group-hover:scale-x-100 origin-left transition-transform duration-500"></div>

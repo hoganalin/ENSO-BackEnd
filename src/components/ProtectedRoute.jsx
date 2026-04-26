@@ -1,13 +1,13 @@
+import { useEffect, useState } from 'react';
+
 import axios from 'axios';
-
-
-const API_BASE = import.meta.env.VITE_API_BASE;
-import { useState, useEffect } from 'react';
-
 import { Navigate } from 'react-router';
 
 import useMessage from '../hooks/useMessage';
+
 import FullPageLoading from './FullPageLoading';
+
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 function ProtectedRoute({ children }) {
   //以下都是從 adminProduct copy過來
@@ -48,7 +48,7 @@ function ProtectedRoute({ children }) {
     };
     checkLogin();
   }, []);
-  
+
   if (loading) {
     return <FullPageLoading isLoading={true} />;
   }

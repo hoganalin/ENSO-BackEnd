@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+
 import useMessage from '../hooks/useMessage';
 import {
   createAdminProduct,
@@ -130,7 +131,7 @@ export default function ProductModal({
             <h2 className="font-serif text-2xl font-medium text-[#111111] tracking-tight">
               {modalType === 'delete' ? '確認刪除' : modalType === 'edit' ? '編錄商物' : '新闢商物'}
             </h2>
-            <p className="text-[0.6rem] uppercase tracking-[0.3em] opacity-40 mt-1">
+            <p className="text-[0.75rem] uppercase tracking-[0.3em] opacity-40 mt-1">
               {modalType === 'delete' ? 'Removal Confirmation' : 'Product Registry Update'}
             </p>
           </div>
@@ -152,12 +153,12 @@ export default function ProductModal({
               {/* Image Column */}
               <div className="lg:col-span-4 space-y-6">
                 <div>
-                  <label className="block text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40 mb-3">商品影像 (Primary)</label>
+                  <label className="block text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40 mb-3">商品影像 (Primary)</label>
                   <div className="group relative w-full aspect-square bg-white border border-[#D1C7B7] rounded-sm overflow-hidden flex items-center justify-center shadow-inner">
                     {tempData.imageUrl ? (
                       <img src={tempData.imageUrl} alt="Preview" className="w-full h-full object-cover p-2" />
                     ) : (
-                      <span className="text-[0.6rem] opacity-20">NO IMAGE</span>
+                      <span className="text-[0.75rem] opacity-20">NO IMAGE</span>
                     )}
                     <input 
                       type="file" 
@@ -166,13 +167,13 @@ export default function ProductModal({
                       ref={fileInputRef}
                     />
                     <div className="absolute inset-0 bg-[#111111]/0 group-hover:bg-[#111111]/5 transition-kyoto flex items-center justify-center">
-                       <span className="opacity-0 group-hover:opacity-100 text-[0.6rem] uppercase tracking-widest text-[#111111] font-bold bg-[#FAF9F6] px-3 py-1.5 shadow-sm border border-[#D1C7B7]">更換影像</span>
+                       <span className="opacity-0 group-hover:opacity-100 text-[0.75rem] uppercase tracking-widest text-[#111111] font-bold bg-[#FAF9F6] px-3 py-1.5 shadow-sm border border-[#D1C7B7]">更換影像</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <label className="block text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">附加影像集 (Gallery)</label>
+                  <label className="block text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">附加影像集 (Gallery)</label>
                   {(tempData.imagesUrl || ['']).map((url, idx) => (
                     <input
                       key={idx}
@@ -190,7 +191,7 @@ export default function ProductModal({
               <div className="lg:col-span-8 space-y-8">
                 <div className="grid grid-cols-1 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">商物標題</label>
+                    <label className="text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">商物標題</label>
                     <input
                       type="text"
                       name="title"
@@ -204,7 +205,7 @@ export default function ProductModal({
 
                 <div className="grid grid-cols-2 gap-8">
                   <div className="space-y-2">
-                    <label className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">分類</label>
+                    <label className="text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">分類</label>
                     <input
                       type="text"
                       name="category"
@@ -214,7 +215,7 @@ export default function ProductModal({
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">編制單位</label>
+                    <label className="text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">編制單位</label>
                     <input
                       type="text"
                       name="unit"
@@ -227,7 +228,7 @@ export default function ProductModal({
 
                 <div className="grid grid-cols-3 gap-8">
                   <div className="space-y-2">
-                    <label className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">原價</label>
+                    <label className="text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">原價</label>
                     <input
                       type="number"
                       name="origin_price"
@@ -237,7 +238,7 @@ export default function ProductModal({
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">售價</label>
+                    <label className="text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">售價</label>
                     <input
                       type="number"
                       name="price"
@@ -247,7 +248,7 @@ export default function ProductModal({
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">當前庫存</label>
+                    <label className="text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">當前庫存</label>
                     <input
                       type="number"
                       name="inventory"
@@ -259,10 +260,10 @@ export default function ProductModal({
                 </div>
 
                 <div className="space-y-4">
-                  <h4 className="text-[0.6rem] uppercase tracking-[0.4em] font-bold opacity-20 border-b border-[#D1C7B7]/30 pb-2">香道特性與場景</h4>
+                  <h4 className="text-[0.75rem] uppercase tracking-[0.4em] font-bold opacity-20 border-b border-[#D1C7B7]/30 pb-2">香道特性與場景</h4>
                   
                   <div className="space-y-2">
-                    <label className="text-[0.65rem] uppercase tracking-[0.2em] font-bold opacity-40">產品總覽 (Description)</label>
+                    <label className="text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">產品總覽 (Description)</label>
                     <textarea
                       name="description"
                       rows="2"
@@ -275,10 +276,10 @@ export default function ProductModal({
                   <div className="grid grid-cols-3 gap-4">
                     {tempData.scenes.map((scene, idx) => (
                       <div key={idx} className="space-y-1">
-                        <label className="text-[0.6rem] uppercase tracking-[0.2em] opacity-40">合宜場合 {idx + 1}</label>
+                        <label className="text-[0.75rem] uppercase tracking-[0.2em] opacity-40">合宜場合 {idx + 1}</label>
                         <input
                           type="text"
-                          className="w-full bg-white border border-[#D1C7B7] rounded-sm p-2 text-[0.7rem] outline-none focus:border-[#111111]"
+                          className="w-full bg-white border border-[#D1C7B7] rounded-sm p-2 text-[0.75rem] outline-none focus:border-[#111111]"
                           value={scene}
                           onChange={(e) => handleSceneChange(idx, e.target.value)}
                         />
@@ -288,16 +289,16 @@ export default function ProductModal({
 
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-1">
-                        <label className="text-[0.6rem] uppercase tracking-[0.2em] opacity-40 font-bold text-[#111111]">基調 Top</label>
-                        <input type="text" name="top_smell" className="w-full bg-[#111111]/5 border-none p-2 text-[0.7rem] outline-none" value={tempData.top_smell || ''} onChange={handleInputChange} />
+                        <label className="text-[0.75rem] uppercase tracking-[0.2em] opacity-40 font-bold text-[#111111]">基調 Top</label>
+                        <input type="text" name="top_smell" className="w-full bg-[#111111]/5 border-none p-2 text-[0.75rem] outline-none" value={tempData.top_smell || ''} onChange={handleInputChange} />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[0.6rem] uppercase tracking-[0.2em] opacity-40 font-bold text-[#984443]">中調 Heart</label>
-                        <input type="text" name="heart_smell" className="w-full bg-[#111111]/5 border-none p-2 text-[0.7rem] outline-none" value={tempData.heart_smell || ''} onChange={handleInputChange} />
+                        <label className="text-[0.75rem] uppercase tracking-[0.2em] opacity-40 font-bold text-[#984443]">中調 Heart</label>
+                        <input type="text" name="heart_smell" className="w-full bg-[#111111]/5 border-none p-2 text-[0.75rem] outline-none" value={tempData.heart_smell || ''} onChange={handleInputChange} />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[0.6rem] uppercase tracking-[0.2em] opacity-40 font-bold text-[#735C00]">末調 Base</label>
-                        <input type="text" name="base_smell" className="w-full bg-[#111111]/5 border-none p-2 text-[0.7rem] outline-none" value={tempData.base_smell || ''} onChange={handleInputChange} />
+                        <label className="text-[0.75rem] uppercase tracking-[0.2em] opacity-40 font-bold text-[#735C00]">末調 Base</label>
+                        <input type="text" name="base_smell" className="w-full bg-[#111111]/5 border-none p-2 text-[0.75rem] outline-none" value={tempData.base_smell || ''} onChange={handleInputChange} />
                     </div>
                   </div>
                 </div>
@@ -315,7 +316,7 @@ export default function ProductModal({
                       <div className={`w-10 h-5 rounded-full transition-kyoto ${tempData.is_enabled ? 'bg-[#3A4D39]' : 'bg-[#D1C7B7]'}`}></div>
                       <div className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-kyoto ${tempData.is_enabled ? 'translate-x-5' : 'translate-x-0'}`}></div>
                     </div>
-                    <span className="text-[0.65rem] uppercase tracking-[0.3em] font-bold opacity-60 group-hover:opacity-100 transition-kyoto">
+                    <span className="text-[0.75rem] uppercase tracking-[0.3em] font-bold opacity-60 group-hover:opacity-100 transition-kyoto">
                       {tempData.is_enabled ? '公開上架中' : '暫時封存'}
                     </span>
                   </label>
@@ -329,14 +330,14 @@ export default function ProductModal({
         <div className="sticky bottom-0 z-10 p-8 border-t border-[#D1C7B7] bg-[#FAF9F6] flex justify-end gap-4">
           <button
             onClick={closeModal}
-            className="px-8 py-2 text-[0.7rem] uppercase tracking-[0.2em] border border-[#D1C7B7] hover:bg-[#111111] hover:text-[#FAF9F6] transition-kyoto rounded-sm"
+            className="px-8 py-2 text-[0.75rem] uppercase tracking-[0.2em] border border-[#D1C7B7] hover:bg-[#111111] hover:text-[#FAF9F6] transition-kyoto rounded-sm"
           >
             取消
           </button>
           <button
             onClick={modalType === 'delete' ? handleDelete : handleSubmit}
             disabled={isLoading}
-            className={`px-10 py-2 text-[0.7rem] uppercase tracking-[0.2em] rounded-sm transition-kyoto shadow-sm ${
+            className={`px-10 py-2 text-[0.75rem] uppercase tracking-[0.2em] rounded-sm transition-kyoto shadow-sm ${
               modalType === 'delete' 
                 ? 'bg-[#984443] text-white hover:bg-[#803332]' 
                 : 'bg-[#111111] text-white hover:bg-[#984443]'

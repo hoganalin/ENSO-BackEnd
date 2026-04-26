@@ -13,6 +13,30 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <!-- Google Fonts: Inter (UI) / Noto Serif TC (中文標題) / Cormorant Garamond (英文襯托) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind CSS (Play CDN) — demo only, production 請改裝 tailwindcss postcss -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // 共用 design token：讓 AdminLayout 裡的 transition-kyoto 之類 custom class 可用
+      tailwind.config = {
+        theme: {
+          extend: {
+            transitionTimingFunction: {
+              kyoto: 'cubic-bezier(0.19, 1, 0.22, 1)',
+            },
+            transitionDuration: {
+              kyoto: '500ms',
+            },
+          },
+        },
+      };
+    </script>
   </head>
   <body>
     <div id="root"></div>

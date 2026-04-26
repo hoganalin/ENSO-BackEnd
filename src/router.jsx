@@ -5,6 +5,7 @@ import { createHashRouter, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminLayout from './layout/AdminLayout';
 import FrontendLayout from './layout/FrontendLayout';
+import AdminAgent from './views/admin/AdminAgent';
 import AdminCoupon from './views/admin/AdminCoupon';
 import AdminDevices from './views/admin/AdminDevices';
 import AdminHome from './views/admin/AdminHome';
@@ -14,20 +15,14 @@ import AdminPaymentLedger from './views/admin/AdminPaymentLedger';
 import AdminProducts from './views/admin/AdminProducts';
 import NotFound from './views/front/NotFound';
 import Login from './views/Login';
+
 const router = createHashRouter([
   {
     path: '/',
     element: <FrontendLayout />,
     children: [
-      {
-        index: true, // 預設首頁
-        element: <Navigate to="/login" replace />,
-      },
-
-      {
-        path: 'login',
-        element: <Login />,
-      },
+      { index: true, element: <Navigate to="/login" replace /> },
+      { path: 'login', element: <Login /> },
     ],
   },
   {
@@ -65,6 +60,10 @@ const router = createHashRouter([
       {
         path: 'payment-ledger',
         element: <AdminPaymentLedger />,
+      },
+      {
+        path: 'agent',
+        element: <AdminAgent />,
       },
     ],
   },

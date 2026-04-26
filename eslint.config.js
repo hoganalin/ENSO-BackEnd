@@ -38,4 +38,22 @@ export default defineConfig([
     },
   },
   pluginReact.configs.flat.recommended,
+  {
+    files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'],
+    settings: {
+      react: { version: 'detect' },
+    },
+    rules: {
+      // React 17+ 新 JSX transform 不需要 import React
+      'react/react-in-jsx-scope': 'off',
+      'react/jsx-uses-react': 'off',
+      // HexSchool 課程 API 回的物件命名是 snake_case，不寫 PropTypes
+      'react/prop-types': 'off',
+      // ' 等中文/特殊字元 inline 在 JSX 內合法
+      'react/no-unescaped-entities': 'off',
+    },
+  },
+  {
+    ignores: ['dist/**', 'node_modules/**', '.vercel/**', 'build/**'],
+  },
 ]);
