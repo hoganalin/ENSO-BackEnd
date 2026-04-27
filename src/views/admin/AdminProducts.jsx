@@ -173,13 +173,13 @@ function AdminProducts() {
             filteredProducts.map((product) => (
               <div
                 key={product.id}
-                className="border border-[#D1C7B7]/40 bg-white p-3 flex gap-3"
+                className="group border border-[#D1C7B7]/40 bg-white p-3 flex gap-3"
               >
                 <div className="w-14 h-14 bg-white border border-[#D1C7B7] p-1 flex items-center justify-center overflow-hidden shrink-0">
                   {product.imageUrl ? (
                     <img
                       src={product.imageUrl}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-125"
                     />
                   ) : (
                     <span className="text-[0.75rem] opacity-20">NO IMG</span>
@@ -281,7 +281,7 @@ function AdminProducts() {
                             {product.imageUrl ? (
                               <img
                                 src={product.imageUrl}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/row:scale-125"
                               />
                             ) : (
                               <span className="text-[0.75rem] opacity-20">

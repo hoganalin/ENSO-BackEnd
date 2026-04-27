@@ -421,7 +421,7 @@ function AdminInventory() {
                             <img
                               src={product.imageUrl}
                               alt={product.title}
-                              className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                              className="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-125"
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center bg-[#FAF9F6]">
