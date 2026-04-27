@@ -84,12 +84,12 @@ function AdminProducts() {
         <div className="flex flex-row md:items-end justify-between gap-3 md:gap-8 border-b border-[#D1C7B7] pb-3 md:pb-10 relative">
           <div className="absolute -bottom-[1px] left-0 w-24 h-[1px] bg-[#984443]"></div>
           <div className="min-w-0">
-            <div className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.6em] text-[#984443] font-bold mb-1 md:mb-4 opacity-80">
+            <div className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.6em] text-[#984443] font-bold mb-1 md:mb-4 opacity-80">
               Inventory
             </div>
             <h2 className="font-serif text-lg md:text-5xl font-medium tracking-tight text-[#111111]">
               商物編錄中心
-              <span className="hidden md:inline text-[0.5em] ml-4 opacity-20 font-sans tracking-widest uppercase">
+              <span className="hidden md:inline text-[0.5em] ml-4 opacity-20 font-sans tracking-wider md:tracking-widest uppercase">
                 PRODUCT CATALOG
               </span>
             </h2>
@@ -110,7 +110,7 @@ function AdminProducts() {
       <div className="max-w-7xl mx-auto">
         {/* Advanced Filter Bar (Editorial Style) */}
         <div className="flex flex-wrap items-center gap-4 md:gap-8 mb-8 md:mb-12">
-          <div className="hidden md:flex items-center gap-4 text-[0.75rem] uppercase tracking-widest opacity-40 font-bold border-r border-[#D1C7B7] pr-8">
+          <div className="hidden md:flex items-center gap-4 text-[0.75rem] uppercase tracking-wider md:tracking-widest opacity-40 font-bold border-r border-[#D1C7B7] pr-8">
             <span>Filter By</span>
             <div className="w-8 h-[1px] bg-[#D1C7B7]"></div>
           </div>
@@ -141,7 +141,7 @@ function AdminProducts() {
               <button
                 key={mode}
                 onClick={() => setFilterEnabled(mode)}
-                className={`px-4 py-1.5 text-[0.75rem] uppercase tracking-widest transition-kyoto rounded-full border ${
+                className={`px-4 py-1.5 text-[0.75rem] uppercase tracking-wider md:tracking-widest transition-kyoto rounded-full border ${
                   filterEnabled === mode
                     ? 'bg-[#111111] text-white border-[#111111]'
                     : 'text-[#111111]/40 border-transparent hover:border-[#D1C7B7]'
@@ -191,7 +191,7 @@ function AdminProducts() {
                       {product.title}
                     </h4>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[0.75rem] uppercase tracking-widest opacity-40">
+                      <span className="text-[0.75rem] uppercase tracking-wider md:tracking-widest opacity-40">
                         {product.category}
                       </span>
                       {product.is_enabled ? (
@@ -241,7 +241,7 @@ function AdminProducts() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#FAF9F6] border-b border-[#D1C7B7] text-[0.75rem] uppercase tracking-[0.3em] font-bold text-[#111111] opacity-60">
+                <tr className="bg-[#FAF9F6] border-b border-[#D1C7B7] text-[10px] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] font-bold text-[#111111] opacity-60">
                   <th className="px-8 py-5"># Item</th>
                   <th className="px-8 py-5">Category</th>
                   <th className="px-8 py-5">Registry Title</th>
@@ -292,7 +292,7 @@ function AdminProducts() {
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        <span className="text-[0.75rem] font-bold uppercase tracking-widest text-[#111111]/40 group-hover/row:text-[#984443] transition-kyoto">
+                        <span className="text-[0.75rem] font-bold uppercase tracking-wider md:tracking-widest text-[#111111]/40 group-hover/row:text-[#984443] transition-kyoto">
                           {product.category}
                         </span>
                       </td>
@@ -326,13 +326,13 @@ function AdminProducts() {
                         <div className="flex items-center justify-center gap-6">
                           <button
                             onClick={() => openModal('edit', product)}
-                            className="text-[0.75rem] uppercase tracking-widest font-bold text-[#111111] opacity-40 hover:opacity-100 transition-kyoto border-b border-transparent hover:border-[#111111] pb-0.5"
+                            className="text-[0.75rem] uppercase tracking-wider md:tracking-widest font-bold text-[#111111] opacity-40 hover:opacity-100 transition-kyoto border-b border-transparent hover:border-[#111111] pb-0.5"
                           >
                             Modify
                           </button>
                           <button
                             onClick={() => openModal('delete', product)}
-                            className="text-[0.75rem] uppercase tracking-widest font-bold text-[#984443] opacity-40 hover:opacity-100 transition-kyoto border-b border-transparent hover:border-[#984443] pb-0.5"
+                            className="text-[0.75rem] uppercase tracking-wider md:tracking-widest font-bold text-[#984443] opacity-40 hover:opacity-100 transition-kyoto border-b border-transparent hover:border-[#984443] pb-0.5"
                           >
                             Remove
                           </button>

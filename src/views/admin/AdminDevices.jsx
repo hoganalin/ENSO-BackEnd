@@ -223,7 +223,7 @@ function ExportModal({ sensors, onClose }) {
             筆感測紀錄已封裝下載 ({format.toUpperCase()})。
           </p>
           <button
-            className="px-10 md:px-12 py-3 bg-[#111111] text-white text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-500"
+            className="px-10 md:px-12 py-3 bg-[#111111] text-white text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-500"
             onClick={onClose}
           >
             退出文卷 / EXIT
@@ -232,7 +232,7 @@ function ExportModal({ sensors, onClose }) {
       ) : (
         <div className="space-y-6 md:space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <section>
-            <label className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] font-black text-[#111111]/30 block mb-3 md:mb-6">
+            <label className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] font-black text-[#111111]/30 block mb-3 md:mb-6">
               溯源週期 / TIME SPAN
             </label>
             <div className="grid grid-cols-3 gap-px bg-[#D1C7B7]/20 border border-[#D1C7B7]/20">
@@ -257,7 +257,7 @@ function ExportModal({ sensors, onClose }) {
           </section>
 
           <section>
-            <label className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] font-black text-[#111111]/30 block mb-3 md:mb-6">
+            <label className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] font-black text-[#111111]/30 block mb-3 md:mb-6">
               封裝格式 / DATA TYPE
             </label>
             <div className="flex flex-wrap gap-4 md:gap-8">
@@ -297,13 +297,13 @@ function ExportModal({ sensors, onClose }) {
 
           <div className="pt-4 md:pt-8 flex flex-col sm:flex-row sm:justify-end gap-3 md:gap-6 sm:items-center border-t border-[#D1C7B7]/10">
             <button
-              className="px-4 py-3 sm:py-0 text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] font-bold text-[#111111]/60 hover:text-[#111111] transition-opacity order-2 sm:order-1"
+              className="px-4 py-3 sm:py-0 text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] font-bold text-[#111111]/60 hover:text-[#111111] transition-opacity order-2 sm:order-1"
               onClick={onClose}
             >
               撤回 / CANCEL
             </button>
             <button
-              className="px-6 md:px-12 py-3 md:py-4 bg-[#111111] text-white text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-700 disabled:opacity-20 order-1 sm:order-2"
+              className="px-6 md:px-12 py-3 md:py-4 bg-[#111111] text-white text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-700 disabled:opacity-20 order-1 sm:order-2"
               onClick={handleExport}
               disabled={exporting}
             >
@@ -356,7 +356,7 @@ function ConfigModal({ sensor, onClose, onSave }) {
             智網節點 {sensor.id} 已完成零時參數對應。
           </p>
           <button
-            className="px-10 md:px-12 py-3 bg-[#111111] text-white text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-500"
+            className="px-10 md:px-12 py-3 bg-[#111111] text-white text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-500"
             onClick={onClose}
           >
             退出 / EXIT
@@ -390,7 +390,7 @@ function ConfigModal({ sensor, onClose, onSave }) {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 md:gap-y-10">
               <section className="space-y-3 md:space-y-4 min-w-0">
-                <label className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] font-black text-[#984443] block px-1">
+                <label className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] font-black text-[#984443] block px-1">
                   溫度警戒線 (°C)
                 </label>
                 <div className="flex gap-2 md:gap-4 items-center">
@@ -412,7 +412,7 @@ function ConfigModal({ sensor, onClose, onSave }) {
                 </div>
               </section>
               <section className="space-y-3 md:space-y-4 min-w-0">
-                <label className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] font-black text-[#111111]/30 block px-1">
+                <label className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] font-black text-[#111111]/30 block px-1">
                   濕度警戒線 (%)
                 </label>
                 <div className="flex gap-2 md:gap-4 items-center">
@@ -438,7 +438,7 @@ function ConfigModal({ sensor, onClose, onSave }) {
 
           <section>
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-1 mb-4 md:mb-6 px-1">
-              <label className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] font-black text-[#111111]/30">
+              <label className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] font-black text-[#111111]/30">
                 物聯傳輸頻率 / SYNC RATE
               </label>
               <span className="text-xs md:text-sm font-serif italic text-[#984443]">
@@ -465,13 +465,13 @@ function ConfigModal({ sensor, onClose, onSave }) {
 
           <div className="pt-4 md:pt-8 flex flex-col sm:flex-row sm:justify-end gap-3 md:gap-6 sm:items-center border-t border-[#D1C7B7]/10">
             <button
-              className="px-4 py-3 sm:py-0 text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] font-bold text-[#111111]/60 hover:text-[#111111] transition-opacity order-2 sm:order-1"
+              className="px-4 py-3 sm:py-0 text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] font-bold text-[#111111]/60 hover:text-[#111111] transition-opacity order-2 sm:order-1"
               onClick={onClose}
             >
               撤回
             </button>
             <button
-              className="px-6 md:px-12 py-3 md:py-4 bg-[#111111] text-white text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-700 disabled:opacity-20 order-1 sm:order-2"
+              className="px-6 md:px-12 py-3 md:py-4 bg-[#111111] text-white text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-700 disabled:opacity-20 order-1 sm:order-2"
               onClick={handleSave}
               disabled={saving}
             >
@@ -526,7 +526,7 @@ function CalibrateModal({ sensor, onClose }) {
         {step === 0 && (
           <div className="space-y-6 md:space-y-10">
             <div className="p-4 md:p-8 bg-[#FAF9F6] border border-[#D1C7B7]/20 space-y-3 md:space-y-4">
-              <div className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] text-[#984443] font-black italic">
+              <div className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] text-[#984443] font-black italic">
                 ⚠️ 智網校準儀軌 / PROTOCOL
               </div>
               <ul className="space-y-2 md:space-y-3 text-xs font-serif italic opacity-60 leading-relaxed pl-4 list-disc marker:text-[#984443]">
@@ -557,13 +557,13 @@ function CalibrateModal({ sensor, onClose }) {
             </div>
             <div className="flex flex-col sm:flex-row sm:justify-end gap-3 md:gap-6 pt-4 sm:items-center">
               <button
-                className="px-4 py-3 sm:py-0 text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] font-bold text-[#111111]/60 hover:text-[#111111] transition-opacity order-2 sm:order-1"
+                className="px-4 py-3 sm:py-0 text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] font-bold text-[#111111]/60 hover:text-[#111111] transition-opacity order-2 sm:order-1"
                 onClick={onClose}
               >
                 撤回
               </button>
               <button
-                className="px-6 md:px-12 py-3 md:py-4 bg-[#111111] text-white text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-700 disabled:opacity-20 order-1 sm:order-2"
+                className="px-6 md:px-12 py-3 md:py-4 bg-[#111111] text-white text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] font-black hover:bg-[#984443] transition-all duration-700 disabled:opacity-20 order-1 sm:order-2"
                 onClick={handleStart}
                 disabled={sensor.status === 'Offline'}
               >
@@ -584,7 +584,7 @@ function CalibrateModal({ sensor, onClose }) {
             <h6 className="font-serif italic text-xl md:text-2xl text-[#111111] mb-3 md:mb-4">
               精準校律進行中...
             </h6>
-            <p className="text-[0.75rem] md:text-xs opacity-40 font-black tracking-widest uppercase">
+            <p className="text-[0.75rem] md:text-xs opacity-40 font-black tracking-wider md:tracking-widest uppercase">
               Base alignment in progress.
             </p>
           </div>
@@ -602,7 +602,7 @@ function CalibrateModal({ sensor, onClose }) {
               感測器 {sensor.id} 已完成零位基線化處理。
             </p>
             <button
-              className="px-10 md:px-16 py-3 md:py-4 bg-[#111111] text-white text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.4em] font-black hover:bg-[#984443] transition-colors"
+              className="px-10 md:px-16 py-3 md:py-4 bg-[#111111] text-white text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.4em] font-black hover:bg-[#984443] transition-colors"
               onClick={onClose}
             >
               退出協議 · EXIT
@@ -624,7 +624,7 @@ function ModalWrapper({ title, onClose, children }) {
       <div className="absolute inset-0 bg-[#111111]/90 backdrop-blur-md animate-in fade-in duration-500"></div>
       <div className="relative bg-white w-full max-w-2xl max-h-[95vh] md:max-h-[90vh] shadow-2xl rounded-sm overflow-hidden border border-[#D1C7B7]/30 flex flex-col animate-in zoom-in fade-in duration-700">
         <div className="px-4 py-3 md:p-8 border-b border-[#D1C7B7]/10 flex justify-between items-center gap-3 bg-[#FAF9F6] shrink-0">
-          <h5 className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.5em] font-black text-[#111111] opacity-60 truncate">
+          <h5 className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.5em] font-black text-[#111111] opacity-60 truncate">
             {title}
           </h5>
           <button
@@ -685,17 +685,17 @@ const AdminDevices = () => {
         <div className="flex flex-row md:items-end justify-between gap-3 md:gap-8 border-b border-[#D1C7B7] pb-3 md:pb-10 relative">
           <div className="absolute -bottom-[1px] left-0 w-24 h-[1px] bg-[#984443]"></div>
           <div className="min-w-0">
-            <div className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.6em] text-[#984443] font-bold mb-1 md:mb-4 opacity-80">
+            <div className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.6em] text-[#984443] font-bold mb-1 md:mb-4 opacity-80">
               Smart Network
             </div>
             <h2 className="font-serif text-lg md:text-5xl font-medium tracking-tight text-[#111111]">
               物聯監儀
-              <span className="hidden md:inline text-[0.5em] ml-4 opacity-20 font-sans tracking-widest uppercase">
+              <span className="hidden md:inline text-[0.5em] ml-4 opacity-20 font-sans tracking-wider md:tracking-widest uppercase">
                 DEVICE NETWORK MONITOR
               </span>
             </h2>
           </div>
-          <div className="flex flex-col md:flex-row gap-2 md:gap-4 shrink-0 self-end">
+          <div className="flex flex-row gap-2 md:gap-4 shrink-0 self-end">
             <button
               className="group relative px-3 md:px-8 py-2 md:py-4 overflow-hidden transition-all duration-300 border border-[#D1C7B7] hover:border-[#111111]"
               onClick={openExport}
@@ -718,7 +718,7 @@ const AdminDevices = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 gap-12 mb-24">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 gap-3 md:gap-12 mb-8 md:mb-24">
         {/* Mobile Card List */}
         <div className="md:hidden px-1 space-y-3">
           {sensors.map((sensor) => (
@@ -731,7 +731,7 @@ const AdminDevices = () => {
                   <div className="font-mono text-xs tracking-tighter font-bold text-[#111111] break-all">
                     {sensor.id}
                   </div>
-                  <div className="text-[0.75rem] opacity-30 uppercase tracking-widest mt-1">
+                  <div className="text-[0.75rem] opacity-30 uppercase tracking-wider md:tracking-widest mt-1">
                     {sensor.type} · {sensor.location}
                   </div>
                 </div>
@@ -748,7 +748,7 @@ const AdminDevices = () => {
               </div>
               <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#D1C7B7]/30">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-[0.75rem] uppercase tracking-widest opacity-40">
+                  <span className="text-[0.75rem] uppercase tracking-wider md:tracking-widest opacity-40">
                     測值
                   </span>
                   <span
@@ -791,13 +791,23 @@ const AdminDevices = () => {
         <div className="hidden md:block overflow-x-auto px-1">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-[#D1C7B7]/30 text-[0.75rem] uppercase tracking-[0.3em] font-bold text-[#111111]/40">
-                <th className="px-4 py-8">節點辨識 / NODE ID</th>
-                <th className="px-4 py-8">安置區域 / LOCATION</th>
-                <th className="px-4 py-8 text-center">連線狀態 / STATUS</th>
-                <th className="px-4 py-8">回傳測值 / TELEMETRY</th>
-                <th className="px-4 py-8">能源存量 / POWER</th>
-                <th className="px-4 py-8 text-right">核定操作 / ACTION</th>
+              <tr className="border-b border-[#D1C7B7]/30 text-[10px] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] font-bold text-[#111111]/40">
+                <th className="px-2 py-3 md:px-4 md:py-8">
+                  節點辨識 / NODE ID
+                </th>
+                <th className="px-2 py-3 md:px-4 md:py-8">
+                  安置區域 / LOCATION
+                </th>
+                <th className="px-2 py-3 md:px-4 md:py-8 text-center">
+                  連線狀態 / STATUS
+                </th>
+                <th className="px-2 py-3 md:px-4 md:py-8">
+                  回傳測值 / TELEMETRY
+                </th>
+                <th className="px-2 py-3 md:px-4 md:py-8">能源存量 / POWER</th>
+                <th className="px-2 py-3 md:px-4 md:py-8 text-right">
+                  核定操作 / ACTION
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#D1C7B7]/10">
@@ -806,20 +816,20 @@ const AdminDevices = () => {
                   key={sensor.id}
                   className="hover:bg-[#111111]/[0.02] transition-colors duration-500 group"
                 >
-                  <td className="px-4 py-10">
+                  <td className="px-2 py-3 md:px-4 md:py-10">
                     <div className="font-mono text-sm tracking-tighter font-bold text-[#111111] group-hover:text-[#984443] transition-colors">
                       {sensor.id}
                     </div>
-                    <div className="text-[0.75rem] opacity-30 uppercase tracking-widest mt-2">
+                    <div className="text-[0.75rem] opacity-30 uppercase tracking-wider md:tracking-widest mt-2">
                       {sensor.type}
                     </div>
                   </td>
-                  <td className="px-4 py-10">
+                  <td className="px-2 py-3 md:px-4 md:py-10">
                     <div className="text-sm font-serif italic text-[#111111]/60">
                       {sensor.location}
                     </div>
                   </td>
-                  <td className="px-4 py-10 text-center">
+                  <td className="px-2 py-3 md:px-4 md:py-10 text-center">
                     <div className="flex flex-col items-center gap-1">
                       <span
                         className={`w-1.5 h-1.5 rounded-full ${sensor.status === 'Online' ? 'bg-[#3A4D39]' : 'bg-[#984443] animate-pulse'}`}
@@ -833,14 +843,14 @@ const AdminDevices = () => {
                       </span>
                     </div>
                   </td>
-                  <td className="px-4 py-10">
+                  <td className="px-2 py-3 md:px-4 md:py-10">
                     <span
                       className={`font-serif text-2xl font-medium tracking-tighter ${sensor.status === 'Offline' ? 'opacity-10' : 'text-[#111111]'}`}
                     >
                       {sensor.lastValue}
                     </span>
                   </td>
-                  <td className="px-4 py-10">
+                  <td className="px-2 py-3 md:px-4 md:py-10">
                     <div className="flex items-center gap-4">
                       <div className="w-16 h-[1px] bg-[#D1C7B7]/30 overflow-hidden relative">
                         <div
@@ -853,16 +863,16 @@ const AdminDevices = () => {
                       </span>
                     </div>
                   </td>
-                  <td className="px-4 py-10 text-right">
-                    <div className="inline-flex gap-8">
+                  <td className="px-2 py-3 md:px-4 md:py-10 text-right">
+                    <div className="inline-flex gap-3 md:gap-8">
                       <button
-                        className="text-[0.75rem] uppercase tracking-[0.3em] font-bold text-[#111111]/30 hover:text-[#111111] transition-colors duration-300"
+                        className="text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] font-bold text-[#111111]/30 hover:text-[#111111] transition-colors duration-300"
                         onClick={() => openCalibrate(sensor)}
                       >
                         校準 / CAL
                       </button>
                       <button
-                        className="text-[0.75rem] uppercase tracking-[0.3em] font-bold text-[#111111]/30 hover:text-[#111111] transition-colors duration-300"
+                        className="text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] font-bold text-[#111111]/30 hover:text-[#111111] transition-colors duration-300"
                         onClick={() => openConfig(sensor)}
                       >
                         配置 / SET
@@ -878,7 +888,7 @@ const AdminDevices = () => {
         {/* Curator's Note Section - Editorial Style */}
         <div className="mt-12 group">
           <div className="bg-[#111111] p-px">
-            <div className="bg-[#FAF9F6] p-16 relative overflow-hidden flex flex-col md:flex-row gap-16">
+            <div className="bg-[#FAF9F6] p-4 md:p-16 relative overflow-hidden flex flex-col md:flex-row gap-4 md:gap-16">
               {/* Decorative Kumiko-like accent */}
               <div className="absolute top-0 right-0 w-32 h-32 opacity-[0.03] pointer-events-none">
                 <svg
@@ -892,7 +902,7 @@ const AdminDevices = () => {
               </div>
 
               <div className="md:w-1/4">
-                <div className="text-[0.75rem] uppercase tracking-[0.6em] text-[#984443] font-black mb-6">
+                <div className="text-[0.75rem] uppercase tracking-[0.2em] md:tracking-[0.6em] text-[#984443] font-black mb-6">
                   Curator's Note
                 </div>
                 <div className="w-12 h-px bg-[#111111]/20 mb-8"></div>
@@ -908,15 +918,15 @@ const AdminDevices = () => {
                   乃是由此處節點數據經由物聯網閘道器 (Gateway)
                   進行即時權重校對後得出，以確保環境數據之絕對精準。
                 </p>
-                <div className="grid grid-cols-2 gap-12 pt-8 border-t border-[#D1C7B7]/30">
+                <div className="grid grid-cols-2 gap-3 md:gap-12 pt-8 border-t border-[#D1C7B7]/30">
                   <div className="space-y-4">
-                    <span className="text-[0.75rem] uppercase tracking-[0.4em] font-black opacity-30">
+                    <span className="text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] font-black opacity-30">
                       溫度保存閾值 / TEMP
                     </span>
                     <div className="font-serif text-lg">22°C - 25°C</div>
                   </div>
                   <div className="space-y-4">
-                    <span className="text-[0.75rem] uppercase tracking-[0.4em] font-black opacity-30">
+                    <span className="text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] font-black opacity-30">
                       濕度保存閾值 / HUMID
                     </span>
                     <div className="font-serif text-lg">45% - 55%</div>

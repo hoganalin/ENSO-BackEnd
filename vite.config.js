@@ -14,5 +14,16 @@ export default defineConfig(({ command }) => {
   return {
     base,
     plugins: [react()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            recharts: ['recharts'],
+            sweetalert: ['sweetalert2'],
+            react: ['react', 'react-dom', 'react-router', 'react-router-dom'],
+          },
+        },
+      },
+    },
   };
 });

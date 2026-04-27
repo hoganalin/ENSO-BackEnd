@@ -29,6 +29,12 @@ const EMBERS = Array.from({ length: 14 }, (_, i) => ({
   duration: `${10 + (i % 5) * 2}s`,
 }));
 
+// 預設 dev / preview 環境顯示一鍵 demo 按鈕；正式部署可用
+// VITE_ENABLE_DEMO=false 關掉。Vercel 上線給面試官看時，仍預設顯示。
+const showDemoButton =
+  import.meta.env.VITE_ENABLE_DEMO !== 'false' &&
+  import.meta.env.VITE_ENABLE_DEMO !== '0';
+
 export default function Login() {
   const navigate = useNavigate();
   const { showError } = useMessage();
@@ -80,7 +86,7 @@ export default function Login() {
     setLoading(true);
 
     document.cookie = `myToken=enso-demo-token;expires=${new Date(
-      Date.now() + 86400000 // 1 天
+      Date.now() + 30 * 86400000 // 30 天，避免 demo 中途被踢回登入
     ).toUTCString()};path=/`;
 
     setSuccess(true);
@@ -257,23 +263,29 @@ export default function Login() {
           </button>
 
           <div className={styles.divider}>
-            <div className={styles.hairline} />
-            <span>或</span>
-            <div className={styles.hairline} />
+            {showDemoButton && (
+              <>
+                <div className={styles.hairline} />
+                <span>或</span>
+                <div className={styles.hairline} />
+              </>
+            )}
           </div>
 
-          <button
-            type="button"
-            onClick={handleDemoLogin}
-            disabled={loading}
-            className={styles.btnDemo}
-          >
-            <i
-              className="fa-solid fa-wand-sparkles"
-              style={{ fontSize: 11, opacity: 0.7 }}
-            />
-            <span>DEMO 一鍵體驗</span>
-          </button>
+          {showDemoButton && (
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              disabled={loading}
+              className={styles.btnDemo}
+            >
+              <i
+                className="fa-solid fa-wand-sparkles"
+                style={{ fontSize: 12, opacity: 0.7 }}
+              />
+              <span>DEMO 一鍵體驗</span>
+            </button>
+          )}
         </form>
 
         <div className={styles.footnote}>

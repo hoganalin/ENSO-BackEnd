@@ -319,9 +319,98 @@ export function getMockCandidates() {
 
 // ---- XiaodianChat /api/agent canned response ----
 
-export function getMockAgentResponse() {
+// 把使用者輸入對應到一個 tool name；找不到對應就回 null（直接 end_turn）。
+// 這讓 demo 模式也能跑「user → tool_use → tool_result → 文字總結」完整 loop，
+// UI 上能看到 tool call 動畫，故事更完整。
+function pickToolForUserInput(text = '') {
+  const t = text.toLowerCase();
+  if (/(銷售|營收|sales|revenue|24h|對話量|kpi)/i.test(text)) {
+    return 'get_sales_summary';
+  }
+  if (/(熱門|意圖|intent|分布|topic|主題)/i.test(text)) {
+    return 'get_top_intents';
+  }
+  if (/(表現|performance|agent.*怎麼|哪.*agent)/i.test(text)) {
+    return 'get_agent_performance';
+  }
+  if (/(客訴|抱怨|失敗|complaint|fail)/i.test(text)) {
+    return 'get_recent_complaints';
+  }
+  if (/(eval|pass.?rate|歷史|趨勢)/i.test(text)) {
+    return 'get_eval_history';
+  }
+  return null;
+}
+
+function summarizeToolResults(toolResults = []) {
+  if (toolResults.length === 0) return '';
+  const lines = toolResults.map((r) => {
+    const content =
+      typeof r.content === 'string' ? r.content : JSON.stringify(r.content);
+    try {
+      const parsed = JSON.parse(content);
+      const data = parsed?.data ?? parsed;
+      // 嘗試把 data 做人話摘要：取前幾個 key/value
+      const preview = Object.entries(data)
+        .slice(0, 4)
+        .map(([k, v]) =>
+          typeof v === 'object' ? `${k}: …` : `${k}=${String(v)}`
+        )
+        .join('，');
+      return preview;
+    } catch {
+      return content.slice(0, 120);
+    }
+  });
+  return `根據工具回傳資料：${lines.join('；')}。（Demo 模式・無連線真實 LLM，純本地工具執行結果。）`;
+}
+
+/**
+ * Demo 版 agent 回應。
+ *
+ * 第一輪（last message 是 user）：依關鍵字挑一支 tool 觸發 tool_use，
+ *                              讓 UI 看到 tool call 動畫。
+ * 第二輪（last message 是 tool）：拿 toolResults 做人話摘要，end_turn。
+ * 找不到 tool 對應的關鍵字 → 直接 end_turn 回 fallback 文字。
+ */
+export function getMockAgentResponse(messages = []) {
+  const last = messages[messages.length - 1];
+
+  // 已經有 tool result → 該結束 loop 並產出文字
+  if (last?.role === 'tool') {
+    return {
+      text: summarizeToolResults(last.toolResults),
+      toolCalls: [],
+      stopReason: 'end_turn',
+      usage: { inputTokens: 0, outputTokens: 0 },
+    };
+  }
+
+  // user 最新訊息 → 嘗試挑一支 tool
+  const userText =
+    last?.role === 'user'
+      ? last.text || ''
+      : messages.findLast?.((m) => m.role === 'user')?.text || '';
+
+  const toolName = pickToolForUserInput(userText);
+  if (toolName) {
+    return {
+      text: '',
+      toolCalls: [
+        {
+          id: `toolu_demo_${Date.now().toString(36)}`,
+          name: toolName,
+          input: {},
+        },
+      ],
+      stopReason: 'tool_use',
+      usage: { inputTokens: 0, outputTokens: 0 },
+    };
+  }
+
+  // 沒匹配關鍵字 → 直接給 fallback 文字
   return {
-    text: '（Demo 模式・小店）這是預設回覆：過去 24 小時三位 agent 對話量穩定、handoff 率約 12%、最新 eval pass rate 85%。連線實際後端後即可走完整 tool_use 迴圈。',
+    text: '（Demo 模式・小店）試試問我「過去 24 小時銷售」、「熱門意圖」、「agent 表現」、「最近客訴」或「eval 歷史」，會觸發本地 tool 執行展示完整迴圈。',
     toolCalls: [],
     stopReason: 'end_turn',
     usage: { inputTokens: 0, outputTokens: 0 },

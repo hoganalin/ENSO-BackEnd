@@ -41,9 +41,9 @@ function makeId(prefix) {
  * @returns {Promise<{ text?: string, toolCalls?: Array, stopReason: string, usage?: object }>}
  */
 async function callAgentApi(messages) {
-  // Demo 模式：/api/agent 不可達，回 canned response 讓 chat 不炸 404
+  // Demo 模式：/api/agent 不可達，本地模擬完整 user→tool_use→tool_result→end_turn 迴圈
   if (isDemoMode()) {
-    return getMockAgentResponse();
+    return getMockAgentResponse(messages);
   }
 
   const res = await fetch(AGENT_ENDPOINT, {

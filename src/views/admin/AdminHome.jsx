@@ -15,6 +15,7 @@ import {
 } from 'recharts';
 
 import { currency } from '../../assets/utils/filter';
+import useIsBelowLg from '../../hooks/useIsBelowLg';
 import { getAdminOrders } from '../../service/adminOrders';
 import { getAdminProducts } from '../../service/adminProducts';
 import { fetchCandidates } from '../../service/candidateCases';
@@ -50,6 +51,7 @@ const AdminHome = () => {
   const [orders, setOrders] = useState([]);
   const [candidates, setCandidates] = useState([]);
   const [dataReady, setDataReady] = useState(false);
+  const isBelowLg = useIsBelowLg();
 
   // IoT 模擬 heartbeat — 仍然是純前端展示
   useEffect(() => {
@@ -215,25 +217,25 @@ const AdminHome = () => {
         <div className="flex flex-row md:items-end justify-between gap-3 md:gap-8 border-b border-[#D1C7B7] pb-3 md:pb-10 relative">
           <div className="absolute -bottom-[1px] left-0 w-24 h-[1px] bg-[#984443]"></div>
           <div className="min-w-0">
-            <div className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.6em] text-[#984443] font-bold mb-1 md:mb-4 opacity-80">
+            <div className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.6em] text-[#984443] font-bold mb-1 md:mb-4 opacity-80">
               Dashboard
             </div>
             <h2 className="font-serif text-lg md:text-5xl font-medium tracking-tight text-[#111111]">
               盤面總覽
-              <span className="hidden md:inline text-[0.5em] ml-4 opacity-20 font-sans tracking-widest uppercase">
+              <span className="hidden md:inline text-[0.5em] ml-4 opacity-20 font-sans tracking-wider md:tracking-widest uppercase">
                 OPERATIONS DASHBOARD
               </span>
             </h2>
           </div>
           <div className="flex flex-col gap-1 md:gap-2 shrink-0 self-end items-end">
-            <div className="flex items-center gap-2 md:gap-3 px-3 md:px-5 py-1.5 md:py-2.5 bg-white border border-[#984443]/30 text-[#984443] rounded-sm text-[0.75rem] uppercase tracking-widest shadow-sm ring-1 ring-[#984443]/5">
+            <div className="flex items-center gap-2 md:gap-3 px-3 md:px-5 py-1.5 md:py-2.5 bg-white border border-[#984443]/30 text-[#984443] rounded-sm text-[0.75rem] uppercase tracking-wider md:tracking-widest shadow-sm ring-1 ring-[#984443]/5">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#984443] opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#984443]"></span>
               </span>
               MQTT 穩定
             </div>
-            <span className="text-[0.75rem] uppercase tracking-[0.3em] opacity-40 italic">
+            <span className="text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] opacity-40 italic">
               {sensors.lastUpdate}
             </span>
           </div>
@@ -340,9 +342,10 @@ const AdminHome = () => {
                   tick={{
                     fill: '#111111',
                     opacity: 0.4,
-                    fontSize: 10,
+                    fontSize: 12,
                     letterSpacing: '1px',
                   }}
+                  hide={isBelowLg}
                 />
                 <YAxis
                   axisLine={false}
@@ -506,7 +509,7 @@ const AdminHome = () => {
               </div>
             </>
           ) : (
-            <div className="h-[140px] md:h-[260px] w-full flex items-center justify-center text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] opacity-30">
+            <div className="h-[140px] md:h-[260px] w-full flex items-center justify-center text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] opacity-30">
               {dataReady ? '尚無已付款訂單資料' : '載入中…'}
             </div>
           )}
@@ -524,7 +527,7 @@ const AdminHome = () => {
           </h5>
           <div className="divide-y divide-[#D1C7B7]/30">
             {priorityTasks.length === 0 && (
-              <div className="py-8 text-center text-[0.75rem] uppercase tracking-[0.3em] opacity-30">
+              <div className="py-8 text-center text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] opacity-30">
                 {dataReady ? '目前無待辦事項' : '載入中…'}
               </div>
             )}
@@ -560,7 +563,7 @@ const AdminHome = () => {
 
         <div className="bg-[#111111] p-3 md:p-10 rounded-sm shadow-2xl relative overflow-hidden flex flex-col">
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#984443]/40 to-transparent"></div>
-          <h5 className="font-serif text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.5em] text-[#FAF9F6] opacity-30 mb-3 md:mb-8 border-l border-[#984443] pl-3 md:pl-4">
+          <h5 className="font-serif text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.5em] text-[#FAF9F6] opacity-30 mb-3 md:mb-8 border-l border-[#984443] pl-3 md:pl-4">
             Terminal Live Log • MQTT
           </h5>
           <div className="font-mono text-[0.75rem] md:text-[0.75rem] text-[#3A4D39] leading-relaxed flex-grow overflow-auto break-all">

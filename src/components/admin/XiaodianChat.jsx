@@ -77,7 +77,7 @@ export default function XiaodianChat() {
         // 送出時不帶樂觀 user message，讓 service 內部統一造
         const { messages: nextMessages } = await sendXiaodianMessage(
           messages,
-          text,
+          text
         );
         setMessages(nextMessages);
       } catch (err) {
@@ -88,7 +88,7 @@ export default function XiaodianChat() {
         setIsSending(false);
       }
     },
-    [input, isSending, messages],
+    [input, isSending, messages]
   );
 
   const handleKeyDown = useCallback(
@@ -98,7 +98,7 @@ export default function XiaodianChat() {
         handleSend();
       }
     },
-    [handleSend],
+    [handleSend]
   );
 
   // 把 messages 串成 render 用的 rows：
@@ -115,7 +115,7 @@ export default function XiaodianChat() {
       // 找緊跟著的 tool message（若有）
       const next = messages[i + 1];
       const toolResults =
-        next && next.role === 'tool' ? next.toolResults ?? [] : [];
+        next && next.role === 'tool' ? (next.toolResults ?? []) : [];
       rows.push({ kind: 'assistant', msg: m, toolResults });
       continue;
     }
@@ -175,9 +175,7 @@ export default function XiaodianChat() {
                           isError ? styles.toolChipError : ''
                         }`}
                       >
-                        <span className={styles.toolChipLabel}>
-                          ▶ {label}
-                        </span>
+                        <span className={styles.toolChipLabel}>▶ {label}</span>
                         <span className={styles.toolChipInput}>
                           {formatToolInput(tc.input)}
                           {isError ? ' · 失敗' : ''}
@@ -227,7 +225,7 @@ export default function XiaodianChat() {
       <div className={styles.composer}>
         <textarea
           className={styles.input}
-          rows={2}
+          rows={4}
           placeholder="問小店關於 agent 的表現…（Enter 送出、Shift+Enter 換行）"
           value={input}
           onChange={(e) => setInput(e.target.value)}

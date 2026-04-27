@@ -26,6 +26,7 @@ import {
 } from 'recharts';
 
 import XiaodianChat from '../../components/admin/XiaodianChat';
+import useIsBelowLg from '../../hooks/useIsBelowLg';
 import { isDemoMode, mockCreateCandidate } from '../../service/agentDemoMock';
 import {
   calculateFunnel,
@@ -98,6 +99,7 @@ const AdminAgent = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+  const [failCount, setFailCount] = useState(0);
   const [lastFetch, setLastFetch] = useState(null);
   // Phase L-2: Live Trace「加進 regression」modal 狀態。
   // 存整個 event，modal 內用 agentId / userMessage / assistantText / timestamp
@@ -110,15 +112,18 @@ const AdminAgent = () => {
   const [candidatesLoading, setCandidatesLoading] = useState(true);
   const [candidatesError, setCandidatesError] = useState(null);
   const [candidateFilter, setCandidateFilter] = useState('proposed');
+  const isBelowLg = useIsBelowLg();
 
   const load = useCallback(async () => {
     try {
-      setError(null);
       const { events: data } = await fetchAgentEvents({ limit: 500 });
       setEvents(data);
       setLastFetch(new Date());
+      setError(null);
+      setFailCount(0);
     } catch (err) {
       setError(err?.message || '無法連線 Agent Events API');
+      setFailCount((n) => n + 1);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -127,12 +132,15 @@ const AdminAgent = () => {
 
   useEffect(() => {
     load();
+    // 連續失敗 ≥3 次就停止輪詢，避免正式登入但 Next.js 沒跑時 console 被 404 洗版
+    if (failCount >= 3) return undefined;
     const timer = setInterval(load, REFRESH_INTERVAL_MS);
     return () => clearInterval(timer);
-  }, [load]);
+  }, [load, failCount]);
 
   const handleRefresh = () => {
     setRefreshing(true);
+    setFailCount(0);
     load();
   };
 
@@ -200,17 +208,17 @@ const AdminAgent = () => {
         <div className="flex flex-row md:items-end justify-between gap-3 md:gap-8 border-b border-[#D1C7B7] pb-3 md:pb-10 relative">
           <div className="absolute -bottom-[1px] left-0 w-24 h-[1px] bg-[#984443]"></div>
           <div className="min-w-0">
-            <div className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.3em] md:tracking-[0.6em] text-[#984443] font-bold mb-1 md:mb-4 opacity-80">
+            <div className="text-[0.75rem] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.6em] text-[#984443] font-bold mb-1 md:mb-4 opacity-80">
               Agent Telemetry
             </div>
             <h2 className="font-serif text-lg md:text-5xl font-medium tracking-tight text-[#111111]">
               使者觀測
-              <span className="hidden md:inline text-[0.5em] ml-4 opacity-20 font-sans tracking-widest uppercase">
+              <span className="hidden md:inline text-[0.5em] ml-4 opacity-20 font-sans tracking-wider md:tracking-widest uppercase">
                 AGENT OBSERVABILITY
               </span>
             </h2>
           </div>
-          <div className="flex flex-col md:flex-row gap-2 md:gap-4 shrink-0 self-end items-end">
+          <div className="flex flex-row gap-2 md:gap-4 shrink-0 self-end items-end">
             <span className={styles.liveDot}>
               <span className={styles.liveDotPing} />
               {error ? '事件流中斷' : '事件流接收中'}
@@ -242,47 +250,65 @@ const AdminAgent = () => {
         </div>
       )}
 
-      {/* ===== KPI 4 格 ===== */}
-      <div className={styles.kpiGrid}>
-        <div
-          className={`${styles.kpiCard} ${styles.kpiCardDark}`}
-          data-glyph="使"
-        >
-          <div className={styles.kpiLabel}>24h 對話量</div>
-          <div className={styles.kpiValue}>
-            {kpis.turns24h}
-            <span className={styles.kpiValueUnit}>turns</span>
+      {/* ===== KPI 一條長卡片，4 欄並排，所有斷點通用 ===== */}
+      <div className="mb-3 md:mb-6 p-3 md:p-5 bg-white border border-[#D1C7B7]/40">
+        <div className="grid grid-cols-4 divide-x divide-[#D1C7B7]/40">
+          <div className="px-2 md:px-4">
+            <div className="text-[10px] md:text-[12px] uppercase tracking-wider text-[#984443] font-bold mb-1 truncate">
+              24h 對話量
+            </div>
+            <div className="font-serif text-xl md:text-3xl">
+              {kpis.turns24h}
+              <span className="text-[10px] md:text-[12px] opacity-50 ml-1">
+                turns
+              </span>
+            </div>
+            <div className="hidden md:block text-[12px] opacity-40 mt-1 truncate">
+              Conversation turns
+            </div>
           </div>
-          <div className={styles.kpiFoot}>Conversation turns</div>
-        </div>
-
-        <div className={styles.kpiCard}>
-          <div className={styles.kpiLabel}>24h Handoff</div>
-          <div className={styles.kpiValue}>
-            {kpis.handoffs24h}
-            <span className={styles.kpiValueUnit}>次</span>
+          <div className="px-2 md:px-4">
+            <div className="text-[10px] md:text-[12px] uppercase tracking-wider text-[#984443] font-bold mb-1 truncate">
+              24h Handoff
+            </div>
+            <div className="font-serif text-xl md:text-3xl">
+              {kpis.handoffs24h}
+              <span className="text-[10px] md:text-[12px] opacity-50 ml-1">
+                次
+              </span>
+            </div>
+            <div className="hidden md:block text-[12px] opacity-40 mt-1 truncate">
+              Agent-to-agent transfers
+            </div>
           </div>
-          <div className={styles.kpiFoot}>Agent-to-agent transfers</div>
-        </div>
-
-        <div className={styles.kpiCard}>
-          <div className={styles.kpiLabel}>平均 Tool Call</div>
-          <div className={styles.kpiValue}>
-            {kpis.avgToolCalls.toFixed(2)}
-            <span className={styles.kpiValueUnit}>/ turn</span>
+          <div className="px-2 md:px-4">
+            <div className="text-[10px] md:text-[12px] uppercase tracking-wider text-[#984443] font-bold mb-1 truncate">
+              平均 Tool Call
+            </div>
+            <div className="font-serif text-xl md:text-3xl">
+              {kpis.avgToolCalls.toFixed(2)}
+              <span className="text-[10px] md:text-[12px] opacity-50 ml-1">
+                /turn
+              </span>
+            </div>
+            <div className="hidden md:block text-[12px] opacity-40 mt-1 truncate">
+              Tool invocations per turn
+            </div>
           </div>
-          <div className={styles.kpiFoot}>Tool invocations per turn</div>
-        </div>
-
-        <div className={styles.kpiCard}>
-          <div className={styles.kpiLabel}>最新 Eval Pass Rate</div>
-          <div className={styles.kpiValue}>
-            {formatPct(kpis.latestPassRate)}
-          </div>
-          <div className={`${styles.kpiFoot} ${passRateFootClass}`}>
-            {kpis.latestEvalTimestamp
-              ? `Last eval · ${new Date(kpis.latestEvalTimestamp).toLocaleDateString('zh-TW')}`
-              : '尚無 eval 資料'}
+          <div className="px-2 md:px-4">
+            <div className="text-[10px] md:text-[12px] uppercase tracking-wider text-[#984443] font-bold mb-1 truncate">
+              Eval Pass
+            </div>
+            <div className="font-serif text-xl md:text-3xl">
+              {formatPct(kpis.latestPassRate)}
+            </div>
+            <div
+              className={`hidden md:block text-[12px] opacity-40 mt-1 truncate ${passRateFootClass}`}
+            >
+              {kpis.latestEvalTimestamp
+                ? `Last · ${new Date(kpis.latestEvalTimestamp).toLocaleDateString('zh-TW')}`
+                : '尚無 eval 資料'}
+            </div>
           </div>
         </div>
       </div>
@@ -424,14 +450,15 @@ const AdminAgent = () => {
                 />
                 <XAxis
                   dataKey="label"
-                  tick={{ fontSize: 10, fill: '#111111', opacity: 0.4 }}
+                  tick={{ fontSize: 12, fill: '#111111', opacity: 0.4 }}
                   axisLine={false}
                   tickLine={false}
+                  hide={isBelowLg}
                 />
                 <YAxis
                   domain={[0, 100]}
                   tickFormatter={(v) => `${v}%`}
-                  tick={{ fontSize: 10, fill: '#111111', opacity: 0.4 }}
+                  tick={{ fontSize: 12, fill: '#111111', opacity: 0.4 }}
                   axisLine={false}
                   tickLine={false}
                 />
