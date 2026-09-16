@@ -5,7 +5,6 @@ import { createHashRouter, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminLayout from './layout/AdminLayout';
 import FrontendLayout from './layout/FrontendLayout';
-import AdminAgent from './views/admin/AdminAgent';
 import AdminCoupon from './views/admin/AdminCoupon';
 import AdminDevices from './views/admin/AdminDevices';
 import AdminHome from './views/admin/AdminHome';
@@ -61,10 +60,8 @@ const router = createHashRouter([
         path: 'payment-ledger',
         element: <AdminPaymentLedger />,
       },
-      {
-        path: 'agent',
-        element: <AdminAgent />,
-      },
+      // 保留舊連結的安全退路，但不再公開「使者」功能。
+      { path: 'agent', element: <Navigate to="/admin" replace /> },
     ],
   },
   {

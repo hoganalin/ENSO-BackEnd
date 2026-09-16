@@ -19,10 +19,6 @@ const TOUR_STEPS = [
     desc: '聚合 ECPay 12 種模擬付款方式的圓餅 / 趨勢 / 明細。',
   },
   {
-    title: '使者觀測',
-    desc: 'AI Agent 對話量、Eval pass rate、Funnel 與 Live Trace。',
-  },
-  {
     title: '物產 / 庫存 / 帳冊',
     desc: '商品 CRUD、庫存調整、訂單編輯，demo 模式會存入 localStorage。',
   },
@@ -42,7 +38,6 @@ const NAV_ITEMS = [
   { to: '/admin/coupon', label: '札記' },
   { to: '/admin/payment-ledger', label: '金流' },
   { to: '/admin/devices', label: '監管' },
-  { to: '/admin/agent', label: '使者' },
 ];
 
 const AdminLayout = () => {
