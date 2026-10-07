@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 
 import { currency } from '../../assets/utils/filter';
+import Dialog from '../../components/admin/Dialog';
+import ProductImage from '../../components/admin/ProductImage';
 import FullPageLoading from '../../components/FullPageLoading';
 import Pagination from '../../components/Pagination';
 import useMessage from '../../hooks/useMessage';
@@ -13,18 +15,19 @@ import {
   deleteAdminOrder,
   deleteAllAdminOrders,
 } from '../../service/adminOrders';
-import {
-  getOrderPaymentMethod,
-  getCategoryMeta,
-} from '../../utils/paymentMethods';
+import { getOrderPaymentMethod } from '../../utils/paymentMethods';
 
 function AdminOrders() {
+  const selfHosted = import.meta.env.VITE_SHOWCASE === 'true' || (import.meta.env.VITE_API_MODE === 'self-hosted' &&
+    !document.cookie.split('; ').includes('myToken=enso-demo-token'));
   const { showError, showSuccess } = useMessage();
   const [orders, setOrders] = useState([]);
   const [pagination, setPagination] = useState({});
   const [tempOrder, setTempOrder] = useState(null);
   const [loading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [operationError, setOperationError] = useState('');
 
   // 搜尋與篩選
   const [searchText, setSearchText] = useState('');
@@ -43,8 +46,10 @@ function AdminOrders() {
   // 取得訂單列表
   const getOrders = async (page = 1) => {
     setIsLoading(true);
+    setLoadError('');
     try {
       const response = await getAdminOrders(page);
+      if (!response.data.success) throw new Error('訂單讀取失敗');
       if (response.data.success) {
         const ordersData = response.data.orders;
         const normalizedOrders = Array.isArray(ordersData)
@@ -54,7 +59,7 @@ function AdminOrders() {
         setPagination(response.data.pagination || {});
       }
     } catch (err) {
-      showError(err.response?.data?.message || '取得訂單資料失敗');
+      setLoadError('訂單資料載入失敗，請重新載入。');
     } finally {
       setIsLoading(false);
     }
@@ -62,17 +67,21 @@ function AdminOrders() {
 
   // 修改付款狀態
   const updatePaymentStatus = async (order, data) => {
+    setOperationError('');
     setIsLoading(true);
     try {
       const payload = data ?? { is_paid: !order?.is_paid };
       const resp = await updateAdminOrder(order, payload);
+      if (!resp.data.success) throw new Error('操作未成功');
       if (resp.data.success) {
-        showSuccess('已成功處理訂單付款！');
+        showSuccess('付款狀態已記錄，此操作不會收款或退款。');
         getOrders(pagination.current_page);
         setIsModalOpen(false);
       }
     } catch (err) {
-      showError(err.response?.data?.message || '付款處理失敗，請稍後再試');
+      setOperationError(
+        err.response?.data?.message || '付款處理失敗，請稍後再試'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -81,16 +90,16 @@ function AdminOrders() {
   // 刪除單筆訂單
   const deleteOrder = async (orderId) => {
     const result = await Swal.fire({
-      title: '確定要刪除此筆訂單嗎？',
-      text: '刪除後資料將無法還原！',
+      title: selfHosted ? '確定取消此筆未付款訂單？' : '確定要刪除此筆訂單嗎？',
+      text: selfHosted ? '庫存將回補，原始訂單會保留在資料庫中。' : '刪除後資料將無法還原！',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#984443',
-      cancelButtonColor: '#111111',
-      confirmButtonText: '是的，刪除它！',
+      confirmButtonColor: '#ba3e2a',
+      cancelButtonColor: '#09256f',
+      confirmButtonText: selfHosted ? '取消訂單並回補庫存' : '確認刪除',
       cancelButtonText: '取消',
-      background: '#FAF9F6',
-      color: '#111111',
+      background: '#fffaf6',
+      color: '#09256f',
     });
 
     if (!result.isConfirmed) return;
@@ -98,8 +107,9 @@ function AdminOrders() {
     setIsLoading(true);
     try {
       const resp = await deleteAdminOrder(orderId);
+      if (!resp.data.success) throw new Error('操作未成功');
       if (resp.data.success) {
-        showSuccess('訂單已刪除');
+        showSuccess(selfHosted ? '訂單已取消，庫存已回補。' : '訂單已刪除');
         const targetPage =
           orders.length <= 1 && pagination.current_page > 1
             ? pagination.current_page - 1
@@ -116,6 +126,7 @@ function AdminOrders() {
 
   // 修改訂單
   const modifyOrder = async (data) => {
+    setOperationError('');
     setIsLoading(true);
     try {
       const finalTotal = Object.values(data.products || {}).reduce(
@@ -124,13 +135,14 @@ function AdminOrders() {
       );
       const updatedData = { ...data, total: finalTotal };
       const resp = await updateAdminOrder(data, updatedData);
+      if (!resp.data.success) throw new Error('操作未成功');
       if (resp.data.success) {
         showSuccess('訂單已修改');
         getOrders(pagination.current_page);
         setIsModalOpen(false);
       }
     } catch (err) {
-      showError(err.response?.data?.message || '修改失敗');
+      setOperationError(err.response?.data?.message || '修改失敗，請稍後再試');
     } finally {
       setIsLoading(false);
     }
@@ -148,11 +160,11 @@ function AdminOrders() {
       text: '這項操作將會清除所有歷史紀錄，無法還原！',
       icon: 'error',
       showCancelButton: true,
-      confirmButtonColor: '#984443',
-      cancelButtonColor: '#111111',
+      confirmButtonColor: '#ba3e2a',
+      cancelButtonColor: '#09256f',
       confirmButtonText: '是的，全部清空！',
-      background: '#FAF9F6',
-      color: '#111111',
+      background: '#fffaf6',
+      color: '#09256f',
     });
 
     if (!result.isConfirmed) return;
@@ -160,6 +172,7 @@ function AdminOrders() {
     setIsLoading(true);
     try {
       const resp = await deleteAllAdminOrders();
+      if (!resp.data.success) throw new Error('操作未成功');
       if (resp.data.success) {
         showSuccess('全部訂單已刪除');
         getOrders(1);
@@ -176,6 +189,7 @@ function AdminOrders() {
   }, []);
 
   const openOrderModal = (order) => {
+    setOperationError('');
     setTempOrder(order);
     reset(order);
     setIsModalOpen(true);
@@ -191,8 +205,12 @@ function AdminOrders() {
     const keyword = searchText.trim().toLowerCase();
     const matchSearch =
       !keyword ||
-      order.id.toLowerCase().includes(keyword) ||
-      order.user.name.toLowerCase().includes(keyword);
+      String(order.id || '')
+        .toLowerCase()
+        .includes(keyword) ||
+      String(order.user?.name || '')
+        .toLowerCase()
+        .includes(keyword);
     const matchPaid =
       filterPaid === 'all' ||
       (filterPaid === 'paid' && order.is_paid) ||
@@ -201,546 +219,263 @@ function AdminOrders() {
   });
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] px-3 py-3 md:px-6 md:py-12 font-sans text-[#111111]">
-      {/* ===== Header ===== */}
-      <div className="max-w-7xl mx-auto mb-6 md:mb-20">
-        <div className="flex flex-row md:items-end justify-between gap-3 md:gap-8 border-b border-[#D1C7B7] pb-3 md:pb-10 relative">
-          <div className="absolute -bottom-[1px] left-0 w-24 h-[1px] bg-[#984443]"></div>
-          <div className="min-w-0">
-            <div className="text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.6em] text-[#984443] font-bold mb-1 md:mb-4 opacity-80">
-              Records
-            </div>
-            <h2 className="font-serif text-lg md:text-5xl font-medium tracking-tight text-[#111111]">
-              訂單管理
-              <span className="hidden md:inline text-[0.5em] ml-4 opacity-20 font-sans tracking-wider md:tracking-widest uppercase">
-                ORDER ARCHIVE
-              </span>
-            </h2>
-          </div>
-          <button
-            className="group relative px-3 md:px-10 py-2 md:py-3 overflow-hidden transition-all duration-500 shrink-0 self-end"
-            onClick={() => deleteOrderAll()}
-          >
-            <div className="absolute inset-0 border border-[#984443]/30 group-hover:border-[#984443] transition-colors"></div>
-            <div className="absolute inset-0 bg-[#984443] translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-            <span className="relative text-[0.75rem] uppercase tracking-[0.2em] md:tracking-[0.4em] font-bold text-[#984443] group-hover:text-white transition-colors whitespace-nowrap">
-              清空所有訂單
-            </span>
+    <div className="enso-page">
+      <header className="enso-page-header">
+        <div>
+          <h1 className="enso-page-title">訂單管理</h1>
+          <p className="enso-page-description">
+            核對收件資料、商品數量與付款狀態。
+          </p>
+        </div>
+        {!selfHosted && <button className="enso-button-secondary" onClick={deleteOrderAll}>
+          刪除全部訂單
+        </button>}
+      </header>
+      <div className="product-toolbar">
+        <label className="workspace-field">
+          <span>搜尋本頁訂單</span>
+          <input
+            type="search"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="訂單編號或收件人"
+          />
+        </label>
+        <div className="workspace-segmented">
+          {[
+            ['all', '全部'],
+            ['paid', '已付款'],
+            ['unpaid', '未付款'],
+          ].map(([value, label]) => (
+            <button
+              key={value}
+              aria-pressed={filterPaid === value}
+              onClick={() => setFilterPaid(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {loadError ? (
+        <div role="alert" className="workspace-error">
+          {loadError}
+          <button className="enso-button-secondary" onClick={() => getOrders()}>
+            重新載入
           </button>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto">
-        {/* Search & Filter - Editorial Style */}
-        <div className="flex flex-row gap-2 md:gap-8 mb-6 md:mb-12 items-center">
-          <div className="relative group flex-1 md:w-96 md:flex-none min-w-0">
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 text-[#111111]/30 group-focus-within:text-[#984443] transition-colors">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-            <input
-              type="text"
-              className="w-full bg-transparent border-b border-[#D1C7B7] py-3 pl-8 pr-4 text-sm focus:outline-none focus:border-[#111111] transition-all placeholder:italic placeholder:opacity-30"
-              placeholder="搜尋訂單編號或客戶姓名..."
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-            />
-          </div>
-
-          <div className="flex items-center gap-3 md:gap-6 flex-wrap">
-            <span className="hidden md:inline text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] font-bold opacity-30">
-              Status
-            </span>
-            <div className="flex gap-2 md:gap-4">
-              {['all', 'paid', 'unpaid'].map((status) => (
-                <button
-                  key={status}
-                  onClick={() => setFilterPaid(status)}
-                  className={`text-[12px] md:text-[0.75rem] uppercase tracking-[0.05em] md:tracking-[0.2em] font-bold px-2 md:px-4 py-1 md:py-1.5 transition-kyoto rounded-sm border whitespace-nowrap ${
-                    filterPaid === status
-                      ? 'bg-[#111111] text-white border-[#111111]'
-                      : 'border-[#D1C7B7] text-[#111111]/40 hover:border-[#111111]'
-                  }`}
-                >
-                  {status === 'all'
-                    ? '全部'
-                    : status === 'paid'
-                      ? '已付款'
-                      : '未付款'}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Orders Table */}
-        <div className="relative">
-          {/* Subtle noise pattern overlay for texture if needed, but keeping it clean for now */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-[#D1C7B7]/30 text-[10px] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] font-bold text-[#111111]/40">
-                  <th className="px-2 py-3 md:px-4 md:py-6 font-bold">
-                    訂單時間
-                  </th>
-                  <th className="px-2 py-3 md:px-4 md:py-6 font-bold hidden lg:table-cell">
-                    訂單編號
-                  </th>
-                  <th className="px-2 py-3 md:px-4 md:py-6 font-bold">
-                    客戶情資
-                  </th>
-                  <th className="px-2 py-3 md:px-4 md:py-6 font-bold hidden lg:table-cell">
-                    付款方式
-                  </th>
-                  <th className="px-2 py-3 md:px-4 md:py-6 font-bold hidden md:table-cell">
-                    付款狀態
-                  </th>
-                  <th className="px-2 py-3 md:px-4 md:py-6 font-bold text-right">
-                    訂單總額
-                  </th>
-                  <th className="px-2 py-3 md:px-4 md:py-6 font-bold text-center">
-                    細節檢索
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#D1C7B7]/10">
-                {filteredOrders.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan="7"
-                      className="px-4 py-32 text-center text-[#111111]/20 italic font-serif text-lg"
-                    >
-                      <div className="flex flex-col items-center gap-6">
-                        <div className="w-12 h-[1px] bg-[#984443]/30"></div>
-                        目前無任何交易紀錄
-                        <div className="w-12 h-[1px] bg-[#984443]/30"></div>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  filteredOrders.map((order) => {
-                    const paymentMethod = getOrderPaymentMethod(order);
-                    const catMeta = getCategoryMeta(paymentMethod);
-                    return (
-                      <tr
-                        key={order.id}
-                        className="hover:bg-[#111111]/[0.02] transition-colors duration-500 group"
-                      >
-                        <td className="px-2 py-3 md:px-4 md:py-8">
-                          <div className="font-medium text-[#111111] text-sm mb-1">
-                            {formatDate(order.create_at).split(' ')[0]}
-                          </div>
-                          <div className="text-[0.75rem] opacity-30 uppercase tracking-tighter">
-                            {formatDate(order.create_at).split(' ')[1]}
-                          </div>
-                        </td>
-                        <td className="px-2 py-3 md:px-4 md:py-8 hidden lg:table-cell">
-                          <span className="text-[0.75rem] opacity-30 font-mono tracking-tighter border-l border-[#D1C7B7] pl-4">
-                            {order.id.slice(0, 8)}...
-                          </span>
-                        </td>
-                        <td className="px-2 py-3 md:px-4 md:py-8 min-w-0">
-                          <div className="font-serif text-sm md:text-base text-[#111111] mb-1 break-all">
-                            {order.user.name}
-                          </div>
-                          <div className="text-[10px] md:text-[0.75rem] opacity-40 italic break-all">
-                            {order.user.email}
-                          </div>
-                          {/* 手機：把付款方式 + 狀態收進客戶情資儲存格 */}
-                          <div className="md:hidden flex items-center gap-2 mt-2 flex-wrap">
-                            <div
-                              className={`w-1.5 h-1.5 rounded-full ${order.is_paid ? 'bg-[#3A4D39]' : 'bg-[#984443]'}`}
-                            ></div>
-                            <span
-                              className={`text-[0.75rem] uppercase tracking-[0.2em] font-bold ${order.is_paid ? 'text-[#3A4D39]' : 'text-[#984443]'}`}
-                            >
-                              {order.is_paid
-                                ? 'PAID'
-                                : order.user.is_paid_mock
-                                  ? 'MOCK'
-                                  : 'UNPAID'}
-                            </span>
-                            {paymentMethod && (
-                              <span className="text-[0.75rem] opacity-50">
-                                · {paymentMethod.shortLabel}
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-2 py-3 md:px-4 md:py-8 hidden lg:table-cell">
-                          {paymentMethod ? (
-                            <div className="flex flex-col gap-1">
-                              <span
-                                className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-[0.75rem] font-bold rounded border w-fit ${catMeta?.colorClass ?? ''}`}
-                              >
-                                <i className={`bi ${paymentMethod.icon}`}></i>
-                                {paymentMethod.shortLabel}
-                              </span>
-                              {order.user.merchant_trade_no && (
-                                <span className="text-[0.75rem] font-mono opacity-40 tracking-tight">
-                                  {order.user.merchant_trade_no}
-                                </span>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-[0.75rem] opacity-20 italic">
-                              —
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-2 py-3 md:px-4 md:py-8 hidden md:table-cell">
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`w-1.5 h-1.5 rounded-full ${order.is_paid ? 'bg-[#3A4D39]' : 'bg-[#984443] animate-pulse'}`}
-                            ></div>
-                            <span
-                              className={`text-[0.75rem] uppercase tracking-[0.2em] font-bold ${order.is_paid ? 'text-[#3A4D39]' : 'text-[#984443]'}`}
-                            >
-                              {order.is_paid
-                                ? 'PAID'
-                                : order.user.is_paid_mock
-                                  ? 'MOCK PAID'
-                                  : 'UNPAID'}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-2 py-3 md:px-4 md:py-8 text-right font-serif text-xl font-medium">
-                          <span className="text-xs opacity-30 mr-2">NT$</span>
-                          {currency(order.total)}
-                        </td>
-                        <td className="px-2 py-3 md:px-4 md:py-8 text-center">
-                          <button
-                            className="px-6 py-2 text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] font-bold text-[#111111]/40 border border-[#D1C7B7]/40 hover:border-[#111111] hover:text-[#111111] transition-all duration-300"
-                            onClick={() => openOrderModal(order)}
-                          >
-                            檢視
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })
+      ) : (
+        <div className="enso-table-shell workspace-data-table" tabIndex={0} role="region" aria-label="資料表格，可左右捲動查看操作欄">
+          <p className="workspace-table-hint">左右滑動表格，可查看完整資料與操作。</p>
+          <table>
+            <thead>
+              <tr>
+                {['訂單編號與時間', '收件人', '金額', '付款狀態', '操作'].map(
+                  (label) => (
+                    <th key={label} scope="col">
+                      {label}
+                    </th>
+                  )
                 )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div className="mt-20 flex justify-center pb-20">
-          <Pagination pagination={pagination} onChangePage={getOrders} />
-        </div>
-      </div>
-
-      {/* Bespoke Order Detail Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12">
-          <div
-            className="absolute inset-0 bg-[#111111]/90 backdrop-blur-md"
-            onClick={() => setIsModalOpen(false)}
-          ></div>
-
-          <div className="relative w-full max-w-6xl bg-[#FAF9F6] shadow-2xl overflow-hidden flex flex-col max-h-full animate-in fade-in zoom-in duration-500">
-            {/* Modal Header - Dark themed for contrast */}
-            <div className="bg-[#111111] p-3 md:p-10 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-[#984443]/30">
-              <div className="mb-6 md:mb-0">
-                <div className="text-[0.75rem] uppercase tracking-[0.2em] md:tracking-[0.6em] text-[#984443] font-bold mb-3">
-                  Order Specification
-                </div>
-                <h3 className="font-serif text-3xl text-white mb-2">
-                  交易情資明細
-                </h3>
-                <div className="flex items-center gap-4 text-[0.75rem] text-white/40 font-mono">
-                  <span>ID: {tempOrder?.id}</span>
-                  <span className="w-1 h-1 rounded-full bg-white/20"></span>
-                  <span className="uppercase tracking-wider md:tracking-widest">
-                    {tempOrder && formatDate(tempOrder.create_at)}
-                  </span>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="group relative w-12 h-12 flex items-center justify-center"
-              >
-                <div className="absolute inset-0 border border-white/10 group-hover:border-white/40 transition-colors"></div>
-                <span className="text-white text-xl font-light group-hover:rotate-90 transition-transform duration-500">
-                  ✕
-                </span>
-              </button>
-            </div>
-
-            <div className="flex-grow overflow-y-auto custom-scrollbar p-3 md:p-10">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-16">
-                {/* Left Side: User Bio Data */}
-                <div className="lg:col-span-4 space-y-12">
-                  <section>
-                    <div className="flex items-center gap-4 mb-8">
-                      <div className="w-8 h-[1px] bg-[#984443]"></div>
-                      <h6 className="text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] text-[#111111] font-bold">
-                        收件情資書
-                      </h6>
-                    </div>
-
-                    <div className="space-y-8">
-                      <div className="group">
-                        <label className="text-[0.75rem] uppercase tracking-wider md:tracking-widest text-[#111111]/40 block mb-2 font-bold group-focus-within:text-[#984443] transition-colors">
-                          姓名 / FULL NAME
-                        </label>
-                        <input
-                          type="text"
-                          className={`w-full bg-transparent border-b border-[#D1C7B7] py-2 text-lg font-serif focus:outline-none focus:border-[#111111] transition-all ${errors.user?.name ? 'border-[#984443]' : ''}`}
-                          {...register('user.name', { required: true })}
-                        />
-                      </div>
-                      <div className="group">
-                        <label className="text-[0.75rem] uppercase tracking-wider md:tracking-widest text-[#111111]/40 block mb-2 font-bold group-focus-within:text-[#984443] transition-colors">
-                          聯絡電話 / CONTACT
-                        </label>
-                        <input
-                          type="tel"
-                          className="w-full bg-transparent border-b border-[#D1C7B7] py-2 font-mono text-sm focus:outline-none focus:border-[#111111] transition-all"
-                          {...register('user.tel', { required: true })}
-                        />
-                      </div>
-                      <div className="group">
-                        <label className="text-[0.75rem] uppercase tracking-wider md:tracking-widest text-[#111111]/40 block mb-2 font-bold group-focus-within:text-[#984443] transition-colors">
-                          地址 / SHIPPING ADDRESS
-                        </label>
-                        <input
-                          type="text"
-                          className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-sm focus:outline-none focus:border-[#111111] transition-all"
-                          {...register('user.address', { required: true })}
-                        />
-                      </div>
-                      <div className="group">
-                        <label className="text-[0.75rem] uppercase tracking-wider md:tracking-widest text-[#111111]/40 block mb-2 font-bold group-focus-within:text-[#984443] transition-colors">
-                          電子郵件 / EMAIL
-                        </label>
-                        <input
-                          type="email"
-                          className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-sm italic focus:outline-none focus:border-[#111111] transition-all"
-                          {...register('user.email', { required: true })}
-                        />
-                      </div>
-                    </div>
-                  </section>
-
-                  <section>
-                    <label className="text-[0.75rem] uppercase tracking-wider md:tracking-widest text-[#111111]/40 block mb-3 font-bold">
-                      客戶留言 / MESSAGE
-                    </label>
-                    <div className="p-3 md:p-6 bg-white border border-[#D1C7B7]/40 font-serif text-sm italic relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-8 h-8 opacity-5">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H15.017C14.4647 8 14.017 8.44772 14.017 9V12C14.017 12.5523 13.5693 13 13.017 13H11.017C10.4647 13 10.017 12.5523 10.017 12V9C10.017 7.34315 11.3601 6 13.017 6H19.017C20.6738 6 22.017 7.34315 22.017 9V15C22.017 17.1111 21.0503 19.0667 19.5397 20.4038C19.3444 20.5772 19.1222 20.7259 18.882 20.8385L18.017 21H14.017ZM3.017 21L3.017 18C3.017 16.8954 3.91243 16 5.017 16H8.017C8.56928 16 9.017 15.5523 9.017 15V9C9.017 8.44772 8.56928 8 8.017 8H4.017C3.46472 8 3.017 8.44772 3.017 9V12C3.017 12.5523 2.56928 13 2.017 13H0.017C-0.535282 13 -1.017 12.5523 -1.017 12V9C-1.017 7.34315 0.326142 6 2.017 6H8.017C9.67386 6 11.017 7.34315 11.017 9V15C11.017 17.1111 10.0503 19.0667 8.53974 20.4038C8.3444 20.5772 8.12216 20.7259 7.88203 20.8385L7.017 21H3.017Z" />
-                        </svg>
-                      </div>
-                      {watch('message') || '本案件目前無備註說明。'}
-                    </div>
-                  </section>
-
-                  {/* 金流資訊：只有 mock 綠界訂單才有 paid_method */}
-                  {(() => {
-                    const pm = getOrderPaymentMethod(tempOrder);
-                    const cm = getCategoryMeta(pm);
-                    if (!pm) return null;
-                    return (
-                      <section>
-                        <label className="text-[0.75rem] uppercase tracking-wider md:tracking-widest text-[#111111]/40 block mb-3 font-bold">
-                          金流資訊 / ECPAY
-                        </label>
-                        <div className="p-3 md:p-6 bg-white border border-[#D1C7B7]/40 space-y-2 text-sm">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[#111111]/50">付款方式</span>
-                            <span
-                              className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-[0.75rem] font-bold rounded border ${cm?.colorClass ?? ''}`}
-                            >
-                              <i className={`bi ${pm.icon}`}></i>
-                              {pm.label}
-                            </span>
-                          </div>
-                          {tempOrder?.user?.merchant_trade_no && (
-                            <div className="flex items-center justify-between">
-                              <span className="text-[#111111]/50">
-                                商店交易編號
-                              </span>
-                              <span className="font-mono text-xs">
-                                {tempOrder.user.merchant_trade_no}
-                              </span>
-                            </div>
-                          )}
-                          {tempOrder?.user?.check_mac_value && (
-                            <div className="flex items-center justify-between">
-                              <span className="text-[#111111]/50">
-                                CheckMacValue
-                              </span>
-                              <span
-                                className="font-mono text-[12px] opacity-50 truncate max-w-[200px]"
-                                title={tempOrder.user.check_mac_value}
-                              >
-                                {tempOrder.user.check_mac_value.slice(0, 16)}…
-                              </span>
-                            </div>
-                          )}
-                          {tempOrder?.user?.is_paid_mock &&
-                            !tempOrder?.is_paid && (
-                              <div className="mt-2 pt-2 border-t border-[#D1C7B7]/30 text-[0.75rem] text-amber-700 italic">
-                                ⓘ 此訂單的金流為 demo
-                                模擬，未真實收款；HexSchool 的 is_paid 仍為
-                                false，可在下方手動更新。
-                              </div>
-                            )}
-                        </div>
-                      </section>
-                    );
-                  })()}
-                </div>
-
-                {/* Right Side: Product Matrix */}
-                <div className="lg:col-span-8 flex flex-col">
-                  <div className="flex justify-between items-center mb-10 pb-4 border-b border-[#D1C7B7]/30">
-                    <h6 className="text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] text-[#111111] font-bold">
-                      商品明細清冊
-                    </h6>
-                    <button
-                      className="text-[0.75rem] uppercase tracking-[0.2em] font-bold text-[#984443] hover:text-[#111111] transition-colors flex items-center gap-2"
-                      onClick={handleSubmit(modifyOrder)}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredOrders.map((order) => (
+                <tr key={order.id}>
+                  <td>
+                    <strong>{order.id}</strong>
+                    <small className="block text-ink-muted">
+                      {formatDate(order.create_at)}
+                    </small>
+                  </td>
+                  <td>{order.user?.name || '未填姓名'}</td>
+                  <td>NT$ {currency(order.total)}</td>
+                  <td>
+                    <span
+                      className={
+                        'enso-status enso-status--' +
+                        (order.is_paid ? 'success' : 'warning')
+                      }
                     >
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#984443]"></span>
-                      更新訂單數據
-                    </button>
-                  </div>
-
-                  <div className="space-y-6">
-                    {tempOrder &&
-                      Object.entries(tempOrder.products).map(([id, item]) => (
-                        <div
-                          key={id}
-                          className="flex gap-3 md:gap-8 group pb-6 border-b border-[#D1C7B7]/10 last:border-0"
-                        >
-                          <div className="w-24 h-32 bg-white p-1 border border-[#D1C7B7]/30 overflow-hidden shrink-0">
-                            <img
-                              src={item.product.imageUrl}
-                              className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
-                            />
-                          </div>
-                          <div className="flex-grow flex flex-col justify-between py-1">
-                            <div>
-                              <div className="text-[0.75rem] uppercase tracking-wider md:tracking-widest text-[#984443] font-bold mb-2">
-                                {item.product.category}
-                              </div>
-                              <h4 className="font-serif text-xl text-[#111111] mb-1">
-                                {item.product.title}
-                              </h4>
-                              <div className="text-[0.75rem] opacity-30 font-mono italic">
-                                UNIT PRICE: ${currency(item.product.price)}
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4">
-                                <span className="text-[0.75rem] uppercase tracking-wider md:tracking-widest opacity-40 font-bold">
-                                  Quantity
-                                </span>
-                                <div className="flex items-center border border-[#D1C7B7] rounded-sm bg-white overflow-hidden">
-                                  <input
-                                    type="number"
-                                    className="w-14 h-8 text-center text-sm font-bold focus:outline-none"
-                                    {...register(`products.${id}.qty`, {
-                                      valueAsNumber: true,
-                                    })}
-                                  />
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <div className="text-[0.75rem] uppercase opacity-30 font-bold tracking-wider md:tracking-widest mb-1">
-                                  Subtotal
-                                </div>
-                                <div className="font-serif text-lg font-medium text-[#111111]">
-                                  $
-                                  {currency(
-                                    (watch(`products.${id}.qty`) || 0) *
-                                      item.product.price
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-
-                  <div className="mt-auto pt-16 border-t border-[#111111] border-opacity-10">
-                    <div className="flex flex-col md:flex-row justify-between items-end gap-3 md:gap-12">
-                      <div className="order-2 md:order-1">
-                        <div className="text-[0.75rem] uppercase tracking-wider md:tracking-widest text-[#111111]/40 mb-3 font-bold">
-                          Status Update
-                        </div>
-                        <button
-                          type="button"
-                          className={`px-10 py-3 text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] font-bold shadow-sm transition-all duration-500 border ${
-                            tempOrder?.is_paid
-                              ? 'border-[#984443] text-[#984443] hover:bg-[#984443] hover:text-white'
-                              : 'bg-[#3A4D39] border-[#3A4D39] text-white hover:bg-[#111111] hover:border-[#111111]'
-                          }`}
-                          onClick={() => updatePaymentStatus(tempOrder)}
-                        >
-                          {tempOrder?.is_paid
-                            ? '標記為未付款 / UNPAY'
-                            : '確認已收款 / CONFIRM'}
-                        </button>
-                      </div>
-
-                      <div className="text-right order-1 md:order-2">
-                        <div className="text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] text-[#984443] mb-2 font-bold opacity-80">
-                          Total Valuation
-                        </div>
-                        <div className="font-serif text-6xl font-medium text-[#111111] tracking-tighter">
-                          <span className="text-xl opacity-20 align-top mr-4 mt-2 inline-block">
-                            NT$
-                          </span>
-                          {currency(totalPrice)}
-                        </div>
-                      </div>
+                      {order.is_paid ? '已付款' : '未付款'}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="product-actions">
+                      <button
+                        className="workspace-link"
+                        onClick={() => openOrderModal(order)}
+                      >
+                        查看與編輯
+                      </button>
+                      <button
+                        className="workspace-link workspace-link--danger"
+                        onClick={() => deleteOrder(order.id)}
+                        disabled={selfHosted && order.is_paid}
+                      >
+                        {selfHosted ? '取消訂單' : '刪除'}
+                      </button>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-3 md:p-8 bg-white border-t border-[#D1C7B7]/30 flex justify-between items-center">
-              <button
-                type="button"
-                className="px-8 py-2 text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] font-bold text-[#111111]/30 hover:text-[#984443] transition-colors"
-                onClick={() => deleteOrder(tempOrder.id)}
-              >
-                刪除此筆記錄 / DELETE
-              </button>
-              <button
-                type="button"
-                className="px-12 py-3 bg-[#111111] text-white text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] font-bold hover:bg-[#984443] transition-all duration-500 shadow-xl"
-                onClick={() => setIsModalOpen(false)}
-              >
-                關閉情資 / CLOSE
-              </button>
-            </div>
-          </div>
+                  </td>
+                </tr>
+              ))}
+              {!filteredOrders.length && (
+                <tr>
+                  <td colSpan="5">
+                    沒有符合條件的訂單，請調整搜尋或付款狀態。
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       )}
-
-      <FullPageLoading isLoading={loading} />
+      <div className="workspace-pagination">
+        <Pagination pagination={pagination} onChangePage={getOrders} />
+      </div>
+      {isModalOpen && (
+        <Dialog
+          title="訂單詳情與編輯"
+          busy={loading}
+          onClose={() => setIsModalOpen(false)}
+          footer={
+            <>
+              <button
+                className="enso-button-secondary"
+                onClick={() => setIsModalOpen(false)}
+                disabled={loading}
+              >
+                取消
+              </button>
+              <button
+                className="enso-button-primary"
+                type="submit"
+                form="order-editor"
+                disabled={loading}
+              >
+                {loading ? '儲存中…' : '儲存訂單'}
+              </button>
+            </>
+          }
+        >
+          {operationError && (
+            <p className="workspace-error" role="alert">
+              {operationError}
+            </p>
+          )}
+          <p className="workspace-hint">
+            訂單 {tempOrder.id}・{formatDate(tempOrder.create_at)}
+          </p>
+          <form id="order-editor" onSubmit={handleSubmit(modifyOrder)}>
+            <fieldset disabled={loading}>
+              <div className="workspace-field-grid">
+                {[
+                  ['name', '收件人姓名', 'text'],
+                  ['tel', '聯絡電話', 'tel'],
+                  ['address', '收件地址', 'text'],
+                  ['email', '電子郵件', 'email'],
+                ].map(([name, label, type]) => (
+                  <label className="workspace-field" key={name}>
+                    <span>{label}（必填）</span>
+                    <input
+                      type={type}
+                      {...register('user.' + name, {
+                        required: '請填寫' + label,
+                      })}
+                      aria-invalid={!!errors.user?.[name]}
+                    />
+                    {errors.user?.[name] && (
+                      <span className="text-danger">
+                        {errors.user[name].message}
+                      </span>
+                    )}
+                  </label>
+                ))}
+              </div>
+              <p className="workspace-hint">
+                客戶留言：{watch('message') || '無'}
+              </p>
+              <h3 className="text-base font-bold mb-4">商品明細</h3>
+              <div className="order-items">
+                {Object.entries(tempOrder.products || {}).map(([id, item]) => (
+                  <div className="order-item" key={id}>
+                    <div className="product-thumbnail">
+                      <ProductImage
+                        variant="thumb"
+                        src={item.product?.imageUrl}
+                        alt={(item.product?.title || '商品') + '主圖'}
+                      />
+                    </div>
+                    <div>
+                      <strong>{item.product?.title || '未命名商品'}</strong>
+                      <p className="workspace-hint">
+                        單價 NT$ {currency(item.product?.price)}
+                      </p>
+                    </div>
+                    <label className="workspace-field">
+                      <span>數量</span>
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        {...register('products.' + id + '.qty', {
+                          valueAsNumber: true,
+                          required: true,
+                          min: 1,
+                          validate: (value) =>
+                            Number.isInteger(value) || '數量須為正整數',
+                        })}
+                      />
+                      {errors.products?.[id]?.qty && (
+                        <span className="text-danger">請填寫正整數</span>
+                      )}
+                    </label>
+                  </div>
+                ))}
+              </div>
+              <p className="text-lg font-bold mt-4">
+                商品合計：NT$ {currency(totalPrice)}
+                {selfHosted && <span className="block workspace-hint">實付總額由伺服器依原訂單折扣計算。已付款訂單不可修改數量。</span>}
+              </p>
+              <p className="workspace-hint">
+                儲存會依商品單價與數量重新計算訂單金額，請先確認折扣與原訂單差異。
+              </p>
+            </fieldset>
+          </form>
+          <section className="order-payment">
+            <h3 className="text-base font-bold">付款資訊</h3>
+            <p className="workspace-hint">
+              {getOrderPaymentMethod(tempOrder)?.label || '尚未提供付款方式'}・
+              {tempOrder.is_paid ? '已付款' : '未付款'}
+            </p>
+            {tempOrder.user?.merchant_trade_no && (
+              <p className="workspace-hint">
+                商店交易編號：{tempOrder.user.merchant_trade_no}
+              </p>
+            )}
+            {tempOrder.user?.check_mac_value && (
+              <details>
+                <summary>檢視交易驗證碼</summary>
+                <p className="workspace-hint break-all">
+                  {tempOrder.user.check_mac_value}
+                </p>
+              </details>
+            )}
+            <p className="workspace-hint">
+              這個按鈕只修改訂單標記，不會執行收款或退款。
+            </p>
+            <button
+              className="enso-button-secondary"
+              disabled={loading || (selfHosted && tempOrder.is_paid)}
+              onClick={() => updatePaymentStatus(tempOrder)}
+            >
+              {selfHosted && tempOrder.is_paid ? '已記錄付款' : tempOrder.is_paid ? '標記為未付款' : '標記為已付款'}
+            </button>
+          </section>
+        </Dialog>
+      )}
+      <FullPageLoading isLoading={loading && !isModalOpen} />
     </div>
   );
 }
-
 export default AdminOrders;

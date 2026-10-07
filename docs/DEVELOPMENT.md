@@ -29,29 +29,30 @@ import 順序走 `eslint-plugin-simple-import-sort` 自動排序，分組：
 
 | 變數 | 預設 | 用途 | 若留空會怎樣 |
 |---|---|---|---|
-| `VITE_API_BASE` | — | HexSchool API base | 所有後台頁面 API 都會打到 `undefined/api/...`，整站壞 |
-| `VITE_API_PATH` | — | HexSchool 租戶 path | 同上 |
+| `VITE_API_BASE` | — | 自建 API base，本機 http://127.0.0.1:3001 | 真實 API 無法連線，展示模式不受影響 |
+| `VITE_API_PATH` | — | 商店 path，本機 enso | 真實管理路由無法連線 |
 
 ### 選填
 
 | 變數 | 預設 | 用途 | 若留空會怎樣 |
 |---|---|---|---|
-| `VITE_AGENT_API_BASE` | `http://localhost:3000` | ENSO-Frontend-demo (Next.js) 的 base URL | `/admin/agent` 頁面所有 agent 功能連線失敗；其他頁面正常 |
+| `VITE_API_MODE` | 未設定 | self-hosted 啟用自建後端的操作限制與庫存紀錄 | 維持舊 API 相容顯示 |
+| `VITE_ENABLE_DEMO` | true | 展示模式入口 | false 可關閉入口，但伺服器仍須自行驗證所有管理請求 |
 
 ### 在 Vercel 設定
 
-**Project Settings → Environment Variables**，三個變數都勾 Production / Preview / Development。
+前端在 **Project Settings → Environment Variables** 設定公開的 API URL、path 與 mode。後端資料庫與管理員密碼只設在 API 主機，不放進 Vite。不同環境應使用不同 API 與資料庫，不能直接部署指向本機的 dist。
 
 ### 安全注意
 
 - `.env` **不 tracked**。`.gitignore` 已列入。
 - `.env.example` **tracked**，作為 clone 後參考。
-- 目前 `.env` 的內容都不是 secret（HexSchool API path 是公開的）。**未來若加 Anthropic API key，切勿放在 `VITE_` 前綴裡** — Vite 會把 `VITE_*` 打包到前端 bundle，等於公開。Anthropic key 應只放在 Next.js repo 的後端環境變數裡。
+- server/.env 含資料庫與管理員密碼，必須保持忽略且不可輸出到紀錄。VITE_ 變數會進入瀏覽器程式碼，只能放公開設定。
 
 ## 新增 API 呼叫
 
 1. 在 [src/service/](../src/service/) 建立或修改對應檔。
-2. 用 `apiAuth`（for HexSchool）或 `fetch`（for agent 後端）。
+2. 管理 API 使用 apiAuth，由攔截器統一處理 Token 與展示模式。隱藏功能不在目前開發範圍。
 3. 匯出具名函式（`export const getXxx = (...) => ...`）。
 4. 不要在 View 裡 `import axios` 直接打 — 走 service 層。
 
@@ -93,21 +94,9 @@ axios.get(`.../foo/${id}`);
 
 ## 樣式系統
 
-混用兩套，**不要再加第三套**：
+主要使用 `src/assets/index.css` 的 ENSO 設計 token、共用元件類別與 Tailwind CSS 4。Bootstrap 保留供相容元件使用，放在低優先序的 bootstrap 樣式層，不再以舊版 Bootstrap Modal 建立新視窗。
 
-1. **Bootstrap 5 classes**：`btn`, `form-control`, `modal` 等（主要用於 Login、ProductModal）
-2. **自訂 Tailwind-風格 utility classes** 搭配專案色票：`bg-[#FAF9F6]`, `text-[#984443]`, `transition-kyoto`
-
-自訂色票（日式侘寂風）：
-
-| Token | 色值 | 用途 |
-|---|---|---|
-| `#FAF9F6` | 米白 | 背景 |
-| `#111111` | 近黑 | 主文字 |
-| `#984443` | 朱紅 | 強調、錯誤 |
-| `#735C00` | 深黃 | 警告 |
-| `#3A4D39` | 墨綠 | 成功 |
-| `#D1C7B7` | 灰米 | 邊框、分隔線 |
+共用表單使用 workspace-field，互動視窗使用原生 Dialog 元件，圖片使用 ProductImage。品牌色彩、元件與斷點請依 [ENSO 後台設計系統](ENSO-ADMIN-DESIGN.md)，不再沿用舊版日式視覺規則。
 
 ## Linter & Formatter
 
@@ -160,3 +149,8 @@ Prettier 有裝但無 `format` script；IDE 用儲存即格式化。
 | `style` | 格式化 |
 
 見 [src/../.claude/agents/git-committer.md](../.claude/agents/git-committer.md)（如果已建立）。
+# 完整展示開發補充
+
+購物副本位於 storefront，具有自己的 package.json。修改前後台後，在根目錄執行 npm run build:showcase，再於 server 執行 npm run showcase，以同源 3002 驗证。伺服器入口不自動監看 build。原本 5175 管理開發模式仍可使用，不要把該模式的 localStorage demo 與新的 PostgreSQL 展示混為一談。
+
+完整啟動、功能邊界與部署變數見 [面試展示指南](INTERVIEW-DEMO.md)。

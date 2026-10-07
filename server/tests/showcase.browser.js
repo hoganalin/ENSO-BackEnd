@@ -1,0 +1,138 @@
+import { randomUUID } from 'node:crypto';
+import { once } from 'node:events';
+import { mkdir } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import assert from 'node:assert/strict';
+import pg from 'pg';
+import { chromium, expect } from '../../node_modules/@playwright/test/index.mjs';
+import { createShowcase } from '../src/showcase.js';
+
+const url = new URL(process.env.DATABASE_URL);
+if (!['127.0.0.1', 'localhost'].includes(url.hostname) || url.pathname !== '/enso_local') throw new Error('Only local test database is allowed');
+const schema = `enso_showcase_test_${randomUUID().replaceAll('-', '')}`;
+const pool = new pg.Pool({ connectionString: url.href });
+let control, service, server, browser;
+const base = 'http://127.0.0.1:5180';
+const output = fileURLToPath(new URL('../../.impeccable/review/showcase/', import.meta.url));
+const workspaces = [];
+try {
+  const before = (await pool.query('SELECT (SELECT count(*) FROM public.products) products,(SELECT count(*) FROM public.orders) orders')).rows[0];
+  await pool.query(`CREATE SCHEMA "${schema}"`);
+  control = new pg.Pool({ connectionString: url.href, options: `-c search_path=${schema}` });
+  service = await createShowcase({ control, databaseUrl: url.href, publicUrl: base, origins: [base] });
+  server = service.app.listen(5180, '127.0.0.1');
+  await once(server, 'listening');
+  browser = await chromium.launch();
+  await mkdir(output, { recursive: true });
+  for (const width of [1440, 390]) {
+    const context = await browser.newContext({ viewport: { width, height: 1000 } });
+    const page = await context.newPage();
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    page.setDefaultTimeout(15000);
+    await page.goto(`${base}/shop/`);
+    await page.getByRole('button', { name: '開始完整體驗' }).click();
+    await expect(page.locator('.interview-banner')).toBeVisible();
+    const workspace = await page.evaluate(() => JSON.parse(sessionStorage.getItem('enso.interview.workspace.v1')));
+    workspaces.push(workspace);
+    const api = `${base}/demo-api/${workspace.id}/api/enso`;
+    const admin = async (path, method = 'GET', data) => {
+      const r = await fetch(`${api}/admin${path}`, { method, headers: { Authorization: workspace.adminToken, 'Content-Type': 'application/json' }, body: data ? JSON.stringify({ data }) : undefined });
+      assert.ok(r.ok, `${path}: ${r.status}`); return r.json();
+    };
+    await expect(page.getByRole('button', { name: '加入購物車 — NT$980', exact: true })).toBeEnabled();
+    await page.screenshot({ path: `${output}home-${width}.png`, fullPage: true });
+    await page.goto(`${base}/shop/#/product`);
+    await page.getByLabel('搜尋香氣').fill('不存在的香氣');
+    await expect(page.getByText('沒有符合條件的香氣，請調整搜尋或分類。')).toBeVisible();
+    await page.getByLabel('搜尋香氣').fill('琥珀黃昏');
+    await page.getByRole('link', { name: '琥珀黃昏商品主圖 琥珀黃昏' }).click();
+    await expect(page.getByRole('heading', { name: '琥珀黃昏', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: '加入購物車', exact: true }).click();
+    await expect(page.getByText('已加入購物車', { exact: true })).toBeVisible();
+    await page.getByRole('link', { name: '查看購物車', exact: true }).click();
+    await page.getByRole('button', { name: '增加琥珀黃昏數量' }).click();
+    await expect(page.getByLabel('商品數量', { exact: true })).toHaveText('2');
+    await page.reload();
+    await expect(page.getByLabel('商品數量', { exact: true })).toHaveText('2');
+    await page.getByRole('link', { name: '填寫展示訂單' }).click();
+    await page.getByRole('button', { name: '確認建立未付款訂單' }).click();
+    await expect(page.getByRole('heading', { name: '展示訂單已建立' })).toBeVisible();
+    const orderId = await page.locator('.shop-order-id').innerText();
+    assert.equal((await admin('/orders')).orders.length, 1);
+    let product = (await admin('/products')).products.find((p) => p.title === '琥珀黃昏');
+    assert.equal(product.inventory, 10);
+    await page.getByRole('link', { name: '到後台查看這筆訂單' }).click();
+    const row = page.getByRole('row').filter({ hasText: orderId });
+    await expect(row).toContainText('未付款');
+    await page.screenshot({ path: `${output}orders-${width}.png`, fullPage: true });
+    await row.getByRole('button', { name: '取消訂單' }).click();
+    const cancelled = page.waitForResponse((r) => r.url().endsWith(`/admin/order/${orderId}`) && r.request().method() === 'DELETE');
+    await page.getByRole('button', { name: '取消訂單並回補庫存' }).click();
+    assert.equal((await cancelled).status(), 200);
+    await expect(row).toHaveCount(0);
+    product = (await admin('/products')).products.find((p) => p.title === '琥珀黃昏');
+    assert.equal(product.inventory, 12);
+    await page.goto(`${base}/#/admin/product`);
+    await page.getByRole('button', { name: '編輯琥珀黃昏', exact: true }).click();
+    await page.getByLabel('售價（NT$）（必填）').fill('888');
+    await page.getByRole('button', { name: '儲存商品', exact: true }).click();
+    await expect(page.locator('dialog')).toHaveCount(0);
+    await page.goto(`${base}/shop/#/product/${product.id}`);
+    await expect(page.locator('.shop-price')).toHaveText('NT$888');
+    await page.getByRole('button', { name: '加入購物車', exact: true }).click();
+    await expect(page.getByText('已加入購物車', { exact: true })).toBeVisible();
+    await page.getByRole('link', { name: '查看購物車', exact: true }).click();
+    await page.getByRole('link', { name: '填寫展示訂單' }).click();
+    product = (await admin('/products')).products.find((p) => p.id === product.id);
+    await admin(`/product/${product.id}`, 'PUT', { ...product, price: 900 });
+    await page.getByRole('button', { name: '確認建立未付款訂單' }).click();
+    await expect(page.getByRole('button', { name: '確認更新後的購物車與金額' })).toBeEnabled();
+    await page.getByRole('button', { name: '確認更新後的購物車與金額' }).click();
+    // The server commits, but the browser loses the response. Retry must not deduct twice.
+    await page.route('**/api/enso/order', async (route) => { await route.fetch(); await route.abort('failed'); }, { times: 1 });
+    await page.getByRole('button', { name: '確認建立未付款訂單' }).click();
+    await expect(page.getByRole('button', { name: '重試同一筆訂單' })).toBeEnabled();
+    await page.getByRole('button', { name: '重試同一筆訂單' }).click();
+    await expect(page.getByRole('heading', { name: '展示訂單已建立' })).toBeVisible();
+    assert.equal((await admin('/orders')).orders.length, 1);
+    assert.equal((await admin('/products')).products.find((p) => p.id === product.id).inventory, 11);
+    await admin(`/product/${product.id}`, 'PUT', { ...(await admin('/products')).products.find((p) => p.id === product.id), inventory: 0 });
+    await page.goto(`${base}/shop/#/product/${product.id}`);
+    await expect(page.getByRole('button', { name: '目前售完' })).toBeDisabled();
+    await page.route('**/api/enso/products/all', (route) => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ success: false, message: '測試暫停，請重試' }) }), { times: 1 });
+    await page.goto(`${base}/shop/#/product`);
+    await expect(page.getByText('測試暫停，請重試')).toBeVisible();
+    await page.getByRole('button', { name: '重新載入商品' }).click();
+    await expect(page.locator('.shop-product')).toHaveCount(6);
+    await page.goto(`${base}/shop/#/product/${product.id}`);
+    await page.screenshot({ path: `${output}product-${width}.png`, fullPage: true });
+    for (const size of [320, 768, 1024, 1440]) {
+      await page.setViewportSize({ width: size, height: 1000 });
+      assert.ok(await page.evaluate(() => globalThis.document.documentElement.scrollWidth <= globalThis.innerWidth + 1), `Overflow at ${size}`);
+    }
+    assert.deepEqual(errors, []);
+    await context.close();
+    console.log(`PASS actual storefront checkout, admin cancellation, stock restoration, price edit, responsiveness: ${width}`);
+  }
+  assert.equal((await fetch(`${base}/demo-api/${'-'.repeat(36)}/health`)).status, 404);
+  assert.equal((await fetch(`${base}/demo-api/session`, { method: 'POST', headers: { Origin: 'https://untrusted.example' } })).status, 403);
+  const rows = (await control.query('SELECT * FROM enso_demo_workspaces')).rows;
+  assert.equal(rows.length, 2);
+  assert.equal((await fetch(`${base}/demo-api/${workspaces[1].id}/api/enso/admin/orders`, { headers: { Authorization: workspaces[0].adminToken } })).status, 401);
+  assert.equal((await fetch(`${base}/demo-api/${workspaces[1].id}/api/enso/cart`, { headers: { 'X-Guest-Token': workspaces[0].guestToken } })).status, 401);
+  await control.query('UPDATE enso_demo_workspaces SET expires_at=now()');
+  assert.equal((await fetch(`${base}/demo-api/${rows[0].id}/health`)).status, 410);
+  await service.cleanup();
+  assert.equal((await control.query('SELECT count(*) FROM enso_demo_workspaces')).rows[0].count, '0');
+  assert.deepEqual((await pool.query('SELECT (SELECT count(*) FROM public.products) products,(SELECT count(*) FROM public.orders) orders')).rows[0], before);
+  console.log('PASS origin rejection, invalid ID, expiry cleanup, real catalog unchanged');
+} finally {
+  await browser?.close();
+  if (server) await new Promise((resolve) => server.close(resolve));
+  if (control && service) { await control.query('UPDATE enso_demo_workspaces SET expires_at=now()'); await service.cleanup(); await service.close(); }
+  await control?.end();
+  // Only this invocation’s generated test control schema is removed.
+  await pool.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
+  await pool.end();
+}

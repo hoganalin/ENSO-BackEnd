@@ -1,36 +1,26 @@
 import { useState, useEffect } from 'react';
 
+import Dialog from '../../components/admin/Dialog';
+import ProductImage from '../../components/admin/ProductImage';
 import FullPageLoading from '../../components/FullPageLoading';
 import Pagination from '../../components/Pagination';
 import useMessage from '../../hooks/useMessage';
 import {
   getAdminProducts,
+  getAdminInventoryLogs,
   updateAdminProduct,
 } from '../../service/adminProducts';
+import { appendInventoryLog, getInventoryLogs } from '../../service/inventoryLogs';
 
 const LOW_STOCK_THRESHOLD = 10;
-const LOG_KEY = 'enso_inventory_logs';
-
-const getLogs = () => {
-  try {
-    return JSON.parse(localStorage.getItem(LOG_KEY) || '[]');
-  } catch {
-    return [];
-  }
-};
-
-const appendLog = (entry) => {
-  const logs = getLogs();
-  localStorage.setItem(LOG_KEY, JSON.stringify([entry, ...logs].slice(0, 200)));
-};
 
 const getStockBadge = (inventory) => {
   const inv = inventory ?? 0;
   if (inv === 0)
-    return { color: 'text-[#984443]', bg: 'bg-[#984443]/10', label: '缺貨' };
+    return { color: 'text-[#ba3e2a]', bg: 'bg-[#ba3e2a]/10', label: '缺貨' };
   if (inv < LOW_STOCK_THRESHOLD)
-    return { color: 'text-[#735C00]', bg: 'bg-[#735C00]/10', label: '低庫存' };
-  return { color: 'text-[#3A4D39]', bg: 'bg-[#3A4D39]/10', label: '庫存充足' };
+    return { color: 'text-[#805500]', bg: 'bg-[#805500]/10', label: '低庫存' };
+  return { color: 'text-[#14624f]', bg: 'bg-[#14624f]/10', label: '庫存充足' };
 };
 
 const REASON_PRESETS = [
@@ -42,10 +32,12 @@ const REASON_PRESETS = [
 ];
 
 function AdminInventory() {
-  const { showSuccess, showError } = useMessage();
+  const { showSuccess } = useMessage();
   const [products, setProducts] = useState([]);
   const [pagination, setPagination] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
+  const [logWarning, setLogWarning] = useState('');
   const [searchText, setSearchText] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 
@@ -56,15 +48,38 @@ function AdminInventory() {
   const [adjustQty, setAdjustQty] = useState('');
   const [adjustNote, setAdjustNote] = useState('');
   const [adjustLoading, setAdjustLoading] = useState(false);
+  const [adjustError, setAdjustError] = useState('');
+  const selfHosted = import.meta.env.VITE_SHOWCASE === 'true' || (import.meta.env.VITE_API_MODE === 'self-hosted' &&
+    !document.cookie.split('; ').includes('myToken=enso-demo-token'));
+  const [serverLogs, setServerLogs] = useState([]);
+  const [logsStatus, setLogsStatus] = useState('');
+
+  useEffect(() => {
+    if (!selfHosted || !showModal || !selectedProduct?.id) return;
+    let active = true;
+    setServerLogs([]);
+    setLogsStatus('正在載入伺服器紀錄…');
+    getAdminInventoryLogs(selectedProduct.id).then(({ data }) => {
+      if (!active) return;
+      setServerLogs(data.logs.map((log) => ({
+        id: log.id, type: log.delta >= 0 ? 'add' : 'subtract', quantity: Math.abs(log.delta),
+        before: log.before_stock, after: log.after_stock, note: log.reason, created_at: log.created_at,
+      })));
+      setLogsStatus('');
+    }).catch(() => { if (active) setLogsStatus('紀錄載入失敗，請關閉視窗後重試。'); });
+    return () => { active = false; };
+  }, [selfHosted, showModal, selectedProduct?.id]);
 
   const getProducts = async (page = 1) => {
     setIsLoading(true);
+    setLoadError('');
     try {
       const res = await getAdminProducts(page);
-      setProducts(res.data.products);
+      if (res.data.success === false) throw new Error('庫存讀取失敗');
+      setProducts(res.data.products || []);
       setPagination(res.data.pagination || {});
     } catch (err) {
-      showError(err.response?.data?.message || '取得商品失敗');
+      setLoadError('庫存資料載入失敗，請重新載入。');
     } finally {
       setIsLoading(false);
     }
@@ -75,6 +90,7 @@ function AdminInventory() {
   }, []);
 
   const openAdjustModal = (product) => {
+    setAdjustError('');
     setSelectedProduct(product);
     setAdjustType('add');
     setAdjustQty('');
@@ -83,7 +99,7 @@ function AdminInventory() {
   };
 
   const previewInventory = () => {
-    const current = selectedProduct?.inventory ?? 0;
+    const current = Number(selectedProduct?.inventory) || 0;
     const delta = parseInt(adjustQty) || 0;
     return Math.max(
       0,
@@ -92,27 +108,34 @@ function AdminInventory() {
   };
 
   const handleAdjust = async () => {
-    const qty = parseInt(adjustQty, 10);
-    if (!qty || qty <= 0) {
-      showError('請輸入有效的數量（正整數）');
+    setAdjustError('');
+    const qty = Number(adjustQty);
+    if (!Number.isInteger(qty) || qty <= 0) {
+      setAdjustError('請輸入有效的數量（正整數）');
       return;
     }
 
-    const current = selectedProduct.inventory ?? 0;
+    const current = Number(selectedProduct.inventory) || 0;
+    if (adjustType === 'subtract' && qty > current) {
+      setAdjustError('扣減數量不可超過目前庫存');
+      return;
+    }
     const newInventory =
       adjustType === 'add' ? current + qty : Math.max(0, current - qty);
 
     setAdjustLoading(true);
     try {
-      await updateAdminProduct(selectedProduct.id, {
+      const response = await updateAdminProduct(selectedProduct.id, {
         ...selectedProduct,
         inventory: newInventory,
+        inventory_note: adjustNote,
         origin_price: Number(selectedProduct.origin_price),
         price: Number(selectedProduct.price),
         is_enabled: selectedProduct.is_enabled ? 1 : 0,
       });
 
-      appendLog({
+      if (response.data?.success === false) throw new Error('庫存更新未成功');
+      const logSaved = selfHosted || appendInventoryLog({
         id: Date.now().toString(),
         product_id: selectedProduct.id,
         product_title: selectedProduct.title,
@@ -124,13 +147,17 @@ function AdminInventory() {
         created_at: new Date().toISOString(),
       });
 
+      setLogWarning(logSaved ? '' : '庫存已更新，但本機調整紀錄未儲存。請勿重複調整庫存，請確認瀏覽器儲存空間與權限。');
+
       showSuccess(
         `${selectedProduct.title} 庫存已${adjustType === 'add' ? '增加' : '減少'} ${qty}，現有 ${newInventory}`
       );
       setShowModal(false);
       getProducts(pagination.current_page);
     } catch (err) {
-      showError(err.response?.data?.message || '庫存更新失敗');
+      setAdjustError(
+        err.response?.data?.message || '庫存更新失敗，請稍後再試。'
+      );
     } finally {
       setAdjustLoading(false);
     }
@@ -142,8 +169,12 @@ function AdminInventory() {
     const keyword = searchText.trim().toLowerCase();
     const matchSearch =
       !keyword ||
-      p.title.toLowerCase().includes(keyword) ||
-      p.category.toLowerCase().includes(keyword);
+      String(p.title || '')
+        .toLowerCase()
+        .includes(keyword) ||
+      String(p.category || '')
+        .toLowerCase()
+        .includes(keyword);
     const matchFilter =
       filterStatus === 'all' ||
       (filterStatus === 'low' && inv > 0 && inv < LOW_STOCK_THRESHOLD) ||
@@ -158,556 +189,245 @@ function AdminInventory() {
   const outCount = products.filter((p) => (p.inventory ?? 0) === 0).length;
 
   // 該商品的歷史紀錄
-  const productLogs = getLogs()
+  const productLogs = selfHosted ? serverLogs : getInventoryLogs()
     .filter((l) => l.product_id === selectedProduct?.id)
     .slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] px-3 py-3 md:px-6 md:py-12 font-sans text-[#111111]">
-      <FullPageLoading isLoading={isLoading} />
-
-      {/* ===== Header ===== */}
-      <div className="max-w-7xl mx-auto mb-6 md:mb-20">
-        <div className="flex flex-row md:items-end justify-between gap-3 md:gap-8 border-b border-[#D1C7B7] pb-3 md:pb-10 relative">
-          <div className="absolute -bottom-[1px] left-0 w-24 h-[1px] bg-[#984443]"></div>
-          <div className="min-w-0">
-            <div className="text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.6em] text-[#984443] font-bold mb-1 md:mb-4 opacity-80">
-              Warehouse
-            </div>
-            <h2 className="font-serif text-lg md:text-5xl font-medium tracking-tight text-[#111111]">
-              庫存文卷
-              <span className="hidden md:inline text-[0.5em] ml-4 opacity-20 font-sans tracking-wider md:tracking-widest uppercase">
-                INVENTORY MANAGEMENT
-              </span>
-            </h2>
-          </div>
-          <div className="flex gap-3 md:gap-12 shrink-0 self-end">
-            <div className="text-right">
-              <span className="block text-[0.75rem] uppercase tracking-wider md:tracking-widest font-bold opacity-30 mb-1">
-                Catalog Size
-              </span>
-              <span className="text-2xl font-serif italic text-[#111111]">
-                {products.length}{' '}
-                <small className="text-xs opacity-40 font-sans not-italic">
-                  Items
-                </small>
-              </span>
-            </div>
-          </div>
+    <div className="enso-page">
+      <header className="enso-page-header">
+        <div>
+          <h1 className="enso-page-title">庫存管理</h1>
+          <p className="enso-page-description">
+            查看本頁庫存、安排補貨並保留數量調整紀錄。
+          </p>
+        </div>
+      </header>
+      {logWarning && <p className="workspace-error" role="alert">{logWarning}</p>}
+      <dl className="workspace-summary">
+        <div>
+          <dt>本頁商品</dt>
+          <dd>{products.length} 項</dd>
+        </div>
+        <div>
+          <dt>低庫存（少於 {LOW_STOCK_THRESHOLD}）</dt>
+          <dd>{lowCount} 項</dd>
+        </div>
+        <div>
+          <dt>缺貨</dt>
+          <dd>{outCount} 項</dd>
+        </div>
+      </dl>
+      <div className="product-toolbar">
+        <label className="workspace-field">
+          <span>搜尋本頁商品</span>
+          <input
+            type="search"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="商品名稱或分類"
+          />
+        </label>
+        <div className="workspace-segmented">
+          {[
+            ['all', '全部'],
+            ['low', '低庫存'],
+            ['out', '缺貨'],
+          ].map(([value, label]) => (
+            <button
+              key={value}
+              aria-pressed={filterStatus === value}
+              onClick={() => setFilterStatus(value)}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
-
-      <div className="max-w-7xl mx-auto">
-        {/* KPI 卡片 — 手機/平板：合併成一張，桌機：三張並排 */}
-        <div className="lg:hidden mb-6 md:mb-12 p-3 md:p-6 bg-white border border-[#D1C7B7]/30">
-          <div className="grid grid-cols-3 divide-x divide-[#D1C7B7]/30">
-            <div className="px-3">
-              <span className="block text-[12px] uppercase tracking-[0.2em] font-bold text-[#111111]/40 mb-2">
-                總量
-              </span>
-              <span className="text-3xl font-serif text-[#111111]">
-                {products.length}
-              </span>
-            </div>
-            <div className="px-3">
-              <span className="block text-[12px] uppercase tracking-[0.2em] font-bold text-[#735C00]/60 mb-2">
-                警戒
-              </span>
-              <span className="text-3xl font-serif text-[#735C00]">
-                {lowCount}
-              </span>
-            </div>
-            <div className="px-3">
-              <span className="block text-[12px] uppercase tracking-[0.2em] font-bold text-[#984443]/60 mb-2">
-                缺貨
-              </span>
-              <span className="text-3xl font-serif text-[#984443]">
-                {outCount}
-              </span>
-            </div>
-          </div>
+      {loadError ? (
+        <div role="alert" className="workspace-error">
+          {loadError}
+          <button
+            className="enso-button-secondary"
+            onClick={() => getProducts()}
+          >
+            重新載入
+          </button>
         </div>
-
-        {/* KPI 卡片 - Bespoke Design (桌機) */}
-        <div className="hidden lg:grid lg:grid-cols-3 gap-3 md:gap-12 mb-8 md:mb-24">
-          <div className="relative group p-3 md:p-10 bg-white border border-[#D1C7B7]/30 transition-kyoto hover:border-[#111111]">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-              <svg
-                className="w-12 h-12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1"
-              >
-                <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-            </div>
-            <span className="block text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] font-bold text-[#111111]/40 mb-3">
-              當前儲備總量
-            </span>
-            <div className="flex items-baseline gap-4">
-              <span className="text-6xl font-serif text-[#111111]">
-                {products.length}
-              </span>
-              <span className="text-[0.75rem] uppercase tracking-wider md:tracking-widest opacity-20 font-bold">
-                Total SKUs
-              </span>
-            </div>
-            <div className="mt-8 pt-6 border-t border-[#D1C7B7]/10 text-[0.75rem] opacity-40 italic">
-              數據同步於本分頁檢索紀錄
-            </div>
-          </div>
-
-          <div className="relative group p-3 md:p-10 bg-white border border-[#D1C7B7]/30 transition-kyoto hover:border-[#735C00]">
-            <div className="absolute top-0 right-0 p-4 opacity-10 text-[#735C00]">
-              <svg
-                className="w-12 h-12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1"
-              >
-                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <span className="block text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] font-bold text-[#735C00]/60 mb-3">
-              低庫存警戒線
-            </span>
-            <div className="flex items-baseline gap-4">
-              <span className="text-6xl font-serif text-[#735C00]">
-                {lowCount}
-              </span>
-              <span className="text-[0.75rem] uppercase tracking-wider md:tracking-widest opacity-20 font-bold">
-                Low Stock
-              </span>
-            </div>
-            <div className="mt-8 pt-6 border-t border-[#D1C7B7]/10 text-[0.75rem] text-[#735C00]/40 italic">
-              存量低於 {LOW_STOCK_THRESHOLD} 件之品項
-            </div>
-          </div>
-
-          <div className="relative group p-3 md:p-10 bg-white border border-[#D1C7B7]/30 transition-kyoto hover:border-[#984443]">
-            <div className="absolute top-0 right-0 p-4 opacity-10 text-[#984443]">
-              <svg
-                className="w-12 h-12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1"
-              >
-                <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <span className="block text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] font-bold text-[#984443]/60 mb-3">
-              缺貨品項統計
-            </span>
-            <div className="flex items-baseline gap-4">
-              <span className="text-6xl font-serif text-[#984443]">
-                {outCount}
-              </span>
-              <span className="text-[0.75rem] uppercase tracking-wider md:tracking-widest opacity-20 font-bold">
-                Out of Stock
-              </span>
-            </div>
-            <div className="mt-8 pt-6 border-t border-[#D1C7B7]/10 text-[0.75rem] text-[#984443]/40 italic">
-              當前存量為零，需即刻補貨
-            </div>
-          </div>
-        </div>
-
-        {/* Search & Filter - Minimalist Inline */}
-        <div className="flex flex-col md:flex-row gap-3 md:gap-12 mb-6 md:mb-12 items-center px-4">
-          <div className="relative group w-full md:flex-grow">
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 text-[#111111]/20 group-focus-within:text-[#984443] transition-colors">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-            <input
-              type="text"
-              className="w-full bg-transparent border-b border-[#D1C7B7] py-3 pl-8 pr-4 text-sm focus:outline-none focus:border-[#111111] transition-all font-serif italic placeholder:opacity-30"
-              placeholder="搜尋商品 ID 或 名稱..."
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-            />
-          </div>
-
-          <div className="flex items-center gap-2 md:gap-3 shrink-0">
-            <span className="hidden lg:inline text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] font-bold opacity-30">
-              Inventory View
-            </span>
-            <div className="flex flex-nowrap gap-1 md:gap-2">
-              {[
-                { id: 'all', label: '全部顯示' },
-                { id: 'low', label: '警戒品項' },
-                { id: 'out', label: '缺貨紀錄' },
-              ].map((filter) => (
-                <button
-                  key={filter.id}
-                  onClick={() => setFilterStatus(filter.id)}
-                  className={`text-[10px] md:text-[12px] uppercase tracking-normal md:tracking-[0.15em] font-bold px-2 md:px-3 py-1 md:py-1.5 transition-kyoto border rounded-sm whitespace-nowrap ${
-                    filterStatus === filter.id
-                      ? 'bg-[#111111] text-white border-[#111111]'
-                      : 'border-[#D1C7B7]/40 text-[#111111]/40 hover:border-[#111111]'
-                  }`}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Inventory Table */}
-        <div className="overflow-x-auto mb-8 md:mb-20 px-1">
-          <table className="w-full text-left">
+      ) : (
+        <div className="enso-table-shell workspace-data-table" tabIndex={0} role="region" aria-label="資料表格，可左右捲動查看操作欄">
+          <p className="workspace-table-hint">左右滑動表格，可查看完整資料與操作。</p>
+          <table>
             <thead>
-              <tr className="border-b border-[#D1C7B7]/30 text-[10px] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] font-bold text-[#111111]/40">
-                <th className="px-2 py-3 md:px-4 md:py-8">縮圖</th>
-                <th className="px-2 py-3 md:px-4 md:py-8">商品名稱 / ID</th>
-                <th className="px-2 py-3 md:px-4 md:py-8 hidden md:table-cell">
-                  物資類別辨識
-                </th>
-                <th className="px-2 py-3 md:px-4 md:py-8 text-center hidden md:table-cell">
-                  架上狀態
-                </th>
-                <th className="px-2 py-3 md:px-4 md:py-8 text-center">
-                  當前存量
-                </th>
-                <th className="px-2 py-3 md:px-4 md:py-8 text-center hidden lg:table-cell">
-                  存盈評級
-                </th>
-                <th className="px-2 py-3 md:px-4 md:py-8 text-right">
-                  核定調度
-                </th>
+              <tr>
+                {['商品', '目前庫存', '狀態', '操作'].map((label) => (
+                  <th scope="col" key={label}>
+                    {label}
+                  </th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#D1C7B7]/10">
-              {filteredProducts.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan="7"
-                    className="px-4 py-32 text-center text-[#111111]/20 italic font-serif text-lg"
-                  >
-                    <div className="flex flex-col items-center gap-6">
-                      <div className="w-12 h-[1px] bg-[#984443]/30"></div>
-                      此檢索條件下查無庫存文卷紀錄
-                      <div className="w-12 h-[1px] bg-[#984443]/30"></div>
+            <tbody>
+              {filteredProducts.map((product) => (
+                <tr key={product.id}>
+                  <td>
+                    <div className="product-identity">
+                      <div className="product-thumbnail">
+                        <ProductImage
+                          variant="thumb"
+                          src={product.imageUrl}
+                          alt={product.title + '商品主圖'}
+                        />
+                      </div>
+                      <strong>{product.title}</strong>
                     </div>
                   </td>
-                </tr>
-              ) : (
-                filteredProducts.map((product) => {
-                  const inv = product.inventory ?? 0;
-                  const st = getStockBadge(product.inventory);
-                  return (
-                    <tr
-                      key={product.id}
-                      className="hover:bg-[#111111]/[0.02] transition-colors duration-500 group"
+                  <td>{product.inventory ?? 0}</td>
+                  <td>
+                    <span
+                      className={
+                        'enso-status ' + getStockBadge(product.inventory).color
+                      }
                     >
-                      <td className="px-2 py-3 md:px-4 md:py-8">
-                        <div className="w-16 h-20 bg-white p-1 border border-[#D1C7B7]/30 overflow-hidden">
-                          {product.imageUrl ? (
-                            <img
-                              src={product.imageUrl}
-                              alt={product.title}
-                              className="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-125"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-[#FAF9F6]">
-                              <span className="text-[0.75rem] opacity-10 uppercase font-black tracking-tighter">
-                                No Image
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-2 py-3 md:px-4 md:py-8">
-                        <div className="font-serif text-lg text-[#111111] mb-1 group-hover:text-[#984443] transition-colors">
-                          {product.title}
-                        </div>
-                        <div className="text-[0.75rem] opacity-30 font-mono tracking-tighter uppercase">
-                          SKU: {product.id.slice(-10)}
-                        </div>
-                      </td>
-                      <td className="px-2 py-3 md:px-4 md:py-8 hidden md:table-cell">
-                        <span className="text-[0.75rem] uppercase tracking-wider md:tracking-widest font-bold opacity-30 italic">
-                          {product.category}
-                        </span>
-                      </td>
-                      <td className="px-2 py-3 md:px-4 md:py-8 text-center hidden md:table-cell">
-                        <div className="flex flex-col items-center gap-1">
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${product.is_enabled ? 'bg-[#3A4D39]' : 'bg-[#111111]/20'}`}
-                          ></span>
-                          <span
-                            className={`text-[0.75rem] uppercase tracking-[0.2em] font-bold ${product.is_enabled ? 'text-[#3A4D39]' : 'opacity-20'}`}
-                          >
-                            {product.is_enabled ? 'Active' : 'Draft'}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-2 py-3 md:px-4 md:py-8 text-center align-middle">
-                        <div className="flex items-center justify-center gap-1">
-                          <span
-                            className={`font-serif text-3xl font-medium tracking-tighter ${st.color}`}
-                          >
-                            {inv}
-                          </span>
-                          <span className="text-[10px] md:text-[0.75rem] opacity-20 font-sans">
-                            Units
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-2 py-3 md:px-4 md:py-8 text-center hidden lg:table-cell">
-                        <span
-                          className={`px-4 py-1.5 text-[0.75rem] uppercase tracking-[0.2em] font-bold border ${st.color} ${st.bg.replace('/10', '/30')} border-transparent`}
-                        >
-                          {st.label}
-                        </span>
-                      </td>
-                      <td className="px-2 py-3 md:px-4 md:py-8 text-right">
-                        <button
-                          className="group relative px-6 py-2 overflow-hidden transition-all duration-300"
-                          onClick={() => openAdjustModal(product)}
-                        >
-                          <div className="absolute inset-0 border border-[#D1C7B7] group-hover:border-[#111111] transition-colors"></div>
-                          <span className="relative text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] font-bold text-[#111111]/40 group-hover:text-[#111111] transition-colors">
-                            庫存調律
-                          </span>
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
+                      {getStockBadge(product.inventory).label}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      className="workspace-link"
+                      onClick={() => openAdjustModal(product)}
+                    >
+                      調整庫存
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {!filteredProducts.length && (
+                <tr>
+                  <td colSpan="4">
+                    沒有符合條件的商品，請調整搜尋或篩選條件。
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
         </div>
-
-        <div className="flex justify-center pb-20">
-          <Pagination pagination={pagination} onChangePage={getProducts} />
-        </div>
-      </div>
-
-      {/* Inventory Adjust Modal - Museum Quality */}
-      {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12">
-          <div
-            className="absolute inset-0 bg-[#111111]/90 backdrop-blur-md animate-in fade-in duration-500"
-            onClick={() => setShowModal(false)}
-          ></div>
-
-          <div className="relative w-full max-w-4xl bg-[#FAF9F6] shadow-2xl overflow-hidden flex flex-col md:flex-row h-full max-h-[85vh] animate-in fade-in zoom-in duration-700">
-            {/* Left Column: Artifact Status */}
-            <div className="md:w-2/5 bg-[#111111] p-3 md:p-12 flex flex-col justify-between text-white border-r border-[#984443]/20">
-              <div>
-                <div className="text-[0.75rem] uppercase tracking-[0.2em] md:tracking-[0.6em] text-[#984443] font-black mb-8">
-                  Stock Calibration
-                </div>
-                <h4 className="font-serif text-4xl font-medium leading-[1.1] mb-6 md:mb-12">
-                  庫存調律儀軌
-                  <span className="block text-xs mt-4 opacity-30 font-sans tracking-[0.2em] uppercase font-bold">
-                    Logistical Alignment
-                  </span>
-                </h4>
-
-                <div className="space-y-12">
-                  <div className="group">
-                    <span className="text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] font-black text-[#984443] block mb-3">
-                      監理對象 / SUBJECT
-                    </span>
-                    <span className="font-serif text-2xl text-white group-hover:text-[#984443] transition-colors duration-500">
-                      {selectedProduct?.title}
-                    </span>
-                  </div>
-
-                  <div className="space-y-4">
-                    <span className="text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] font-black text-white/30 block mb-1">
-                      當前盈損評價
-                    </span>
-                    <div className="flex items-baseline gap-4">
-                      <span
-                        className={`text-6xl font-serif font-medium ${getStockBadge(selectedProduct?.inventory).color.replace('text-', 'text-opacity-100 text-')}`}
-                      >
-                        {selectedProduct?.inventory ?? 0}
-                      </span>
-                      <span className="text-xs font-mono opacity-20 uppercase tracking-wider md:tracking-widest">
-                        Base Units
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-12 border-t border-white/5">
-                <button
-                  className="text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] font-bold text-white/20 hover:text-white transition-all duration-300 flex items-center gap-4 group"
-                  onClick={() => setShowModal(false)}
-                >
-                  <span className="w-8 h-[1px] bg-white/10 group-hover:w-12 group-hover:bg-[#984443] transition-all"></span>
-                  撤回此案 / ABANDON
-                </button>
-              </div>
-            </div>
-
-            {/* Right Column: Execution Form */}
-            <div className="flex-grow p-3 md:p-12 overflow-y-auto custom-scrollbar bg-white">
-              <div className="max-w-md mx-auto space-y-12">
-                {/* Adjust Type Selection */}
-                <section>
-                  <label className="text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] font-black text-[#111111]/30 block mb-6">
-                    調用方向 / OPERATION
-                  </label>
-                  <div className="flex gap-4">
-                    <button
-                      className={`flex-1 py-4 text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] font-black transition-all duration-500 border ${
-                        adjustType === 'add'
-                          ? 'bg-[#111111] text-white border-[#111111]'
-                          : 'bg-transparent text-[#111111]/30 border-[#D1C7B7]/40 hover:border-[#111111]'
-                      }`}
-                      onClick={() => setAdjustType('add')}
-                    >
-                      進貨入庫 / ADD
-                    </button>
-                    <button
-                      className={`flex-1 py-4 text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] font-black transition-all duration-500 border ${
-                        adjustType === 'subtract'
-                          ? 'bg-[#984443] text-white border-[#984443]'
-                          : 'bg-transparent text-[#984443]/20 border-[#D1C7B7]/40 hover:border-[#984443]'
-                      }`}
-                      onClick={() => setAdjustType('subtract')}
-                    >
-                      出庫損耗 / SUB
-                    </button>
-                  </div>
-                </section>
-
-                {/* Quantity Input */}
-                <section>
-                  <div className="flex justify-between items-end mb-4 px-1">
-                    <label className="text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] font-black text-[#111111]/30">
-                      量計員額 / UNITS
-                    </label>
-                    <div className="font-serif italic text-xs text-[#111111]/40">
-                      預期圓滿：
-                      <span
-                        className={`ms-2 font-bold not-italic font-sans text-sm ${getStockBadge(previewInventory()).color}`}
-                      >
-                        {previewInventory()}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="relative group">
-                    <input
-                      type="number"
-                      className="w-full bg-transparent border-b border-[#D1C7B7] py-6 text-5xl font-serif focus:outline-none focus:border-[#111111] transition-all placeholder:opacity-10"
-                      placeholder="00"
-                      min="1"
-                      value={adjustQty}
-                      onChange={(e) => setAdjustQty(e.target.value)}
-                    />
-                    <div className="absolute right-0 bottom-6 text-[0.75rem] uppercase tracking-wider md:tracking-widest font-black opacity-10">
-                      QTY SPEC
-                    </div>
-                  </div>
-                </section>
-
-                {/* Adjustment Notes */}
-                <section>
-                  <label className="text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.4em] font-black text-[#111111]/30 block mb-6">
-                    更動緣由 / REASONING
-                  </label>
-                  <div className="flex flex-wrap gap-2 mb-8">
-                    {REASON_PRESETS.map((preset) => (
-                      <button
-                        key={preset}
-                        className={`px-4 py-2 text-[0.75rem] uppercase tracking-wider md:tracking-widest font-bold border transition-all duration-300 ${
-                          adjustNote === preset
-                            ? 'bg-[#111111] text-white border-[#111111]'
-                            : 'bg-transparent border-[#D1C7B7]/30 text-[#111111]/40 hover:border-[#111111] hover:text-[#111111]'
-                        }`}
-                        onClick={() => setAdjustNote(preset)}
-                      >
-                        {preset}
-                      </button>
-                    ))}
-                  </div>
-                  <input
-                    type="text"
-                    className="w-full bg-transparent border-b border-[#D1C7B7]/30 py-4 text-sm focus:outline-none focus:border-[#111111] transition-all font-serif italic placeholder:opacity-20"
-                    placeholder="或自行詳述其餘調度原由..."
-                    value={adjustNote}
-                    onChange={(e) => setAdjustNote(e.target.value)}
-                  />
-                </section>
-
-                {/* History Snippet */}
-                {productLogs.length > 0 && (
-                  <section className="pt-12 border-t border-[#D1C7B7]/10">
-                    <label className="text-[0.75rem] uppercase tracking-[0.5em] font-black text-[#111111]/20 block mb-6">
-                      ARCHIVAL LOGS (LAST 5)
-                    </label>
-                    <div className="space-y-4">
-                      {productLogs.map((log) => (
-                        <div
-                          key={log.id}
-                          className="flex justify-between items-center text-[0.75rem] group/log"
-                        >
-                          <div className="flex items-center gap-4">
-                            <span
-                              className={`font-bold tracking-wider md:tracking-widest ${log.type === 'add' ? 'text-[#3A4D39]' : 'text-[#984443]'}`}
-                            >
-                              {log.type === 'add' ? '入庫' : '出庫'} /{' '}
-                              {log.quantity}
-                            </span>
-                            <span className="opacity-30 italic font-serif flex items-center gap-2">
-                              <span className="w-1 h-1 rounded-full bg-[#D1C7B7]"></span>
-                              {log.note || '未見詳述'}
-                            </span>
-                          </div>
-                          <span className="opacity-20 font-mono text-[0.75rem]">
-                            {new Date(log.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                )}
-
-                <div className="pt-16">
-                  <button
-                    className="w-full group relative py-5 bg-[#111111] overflow-hidden transition-all duration-700 shadow-2xl disabled:opacity-20"
-                    onClick={handleAdjust}
-                    disabled={
-                      adjustLoading || !adjustQty || parseInt(adjustQty) <= 0
-                    }
-                  >
-                    <div className="absolute inset-0 bg-[#984443] translate-y-full group-hover:translate-y-0 transition-transform duration-700"></div>
-                    <span className="relative text-[0.75rem] uppercase tracking-[0.2em] md:tracking-[0.6em] font-black text-white">
-                      {adjustLoading
-                        ? '進行封存調律中...'
-                        : '提交此案 · 奉納儲入'}
-                    </span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
+      <div className="workspace-pagination">
+        <Pagination pagination={pagination} onChangePage={getProducts} />
+      </div>
+      {showModal && (
+        <Dialog
+          title={'調整庫存：' + selectedProduct.title}
+          busy={adjustLoading}
+          onClose={() => setShowModal(false)}
+          footer={
+            <>
+              <button
+                className="enso-button-secondary"
+                disabled={adjustLoading}
+                onClick={() => setShowModal(false)}
+              >
+                取消
+              </button>
+              <button
+                className="enso-button-primary"
+                form="stock-editor"
+                type="submit"
+                disabled={adjustLoading}
+              >
+                {adjustLoading ? '儲存中…' : '儲存庫存調整'}
+              </button>
+            </>
+          }
+        >
+          {adjustError && (
+            <p className="workspace-error" role="alert">
+              {adjustError}
+            </p>
+          )}
+          <form
+            id="stock-editor"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleAdjust();
+            }}
+          >
+            <p className="workspace-hint">
+              目前庫存 {selectedProduct.inventory ?? 0}，調整後預計為{' '}
+              {previewInventory()}。
+            </p>
+            <fieldset disabled={adjustLoading}>
+              <legend className="text-base font-bold mb-3">調整方式</legend>
+              <div className="workspace-segmented mb-6">
+                {[
+                  ['add', '增加庫存'],
+                  ['subtract', '扣減庫存'],
+                ].map(([value, label]) => (
+                  <button
+                    type="button"
+                    key={value}
+                    aria-pressed={adjustType === value}
+                    onClick={() => setAdjustType(value)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <label className="workspace-field">
+                <span>調整數量（正整數）</span>
+                <input
+                  type="number"
+                  required
+                  min="1"
+                  step="1"
+                  value={adjustQty}
+                  onChange={(e) => setAdjustQty(e.target.value)}
+                />
+              </label>
+              <label className="workspace-field">
+                <span>調整原因</span>
+                <input
+                  value={adjustNote}
+                  list="stock-reasons"
+                  onChange={(e) => setAdjustNote(e.target.value)}
+                  placeholder="選擇常用原因或自行輸入"
+                />
+                <datalist id="stock-reasons">
+                  {REASON_PRESETS.map((reason) => (
+                    <option value={reason} key={reason} />
+                  ))}
+                </datalist>
+              </label>
+            </fieldset>
+          </form>
+          <h3 className="text-base font-bold mt-6 mb-3">{selfHosted ? '最近五筆伺服器紀錄' : '最近五筆本機紀錄'}</h3>
+          <p className="workspace-hint">
+            {selfHosted ? '庫存變更與原因由伺服器儲存，包含商品調整及訂單異動。' : '此紀錄只保存在目前瀏覽器，不是伺服器稽核紀錄。'}
+          </p>
+          {selfHosted && logsStatus && <p role="status" className="workspace-hint">{logsStatus}</p>}
+          {productLogs.length ? (
+            <ul className="workspace-log-list">
+              {productLogs.map((log) => (
+                <li key={log.id}>
+                  <span>
+                    {log.type === 'add' ? '入庫' : '出庫'} {log.quantity}，
+                    {log.before} → {log.after}
+                  </span>
+                  <span>
+                    {log.note || '未填原因'}・
+                    {new Date(log.created_at).toLocaleDateString()}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="workspace-hint">尚無調整紀錄。</p>
+          )}
+        </Dialog>
+      )}
+      <FullPageLoading isLoading={isLoading} />
     </div>
   );
 }
-
 export default AdminInventory;

@@ -5,22 +5,24 @@
 // 對示範流程體感破壞很大。改成 localStorage 之後，新增/編輯/刪除會真正反映在
 // 列表上，跟正式環境體感一致；登出時 demoStore.reset() 一鍵清回 seed。
 
+import { getDemoProductImages, upgradeLegacyProductImages } from './demoProductImages.js';
+
 const KEYS = {
   products: 'enso_demo_products',
   orders: 'enso_demo_orders',
   coupons: 'enso_demo_coupons',
   uploadIdx: 'enso_demo_upload_idx',
+  imageVersion: 'enso_demo_image_version',
+  imageBackup: 'enso_demo_products_before_images_v1',
 };
 
 const D = 86400; // seconds in a day
 const M = D * 30; // 假設一個月 30 天
 
 // 圖片 URL pool — upload mock 輪流回，避免上傳兩張看起來都一樣
-const UPLOAD_IMAGES = [
-  'https://storage.googleapis.com/vue-course-api.appspot.com/rogan/1773124274099.png',
-  'https://storage.googleapis.com/vue-course-api.appspot.com/rogan/1773126097700.png',
-  'https://storage.googleapis.com/vue-course-api.appspot.com/rogan/1773129441675.png',
-];
+const UPLOAD_IMAGES = [1, 2, 3, 4, 5, 6].map(
+  (id) => getDemoProductImages(id).imageUrl
+);
 
 // ===== Seeds =====
 
@@ -99,6 +101,12 @@ const SEED_PRODUCTS = [
     imageUrl: UPLOAD_IMAGES[2],
   },
 ];
+
+// Keep the API shape: one main image and four gallery URLs per demo product.
+const IMAGE_SEED_PRODUCTS = SEED_PRODUCTS.map((product) => ({
+  ...product,
+  ...getDemoProductImages(product.id),
+}));
 
 // 12 筆訂單，散在 6 個月內，涵蓋所有 12 種綠界付款方式
 function buildSeedOrders() {
@@ -266,7 +274,7 @@ function buildSeedOrders() {
         total,
         user: {
           name,
-          email: `${name.toLowerCase().replace(/[^a-z]/g, '')}@example.com`,
+          email: `customer${idx + 1}@example.com`,
           address: addr,
           tel: `09${String(10000000 + idx * 1234567).slice(0, 8)}`,
           paid_method: method,
@@ -325,14 +333,33 @@ function write(key, value) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    /* ignore */
+    const error = new Error('示範資料未儲存。瀏覽器儲存空間不足或儲存權限被停用，請確認設定後重試。');
+    error.code = 'DEMO_STORAGE_UNAVAILABLE';
+    throw error;
   }
 }
 
 // ===== Public API =====
 
 export function getProducts() {
-  return read(KEYS.products, SEED_PRODUCTS);
+  const products = read(KEYS.products, IMAGE_SEED_PRODUCTS);
+  if (!Array.isArray(products)) return products;
+  try {
+    if (localStorage.getItem(KEYS.imageVersion) === '1') return products;
+    const upgraded = upgradeLegacyProductImages(products);
+    if (upgraded.some((product, index) => product !== products[index])) {
+      // Save recovery data before changing persisted images. On quota failure,
+      // preserve the existing data instead of silently resetting the demo.
+      if (!localStorage.getItem(KEYS.imageBackup)) {
+        localStorage.setItem(KEYS.imageBackup, JSON.stringify(products));
+      }
+      localStorage.setItem(KEYS.products, JSON.stringify(upgraded));
+    }
+    localStorage.setItem(KEYS.imageVersion, '1');
+    return upgraded;
+  } catch {
+    return products;
+  }
 }
 
 export function createProduct(data) {

@@ -1,0 +1,82 @@
+.footer {
+  background: #09256f;
+  color: #f8f3ef;
+  padding: clamp(3.5rem, 7vw, 7rem) 0 3rem;
+}
+
+.footer__grid {
+  display: grid;
+  gap: clamp(3rem, 9vw, 10rem);
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+}
+
+.footer__wordmark {
+  color: #f8f3ef;
+  display: inline-block;
+  font-family: "Tilt Warp", sans-serif;
+  font-size: clamp(3rem, 6vw, 6rem);
+  letter-spacing: -0.06em;
+  line-height: 0.85;
+  margin-bottom: 1.8rem;
+}
+
+.footer__intro p {
+  font-size: 1rem;
+  line-height: 1.9;
+  margin: 0;
+  max-width: 26ch;
+}
+
+.footer__intro span {
+  color: #d9f81b;
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  margin-top: 2.4rem;
+}
+
+.footer__links {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  h2 {
+    color: #d9f81b;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    margin: 0 0 1rem;
+  }
+
+  a {
+    color: #f8f3ef;
+    font-size: 0.92rem;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 0.32rem;
+    transition: color 180ms ease-out, text-decoration-color 180ms ease-out;
+
+    &:hover,
+    &:focus-visible {
+      color: #d9f81b;
+      text-decoration-color: currentColor;
+    }
+  }
+}
+
+@media (max-width: 720px) {
+  .footer__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer__links {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

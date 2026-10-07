@@ -1,0 +1,422 @@
+{
+  "schemaVersion": 1,
+  "createdOn": "2026-09-30",
+  "status": "generated-candidates-not-published",
+  "directionApprovedOn": "2026-09-30",
+  "individualAssetsApproved": false,
+  "originalAssetsPreserved": true,
+  "remoteProductDataModified": false,
+  "generatedConceptImagery": true,
+  "pathBase": "assets/product-images",
+  "notes": [
+    "圖片是生成式商品概念，不是真實商品攝影。",
+    "英文品名為視覺提案，未變更既有商品標題。",
+    "道具、花葉與香具不代表已確認成分、配件或實體尺寸。",
+    "沒有公開 URL，localPath 不可直接填入正式 API。",
+    "材質圖偏向線香及包裝情境，若需要微距紙紋須另行補拍或製圖。"
+  ],
+  "products": [
+    {
+      "slug": "amber-twilight",
+      "productName": "琥珀黃昏",
+      "proposedEnglishName": "AMBER TWILIGHT",
+      "assets": [
+        {
+          "role": "main",
+          "localPath": "amber-twilight/amber-twilight-main-v1.png",
+          "alt": "琥珀黃昏商品主圖概念圖",
+          "targetField": "imageUrl",
+          "galleryIndex": null,
+          "promptPath": "prompts/amber-twilight-main-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2148734,
+          "sha256": "C2435557275958A797AA9C44B6B2C2C72C23A205A9A0A138163C40715BCFDF20"
+        },
+        {
+          "role": "detail",
+          "localPath": "amber-twilight/amber-twilight-detail-v1.png",
+          "alt": "琥珀黃昏包裝細節概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 0,
+          "promptPath": "prompts/amber-twilight-detail-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2282973,
+          "sha256": "B7B048D92F41B54B66A533313252CC8D7B1639E5FF65CA04CBFCF8BDE6669F05"
+        },
+        {
+          "role": "lifestyle",
+          "localPath": "amber-twilight/amber-twilight-lifestyle-v1.png",
+          "alt": "琥珀黃昏生活情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 1,
+          "promptPath": "prompts/amber-twilight-lifestyle-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 1999723,
+          "sha256": "5C480FB3F388E0805EC2D78945B024B79FB7F83C13E443AC5749AE28E7417E1F"
+        },
+        {
+          "role": "material",
+          "localPath": "amber-twilight/amber-twilight-material-v1.png",
+          "alt": "琥珀黃昏材質情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 2,
+          "promptPath": "prompts/amber-twilight-material-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2086589,
+          "sha256": "551D31964937A4B4C1AF0B1D3AF96BA8FAF291BF407B0B288B6A10B5F3AEDB1C"
+        },
+        {
+          "role": "scale",
+          "localPath": "amber-twilight/amber-twilight-scale-v1.png",
+          "alt": "琥珀黃昏比例與使用情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 3,
+          "promptPath": "prompts/amber-twilight-scale-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2548150,
+          "sha256": "29F9D60C646E5C048914FAD6E00DE40727CFD8C7DE7B9D5234CCD219C6C124EE"
+        }
+      ]
+    },
+    {
+      "slug": "forest-morning",
+      "productName": "晨林沈靜",
+      "proposedEnglishName": "FOREST MORNING",
+      "assets": [
+        {
+          "role": "main",
+          "localPath": "forest-morning/forest-morning-main-v1.png",
+          "alt": "晨林沈靜商品主圖概念圖",
+          "targetField": "imageUrl",
+          "galleryIndex": null,
+          "promptPath": "prompts/forest-morning-main-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2409354,
+          "sha256": "AAA6FE4F8DA40077DC7BBB824297F7C5E0E7A557E51AD63DDBB2FE1C639B5123"
+        },
+        {
+          "role": "detail",
+          "localPath": "forest-morning/forest-morning-detail-v1.png",
+          "alt": "晨林沈靜包裝細節概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 0,
+          "promptPath": "prompts/forest-morning-detail-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2263289,
+          "sha256": "993F0CD5D575B5E08B7DE862BB50BECB6BF3A5A4E6455A0E2EBDA90DAD058770"
+        },
+        {
+          "role": "lifestyle",
+          "localPath": "forest-morning/forest-morning-lifestyle-v1.png",
+          "alt": "晨林沈靜生活情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 1,
+          "promptPath": "prompts/forest-morning-lifestyle-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2229303,
+          "sha256": "CE794541EC25A519F2871CDEDAD0243E1D07DE5BEAD7F99EF3292C352B288998"
+        },
+        {
+          "role": "material",
+          "localPath": "forest-morning/forest-morning-material-v1.png",
+          "alt": "晨林沈靜材質情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 2,
+          "promptPath": "prompts/forest-morning-material-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2264702,
+          "sha256": "C1EFDA40AA30BB0A07FAC18E2A97E0F51DCA72CD88FE428EA02D1B1309D3D598"
+        },
+        {
+          "role": "scale",
+          "localPath": "forest-morning/forest-morning-scale-v1.png",
+          "alt": "晨林沈靜比例與使用情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 3,
+          "promptPath": "prompts/forest-morning-scale-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2823158,
+          "sha256": "9648B07E4DE279B9C97B2823AFDD192F0C727F58384AA76455B625D42584AAB0"
+        }
+      ]
+    },
+    {
+      "slug": "dragon-resin",
+      "productName": "龍血沉香",
+      "proposedEnglishName": "DRAGON RESIN",
+      "assets": [
+        {
+          "role": "main",
+          "localPath": "dragon-resin/dragon-resin-main-v1.png",
+          "alt": "龍血沉香商品主圖概念圖",
+          "targetField": "imageUrl",
+          "galleryIndex": null,
+          "promptPath": "prompts/dragon-resin-main-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2135789,
+          "sha256": "746434548703057BFF21EC65AD6F5F998D41A480D7A1706A74A9CC425E937479"
+        },
+        {
+          "role": "detail",
+          "localPath": "dragon-resin/dragon-resin-detail-v1.png",
+          "alt": "龍血沉香包裝細節概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 0,
+          "promptPath": "prompts/dragon-resin-detail-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2399937,
+          "sha256": "56E93CD786E8BA2D7FDED8D2585EC9A86D1ED4E79B368DA4D851AB0B605F92F8"
+        },
+        {
+          "role": "lifestyle",
+          "localPath": "dragon-resin/dragon-resin-lifestyle-v1.png",
+          "alt": "龍血沉香生活情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 1,
+          "promptPath": "prompts/dragon-resin-lifestyle-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 1914970,
+          "sha256": "93B2A116FD4DA20852293226EFE64A696885DC9D598C8F855411119FC3161D63"
+        },
+        {
+          "role": "material",
+          "localPath": "dragon-resin/dragon-resin-material-v1.png",
+          "alt": "龍血沉香材質情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 2,
+          "promptPath": "prompts/dragon-resin-material-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2137617,
+          "sha256": "D8E2BB41E81FA539850BFBC2A75D95B6733E599B3B926A3E85F138CB62556B1C"
+        },
+        {
+          "role": "scale",
+          "localPath": "dragon-resin/dragon-resin-scale-v1.png",
+          "alt": "龍血沉香比例與使用情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 3,
+          "promptPath": "prompts/dragon-resin-scale-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2650058,
+          "sha256": "E40B1F1C3A445866337BD0279F54B3AE23770ED076ED66F811F0141B77C1DCB0"
+        }
+      ]
+    },
+    {
+      "slug": "white-sage",
+      "productName": "白鼠尾草淨化",
+      "proposedEnglishName": "WHITE SAGE",
+      "assets": [
+        {
+          "role": "main",
+          "localPath": "white-sage/white-sage-main-v1.png",
+          "alt": "白鼠尾草淨化商品主圖概念圖",
+          "targetField": "imageUrl",
+          "galleryIndex": null,
+          "promptPath": "prompts/white-sage-main-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2127677,
+          "sha256": "2F3AAA835A34684CD9834B46944C16C950DD5C8F84123C4C1CA8673FE12898A2"
+        },
+        {
+          "role": "detail",
+          "localPath": "white-sage/white-sage-detail-v1.png",
+          "alt": "白鼠尾草淨化包裝細節概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 0,
+          "promptPath": "prompts/white-sage-detail-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2363992,
+          "sha256": "1DA128FC2E5AFBDAF6F1927130387C29D3879B6998C55D54FE72A8E6D4A8AA85"
+        },
+        {
+          "role": "lifestyle",
+          "localPath": "white-sage/white-sage-lifestyle-v1.png",
+          "alt": "白鼠尾草淨化生活情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 1,
+          "promptPath": "prompts/white-sage-lifestyle-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 1940376,
+          "sha256": "EB0570F68DA5297E320F67D666FBF92EEE369A6B009410F3C1E1FA5560784462"
+        },
+        {
+          "role": "material",
+          "localPath": "white-sage/white-sage-material-v1.png",
+          "alt": "白鼠尾草淨化材質情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 2,
+          "promptPath": "prompts/white-sage-material-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2057754,
+          "sha256": "9D4F95227123028786BF90EC2E7A7D1716A6E8682E5D358BA1975061D7D1B058"
+        },
+        {
+          "role": "scale",
+          "localPath": "white-sage/white-sage-scale-v1.png",
+          "alt": "白鼠尾草淨化比例與使用情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 3,
+          "promptPath": "prompts/white-sage-scale-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2833980,
+          "sha256": "28E49A1D44105986B07AC756E8EF4B9FAB3258AF4C679B324D90E3B438A20F44"
+        }
+      ]
+    },
+    {
+      "slug": "jasmine-night",
+      "productName": "茉莉月夜",
+      "proposedEnglishName": "JASMINE NIGHT",
+      "assets": [
+        {
+          "role": "main",
+          "localPath": "jasmine-night/jasmine-night-main-v1.png",
+          "alt": "茉莉月夜商品主圖概念圖",
+          "targetField": "imageUrl",
+          "galleryIndex": null,
+          "promptPath": "prompts/jasmine-night-main-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2162157,
+          "sha256": "7B1B7E079773406DBEE445CAA33B87B4C104B5C5CDCB5AE46C13771091D06ABA"
+        },
+        {
+          "role": "detail",
+          "localPath": "jasmine-night/jasmine-night-detail-v1.png",
+          "alt": "茉莉月夜包裝細節概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 0,
+          "promptPath": "prompts/jasmine-night-detail-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2335646,
+          "sha256": "B98E2DC0D9404C4B03ECF50A20D710BDE0E3284AA481C00A5743B00B78217D02"
+        },
+        {
+          "role": "lifestyle",
+          "localPath": "jasmine-night/jasmine-night-lifestyle-v1.png",
+          "alt": "茉莉月夜生活情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 1,
+          "promptPath": "prompts/jasmine-night-lifestyle-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 1907675,
+          "sha256": "8CA24BFFBDB03AD03DBF540EA7C0CF89071C87983FAC284D8C1E50F4AEC452FD"
+        },
+        {
+          "role": "material",
+          "localPath": "jasmine-night/jasmine-night-material-v1.png",
+          "alt": "茉莉月夜材質情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 2,
+          "promptPath": "prompts/jasmine-night-material-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2164540,
+          "sha256": "EFF10986CFB5418A387B89AE3220A515096FDDFE10D4A138C366394E1F41373C"
+        },
+        {
+          "role": "scale",
+          "localPath": "jasmine-night/jasmine-night-scale-v1.png",
+          "alt": "茉莉月夜比例與使用情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 3,
+          "promptPath": "prompts/jasmine-night-scale-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2720837,
+          "sha256": "ED4AF781A5E63A9D2E64EC6373F8033549132BB4DA3A57EE7FB809E2882C86E3"
+        }
+      ]
+    },
+    {
+      "slug": "spring-dew",
+      "productName": "春分雨露",
+      "proposedEnglishName": "SPRING DEW",
+      "assets": [
+        {
+          "role": "main",
+          "localPath": "spring-dew/spring-dew-main-v1.png",
+          "alt": "春分雨露商品主圖概念圖",
+          "targetField": "imageUrl",
+          "galleryIndex": null,
+          "promptPath": "prompts/spring-dew-main-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2333107,
+          "sha256": "76EA7D27D7F0F90D50DCBD9BCAFBB34D38E832234E127706F9552F1235B4F2F1"
+        },
+        {
+          "role": "detail",
+          "localPath": "spring-dew/spring-dew-detail-v1.png",
+          "alt": "春分雨露包裝細節概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 0,
+          "promptPath": "prompts/spring-dew-detail-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2355344,
+          "sha256": "BF5FB9077F67E7F00C04DF16EE086B085EFA7EE07C5448269EFE4292EA079AD6"
+        },
+        {
+          "role": "lifestyle",
+          "localPath": "spring-dew/spring-dew-lifestyle-v1.png",
+          "alt": "春分雨露生活情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 1,
+          "promptPath": "prompts/spring-dew-lifestyle-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 1954168,
+          "sha256": "6D90BDA0E216FB2B6B7DDE4659DE5E9C7847CA171742CCE987C9ED0FBEFF1ACB"
+        },
+        {
+          "role": "material",
+          "localPath": "spring-dew/spring-dew-material-v1.png",
+          "alt": "春分雨露材質情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 2,
+          "promptPath": "prompts/spring-dew-material-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2165085,
+          "sha256": "6B1CFB34EAE53B8095EC59D91D9048BB6CC2CCEF34FB5A271C46D7F72541999F"
+        },
+        {
+          "role": "scale",
+          "localPath": "spring-dew/spring-dew-scale-v1.png",
+          "alt": "春分雨露比例與使用情境概念圖",
+          "targetField": "imagesUrl",
+          "galleryIndex": 3,
+          "promptPath": "prompts/spring-dew-scale-v1.txt",
+          "width": 1122,
+          "height": 1402,
+          "bytes": 2645069,
+          "sha256": "191BD7BC23514C6C515D7151BEB151E8A1FD6D6B231C8024576FF9F7D2D15381"
+        }
+      ]
+    }
+  ]
+}

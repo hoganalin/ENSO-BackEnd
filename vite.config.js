@@ -9,11 +9,12 @@ import { defineConfig } from 'vite';
 export default defineConfig(({ command }) => {
   const isBuild = command === 'build';
   const isVercel = process.env.VERCEL === '1';
-  const base = !isBuild || isVercel ? '/' : '/ENSO-BackEnd/';
+  const base = !isBuild || isVercel || process.env.ENSO_SHOWCASE === '1' ? '/' : '/ENSO-BackEnd/';
 
   return {
     base,
     plugins: [react()],
+    define: process.env.ENSO_SHOWCASE === '1' ? { 'import.meta.env.VITE_SHOWCASE': '"true"' } : {},
     build: {
       rollupOptions: {
         output: {

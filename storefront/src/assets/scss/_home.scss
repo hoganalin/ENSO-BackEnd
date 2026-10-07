@@ -1,0 +1,836 @@
+.enso-hero {
+  background: #efe6e1;
+  color: #09256f;
+  min-height: 740px;
+  overflow: hidden;
+  position: relative;
+}
+
+.enso-hero__scene {
+  overflow: hidden;
+  z-index: 1;
+
+  img {
+    display: block;
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
+}
+
+.enso-hero__scene.r-sunlit-room {
+  height: 79.5%;
+  top: 7.6%;
+  width: 50%;
+}
+
+.enso-hero__time-rail.r-time-rail {
+  height: 79.5%;
+  top: 7.6%;
+  width: 18%;
+}
+
+.enso-hero__package {
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.enso-hero__copy {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 5;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.enso-hero__kicker,
+.enso-hero__summary,
+.enso-hero__description,
+.enso-hero__rail-signoff,
+.enso-hero__dock-details,
+.enso-hero__quantity,
+.enso-hero__dock-closing {
+  letter-spacing: 0.18em;
+}
+
+.enso-hero__kicker {
+  align-items: center;
+  display: flex;
+  font-size: clamp(0.65rem, 0.8vw, 0.9rem);
+  font-weight: 800;
+  margin: 0;
+}
+
+.enso-hero__title {
+  color: #09256f;
+  font-family: "Tilt Warp", sans-serif;
+  font-size: clamp(4rem, 7.6vw, 7.94rem);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  line-height: 0.8;
+  margin: 0;
+}
+
+.enso-hero__summary {
+  font-size: clamp(0.72rem, 1.12vw, 1.2rem);
+  font-weight: 700;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.enso-hero__time-rail {
+  background: #efe6e1;
+  border-right: 1px solid rgba(9, 37, 111, 0.45);
+  overflow: visible;
+  z-index: 6;
+}
+
+.enso-hero__rail-line {
+  background: #09256f;
+  height: 100%;
+  left: 17.4%;
+  position: absolute;
+  top: 0;
+  width: 1px;
+}
+
+.enso-hero__time {
+  align-items: flex-start;
+  background: transparent;
+  border: 0;
+  color: #09256f;
+  display: flex;
+  flex-direction: column;
+  font-size: clamp(0.62rem, 0.9vw, 0.92rem);
+  font-weight: 800;
+  justify-content: center;
+  letter-spacing: 0.14em;
+  line-height: 1.35;
+  padding: 0 1rem 0 calc(17.4% + 2.35rem);
+  text-align: left;
+
+  &::before {
+    background: #efe6e1;
+    border: 2px solid #09256f;
+    border-radius: 999px;
+    content: "";
+    height: clamp(1.25rem, 2vw, 2rem);
+    left: calc(17.4% - clamp(0.625rem, 1vw, 1rem));
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: clamp(1.25rem, 2vw, 2rem);
+  }
+
+  span,
+  strong {
+    display: block;
+  }
+
+  strong {
+    font-size: 0.92em;
+  }
+
+  span {
+    white-space: nowrap;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(217, 248, 27, 0.24);
+  }
+}
+
+.enso-hero__time--active::before {
+  background: #d9f81b;
+}
+
+.enso-hero__rail-signoff {
+  bottom: 2.5%;
+  font-size: clamp(0.5rem, 0.59vw, 0.68rem);
+  font-weight: 800;
+  line-height: 1.55;
+  margin: 0;
+  padding-left: calc(17.4% + 1.45rem);
+  position: absolute;
+  color: #5e729b;
+}
+
+.enso-hero__time.r-evening-time {
+  font-size: clamp(1.2rem, 1.6vw, 1.7rem);
+}
+
+.enso-hero__rituals {
+  display: grid;
+  gap: clamp(0.3rem, 0.65vw, 0.75rem);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  inset: auto;
+  left: 20%;
+  pointer-events: none;
+  position: absolute;
+  top: 56%;
+  width: 29.25%;
+}
+
+.enso-hero__ritual {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #09256f;
+  display: flex;
+  flex-direction: column;
+  font-size: clamp(0.68rem, 0.85vw, 0.95rem);
+  font-weight: 800;
+  gap: 0.9rem;
+  justify-content: center;
+  letter-spacing: 0.16em;
+  min-width: 0;
+  padding: 0;
+  pointer-events: auto;
+
+  i {
+    align-items: center;
+    border: 1px solid #09256f;
+    border-radius: 999px;
+    display: flex;
+    font-size: clamp(1.45rem, 2.4vw, 2.7rem);
+    aspect-ratio: 1;
+    height: auto;
+    justify-content: center;
+    transition: background 180ms ease-out, box-shadow 180ms ease-out;
+    width: min(100%, clamp(3.75rem, 6.6vw, 7rem));
+  }
+
+  &:hover i,
+  &:focus-visible i,
+  &.is-active i {
+    background: #d9f81b;
+    box-shadow: 0 8px 18px rgba(9, 37, 111, 0.16);
+  }
+}
+
+.enso-hero__description {
+  align-items: center;
+  display: flex;
+  font-size: clamp(0.62rem, 0.9vw, 0.98rem);
+  font-weight: 600;
+  line-height: 1.45;
+  margin: 0;
+  max-width: 37ch;
+}
+
+.enso-hero .enso-hero__description {
+  height: auto;
+  top: 73%;
+}
+
+.enso-hero .enso-hero__explore {
+  height: auto;
+  top: 82.5%;
+}
+
+.enso-hero__explore {
+  align-items: center;
+  color: #09256f;
+  display: flex;
+  font-size: clamp(0.6rem, 0.8vw, 0.9rem);
+  font-weight: 800;
+  gap: 1.2rem;
+  letter-spacing: 0.12em;
+  text-decoration: underline;
+  text-underline-offset: 0.4rem;
+
+  i {
+    font-size: 1.3em;
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: #bf5c37;
+  }
+}
+
+.enso-hero__purchase-dock {
+  align-items: center;
+  background: #f8f3ef;
+  border-top: 1px solid rgba(9, 37, 111, 0.45);
+  display: grid;
+  grid-template-columns: 10% 20% 20% 40% 10%;
+  position: absolute;
+  z-index: 20;
+}
+
+.enso-hero__purchase-dock.r-purchase-dock {
+  height: 12.9%;
+  top: 87.1%;
+}
+
+.enso-hero__dock-product {
+  align-self: center;
+  height: 88%;
+  justify-self: center;
+  object-fit: contain;
+  width: 76%;
+}
+
+.enso-hero__dock-product.r-dock-product,
+.enso-hero__dock-details.r-dock-details,
+.enso-hero__quantity.r-dock-quantity,
+.enso-hero__add-cart.r-dock-add-to-cart,
+.enso-hero__dock-closing.r-dock-closing-line {
+  height: auto;
+  left: auto;
+  position: relative;
+  top: auto;
+  width: auto;
+}
+
+.enso-hero__dock-product.r-dock-product {
+  height: 90%;
+  transform: translateX(20%);
+  width: 62%;
+}
+
+.enso-hero__add-cart.r-dock-add-to-cart {
+  height: 58%;
+  justify-self: center;
+  width: 92%;
+}
+
+.enso-hero__dock-details {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  font-size: clamp(0.52rem, 0.8vw, 0.88rem);
+  justify-content: center;
+  line-height: 1.45;
+  padding-left: 0.5rem;
+
+  strong {
+    font-size: clamp(0.85rem, 1.15vw, 1.25rem);
+    letter-spacing: 0.14em;
+  }
+
+  small {
+    color: #53669a;
+    font-size: 0.83em;
+    margin-top: 0.35rem;
+  }
+}
+
+.enso-hero__quantity {
+  align-items: center;
+  border-left: 1px solid rgba(9, 37, 111, 0.35);
+  border-right: 1px solid rgba(9, 37, 111, 0.35);
+  display: flex;
+  font-size: clamp(0.55rem, 0.75vw, 0.82rem);
+  font-weight: 800;
+  gap: clamp(0.5rem, 2vw, 2rem);
+  height: 50%;
+  justify-content: center;
+
+  > div {
+    align-items: center;
+    border: 1px solid #09256f;
+    border-radius: 999px;
+    display: flex;
+    height: clamp(2.2rem, 3.2vw, 3.25rem);
+  }
+
+  button {
+    background: transparent;
+    border: 0;
+    color: #09256f;
+    font-size: clamp(1.1rem, 1.4vw, 1.5rem);
+    height: 100%;
+    width: clamp(2rem, 3vw, 3.2rem);
+
+    &:hover,
+    &:focus-visible {
+      color: #bf5c37;
+    }
+  }
+
+  output {
+    font-variant-numeric: tabular-nums;
+    min-width: 1rem;
+    text-align: center;
+  }
+}
+
+.enso-hero__add-cart {
+  align-items: center;
+  align-self: center;
+  background: #d9f81b;
+  border: 1px solid #09256f;
+  border-radius: 999px;
+  color: #09256f;
+  display: flex;
+  font-size: clamp(0.72rem, 1.08vw, 1.2rem);
+  font-weight: 900;
+  height: 74%;
+  justify-content: center;
+  letter-spacing: 0.13em;
+  transition: background 180ms ease-out, box-shadow 180ms ease-out, transform 180ms ease-out;
+  width: 92%;
+
+  &:hover,
+  &:focus-visible {
+    background: #c5e91d;
+    box-shadow: 0 10px 22px rgba(9, 37, 111, 0.2);
+    transform: translateY(-2px);
+  }
+}
+
+.enso-hero__dock-closing {
+  align-items: center;
+  display: flex;
+  font-size: clamp(0.5rem, 0.65vw, 0.74rem);
+  font-weight: 800;
+  line-height: 1.45;
+  padding-left: 1.2rem;
+}
+
+.enso-hero button:focus-visible,
+.enso-hero a:focus-visible {
+  outline: 2px solid #bf5c37;
+  outline-offset: 4px;
+}
+
+@media (min-width: 981px) {
+  .enso-hero__purchase-dock {
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .enso-hero__purchase-dock > * {
+    min-height: 0;
+  }
+}
+
+.enso-landing-section {
+  padding: clamp(5rem, 10vw, 10rem) 0;
+}
+
+.enso-landing-section--rituals {
+  background: #09256f;
+  color: #f8f3ef;
+  scroll-margin-top: 5rem;
+}
+
+.enso-section-heading {
+  margin-bottom: clamp(2.5rem, 5vw, 5rem);
+  max-width: 54rem;
+
+  p {
+    color: #d9f81b;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    margin: 0 0 1rem;
+  }
+
+  h2 {
+    font-family: "Tilt Warp", "Noto Sans TC", sans-serif;
+    font-size: clamp(2.5rem, 6vw, 5.8rem);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    line-height: 0.98;
+    margin: 0;
+  }
+}
+
+.enso-ritual-grid {
+  border-top: 1px solid rgba(248, 243, 239, 0.45);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.enso-ritual-card {
+  color: #f8f3ef;
+  min-height: 23rem;
+  padding: clamp(1.5rem, 3vw, 3rem);
+  position: relative;
+  transition: background 180ms ease-out, color 180ms ease-out;
+
+  + .enso-ritual-card {
+    border-left: 1px solid rgba(248, 243, 239, 0.45);
+  }
+
+  i {
+    color: #d9f81b;
+    font-size: 2.2rem;
+  }
+
+  p {
+    font-size: 0.73rem;
+    font-weight: 800;
+    letter-spacing: 0.17em;
+    margin: 4.5rem 0 0.75rem;
+  }
+
+  h3 {
+    font-family: "Tilt Warp", "Noto Sans TC", sans-serif;
+    font-size: clamp(1.8rem, 3vw, 3rem);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    margin: 0 0 1rem;
+  }
+
+  span {
+    display: block;
+    line-height: 1.8;
+    max-width: 20ch;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: #d9f81b;
+    color: #09256f;
+
+    i {
+      color: #09256f;
+    }
+  }
+}
+
+.enso-landing-section--products {
+  background: #efe6e1;
+  color: #09256f;
+}
+
+.enso-section-heading--split {
+  align-items: end;
+  display: flex;
+  justify-content: space-between;
+
+  a {
+    color: #09256f;
+    font-size: 0.9rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-decoration: underline;
+    text-underline-offset: 0.4rem;
+
+    &:hover,
+    &:focus-visible {
+      color: #bf5c37;
+    }
+  }
+}
+
+.enso-section-heading--split .enso-section-heading__highlight {
+  background: #d9f81b;
+  color: #09256f;
+  display: inline-block;
+  line-height: 1.2;
+  margin-bottom: 1.3rem;
+  padding: 0.22rem 0.36rem 0.26rem;
+}
+
+.enso-featured-swiper {
+  overflow: visible;
+  padding-bottom: 3.5rem;
+
+  .swiper-pagination-bullet {
+    background: #09256f;
+  }
+}
+
+.enso-product-card {
+  background: #fffaf6;
+  min-height: 31rem;
+
+  img {
+    display: block;
+    height: 19rem;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  > div {
+    padding: 1.5rem;
+  }
+
+  p {
+    color: #bf5c37;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    margin: 0 0 0.55rem;
+  }
+
+  h3 {
+    color: #09256f;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0 0 0.8rem;
+  }
+
+  span {
+    color: #365080;
+    display: -webkit-box;
+    line-height: 1.65;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  button {
+    background: transparent;
+    border: 0;
+    color: #09256f;
+    font-size: 0.82rem;
+    font-weight: 800;
+    margin-top: 1.25rem;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 0.35rem;
+
+    &:hover,
+    &:focus-visible {
+      color: #bf5c37;
+    }
+  }
+}
+
+.enso-landing-section--story {
+  background: #bf5c37;
+  color: #fffaf6;
+}
+
+.enso-story {
+  display: grid;
+  gap: clamp(2rem, 6vw, 8rem);
+  grid-template-columns: 1.3fr 0.7fr;
+
+  > div:first-child p {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    margin: 0 0 1rem;
+  }
+
+  h2 {
+    font-family: "Tilt Warp", "Noto Sans TC", sans-serif;
+    font-size: clamp(2.6rem, 5.5vw, 5.4rem);
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    margin: 0;
+  }
+
+  > div:last-child {
+    align-self: end;
+    font-size: 1rem;
+    line-height: 2;
+
+    a {
+      color: #fffaf6;
+      display: inline-flex;
+      font-weight: 800;
+      gap: 1rem;
+      letter-spacing: 0.1em;
+      margin-top: 1rem;
+      text-decoration: underline;
+      text-underline-offset: 0.4rem;
+    }
+  }
+}
+
+@media (max-width: 980px) {
+  .enso-hero.comp-frame {
+    aspect-ratio: auto;
+    display: grid;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    padding-top: 0;
+  }
+
+  .enso-hero .r-time-rail,
+  .enso-hero .r-ritual-kicker,
+  .enso-hero .r-hero-headline,
+  .enso-hero .r-hero-summary,
+  .enso-hero .r-reading-choice,
+  .enso-hero .r-yoga-choice,
+  .enso-hero .r-sleep-choice,
+  .enso-hero .r-reset-choice,
+  .enso-hero .r-ritual-description,
+  .enso-hero .r-ritual-link,
+  .enso-hero .r-sunlit-room,
+  .enso-hero .r-incense-package,
+  .enso-hero .r-purchase-dock {
+    height: auto;
+    left: auto;
+    position: relative;
+    inset: auto;
+    top: auto;
+    width: auto;
+  }
+
+  .enso-hero .r-time-rail {
+    display: none;
+  }
+
+  .enso-hero__scene {
+    grid-column: 1;
+    grid-row: 1;
+    height: min(62vw, 42rem);
+  }
+
+  .enso-hero__scene.r-sunlit-room {
+    height: min(62vw, 42rem);
+    top: auto;
+  }
+
+  .enso-hero__package {
+    grid-column: 1;
+    grid-row: 1;
+    height: min(62vw, 42rem);
+    justify-self: center;
+    width: min(62%, 32rem);
+    z-index: 2;
+  }
+
+  .enso-hero__package.r-incense-package {
+    height: min(62vw, 42rem);
+    top: auto;
+  }
+
+  .enso-hero__copy {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: clamp(2rem, 8vw, 5rem) clamp(1.25rem, 5vw, 3rem);
+    position: relative;
+    z-index: 6;
+  }
+
+  .enso-hero__kicker,
+  .enso-hero__title,
+  .enso-hero__summary,
+  .enso-hero__description,
+  .enso-hero__explore {
+    grid-column: 1 / -1;
+  }
+
+  .enso-hero__kicker {
+    margin-bottom: 1.1rem;
+  }
+
+  .enso-hero__summary {
+    margin: 1.25rem 0 2rem;
+  }
+
+  .enso-hero__rituals {
+    display: grid;
+    gap: 0.8rem;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(4, 1fr);
+    inset: auto;
+    left: auto;
+    margin-bottom: 2rem;
+    position: relative;
+    top: auto;
+    width: auto;
+  }
+
+  .enso-hero__ritual {
+    min-height: 9rem;
+    position: relative;
+  }
+
+  .enso-hero__description {
+    margin-bottom: 1.5rem;
+  }
+
+  .enso-hero__purchase-dock {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    min-height: 9rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .enso-hero__dock-product {
+    grid-row: span 2;
+    height: 7rem;
+    width: 4rem;
+  }
+
+  .enso-hero__dock-details {
+    padding-left: 0;
+  }
+
+  .enso-hero__quantity {
+    border: 0;
+    gap: 1rem;
+    height: auto;
+    justify-content: flex-start;
+  }
+
+  .enso-hero__add-cart {
+    grid-column: 1 / -1;
+    height: 3.4rem;
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  .enso-hero__dock-closing {
+    display: none;
+  }
+
+  .enso-ritual-grid,
+  .enso-story {
+    grid-template-columns: 1fr;
+  }
+
+  .enso-ritual-card + .enso-ritual-card {
+    border-left: 0;
+    border-top: 1px solid rgba(248, 243, 239, 0.45);
+  }
+
+  .enso-ritual-card {
+    min-height: 14rem;
+
+    p {
+      margin-top: 1.6rem;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .enso-hero__copy {
+    display: block;
+  }
+
+  .enso-hero__title {
+    font-size: clamp(3.8rem, 20vw, 6rem);
+  }
+
+  .enso-hero__rituals {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .enso-hero__ritual {
+    min-height: 7.5rem;
+  }
+
+  .enso-hero__purchase-dock {
+    grid-template-columns: auto 1fr;
+  }
+
+  .enso-hero__quantity {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .enso-section-heading--split {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}

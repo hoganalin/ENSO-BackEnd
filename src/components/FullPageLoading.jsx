@@ -1,5 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-
 const FullPageLoading = ({ isLoading }) => {
   if (!isLoading) return null;
 

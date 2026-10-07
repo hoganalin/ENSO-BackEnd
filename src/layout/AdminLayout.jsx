@@ -3,41 +3,32 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 
+import { clearWorkspace } from '../../shared/showcase';
+import Dialog from '../components/admin/Dialog';
 import MessageToast from '../components/MessageToast';
 import useMessage from '../hooks/useMessage';
 import { resetDemoData } from '../service/demoStore';
+import { AUTH_TIMEOUT, clearSessionCookies, getApiBase, isShowcase, readSessionToken } from '../service/session';
 
 const TOUR_KEY = 'enso_demo_seen_tour';
 
 const TOUR_STEPS = [
-  {
-    title: '盤面總覽',
-    desc: '即時 IoT 感測器、KPI、低庫存待辦一頁總覽。',
-  },
-  {
-    title: '金流台帳',
-    desc: '聚合 ECPay 12 種模擬付款方式的圓餅 / 趨勢 / 明細。',
-  },
-  {
-    title: '物產 / 庫存 / 帳冊',
-    desc: '商品 CRUD、庫存調整、訂單編輯，demo 模式會存入 localStorage。',
-  },
-  {
-    title: '物聯監儀',
-    desc: '感測器網路 + 校準 / 配置面板，純前端模擬。',
-  },
+  { title: '總覽', desc: '查看營收、訂單、商品與低庫存提醒。' },
+  { title: '商品與圖片', desc: '管理商品資料、主圖與最多五張圖庫圖片。' },
+  { title: '訂單與庫存', desc: '處理訂單、調整庫存並保留 demo 操作結果。' },
+  { title: '設備', desc: '查看倉儲感測器心跳、電池與測值狀態。' },
 ];
 
-const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = getApiBase();
 
 const NAV_ITEMS = [
-  { to: '/admin', label: '盤面', end: true },
-  { to: '/admin/product', label: '物產' },
-  { to: '/admin/order', label: '帳冊' },
+  { to: '/admin', label: '總覽', end: true },
+  { to: '/admin/product', label: '商品' },
+  { to: '/admin/order', label: '訂單' },
   { to: '/admin/inventory', label: '庫存' },
-  { to: '/admin/coupon', label: '札記' },
+  { to: '/admin/coupon', label: '優惠券' },
   { to: '/admin/payment-ledger', label: '金流' },
-  { to: '/admin/devices', label: '監管' },
+  { to: '/admin/devices', label: '設備' },
 ];
 
 const AdminLayout = () => {
@@ -51,14 +42,14 @@ const AdminLayout = () => {
       .split('; ')
       .some((row) => row === 'myToken=enso-demo-token');
 
-  // Demo onboarding：第一次進來顯示 5 步導覽，看過後存 flag
   const [showTour, setShowTour] = useState(false);
+
   useEffect(() => {
     if (!isDemoSession) return;
     try {
       if (!localStorage.getItem(TOUR_KEY)) setShowTour(true);
     } catch {
-      /* ignore */
+      /* 儲存空間不可用時仍可正常使用後台。 */
     }
   }, [isDemoSession]);
 
@@ -72,213 +63,139 @@ const AdminLayout = () => {
   };
 
   const handleResetDemo = () => {
-    if (
-      !window.confirm('重置 demo 資料？這會清掉所有新增 / 編輯，回到初始狀態。')
-    )
-      return;
+    if (!window.confirm('重置展示資料？這會清掉所有新增與編輯，回到初始狀態。')) return;
     resetDemoData();
-    showSuccess('已重置 demo 資料');
-    // 重新整理讓所有頁面重抓 mock seed
+    showSuccess('展示資料已重置');
     setTimeout(() => window.location.reload(), 600);
   };
 
   const logout = async () => {
     try {
-      const token = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('myToken='))
-        ?.split('=')[1];
+      const token = readSessionToken();
 
       if (token !== 'enso-demo-token') {
-        await axios.post(`${API_BASE}/logout`);
+        await axios.post(`${API_BASE}/logout`, null, { timeout: AUTH_TIMEOUT });
       } else {
-        // Demo 登出時順便清掉 demo 期間累積的 localStorage 資料
         resetDemoData();
       }
 
-      document.cookie =
-        'myToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      clearSessionCookies();
+      if (isShowcase) { clearWorkspace(); window.location.assign('/shop/#/'); return; }
       delete axios.defaults.headers.common.Authorization;
-
-      showSuccess('登出成功');
+      showSuccess('已登出');
       navigate('/login');
-    } catch (error) {
-      showError('登出失敗');
+    } catch {
+      showError('登出失敗，請稍後再試');
     }
   };
 
   return (
-    <div
-      translate="no"
-      className="min-h-screen bg-[#FAF9F6] flex flex-col font-sans text-[#111111]"
-    >
+    <div translate="no" className="admin-shell">
       <MessageToast />
+      {isShowcase && <div className="admin-demo-banner"><span>獨立面試展示，三十分鐘後到期。不收款、不出貨。設備為模擬資料。</span><a href="/shop/#/">返回購物前台</a></div>}
 
       {isDemoSession && (
-        <div className="bg-[#984443] text-[#FAF9F6] text-[11px] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.25em] py-1 md:py-1.5 px-2 md:px-3 flex flex-wrap items-center justify-center gap-2 md:gap-4">
-          <span className="md:inline">
-            <span className="md:hidden">DEMO · 寫入存 localStorage</span>
-            <span className="hidden md:inline">
-              展示模式 · DEMO · 寫入會存於 localStorage
-            </span>
-          </span>
-          <button
-            type="button"
-            onClick={handleResetDemo}
-            className="px-2 py-0.5 border border-[#FAF9F6]/40 hover:bg-[#FAF9F6] hover:text-[#984443] transition-kyoto"
-          >
-            重置資料 · RESET
+        <div className="admin-demo-banner" role="status">
+          <span>展示模式 · 操作結果會保存在目前瀏覽器</span>
+          <button type="button" onClick={handleResetDemo}>
+            重置展示資料
           </button>
         </div>
       )}
 
       {showTour && (
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#111111]/60 backdrop-blur-sm"
-          onClick={(e) => e.target === e.currentTarget && closeTour()}
-        >
-          <div className="bg-[#FAF9F6] max-w-xl w-full p-8 md:p-12 shadow-2xl border border-[#D1C7B7]">
-            <div className="text-[12px] md:text-[0.75rem] uppercase tracking-[0.4em] text-[#984443] font-bold mb-2">
-              Welcome
-            </div>
-            <h3 className="font-serif text-2xl md:text-3xl mb-6">
-              ENSO Admin · Demo 導覽
-            </h3>
-            <ul className="space-y-3 mb-8">
-              {TOUR_STEPS.map((s, i) => (
-                <li key={s.title} className="flex gap-3">
-                  <span className="font-serif text-[#984443] text-lg w-6 shrink-0">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
+        <Dialog title="歡迎使用 ENSO 營運工作台" onClose={closeTour}>
+          <div className="admin-tour">
+            <h2 id="admin-tour-title" className="admin-tour__title">
+              先從營運總覽開始
+            </h2>
+            <div>
+              {TOUR_STEPS.map((step, index) => (
+                <div key={step.title} className="admin-tour__step">
+                  <span className="admin-tour__number">{String(index + 1).padStart(2, '0')}</span>
                   <div>
-                    <div className="font-bold text-[14px] md:text-[15px]">
-                      {s.title}
-                    </div>
-                    <div className="text-[12px] md:text-[13px] opacity-70">
-                      {s.desc}
-                    </div>
+                    <strong>{step.title}</strong>
+                    <div className="admin-tour__desc">{step.desc}</div>
                   </div>
-                </li>
+                </div>
               ))}
-            </ul>
-            <button
-              type="button"
-              onClick={closeTour}
-              className="w-full px-4 py-3 bg-[#111111] text-[#FAF9F6] text-[12px] md:text-[0.75rem] uppercase tracking-[0.3em] hover:bg-[#984443] transition-kyoto"
-            >
-              開始探索 · Start
+            </div>
+            <button type="button" className="enso-button-primary mt-6 w-full" onClick={closeTour}>
+              開始使用
             </button>
           </div>
-        </div>
+        </Dialog>
       )}
 
-      {/* 頂部導航列 - 博物館門戶風格 */}
-      <header className="sticky top-0 z-50 bg-[#FAF9F6]/80 backdrop-blur-md border-b border-[#D1C7B7] px-3 py-3 md:px-6 md:py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 md:gap-8 min-w-0">
-            <div className="flex flex-col min-w-0">
-              <h1 className="font-serif text-base md:text-2xl font-bold tracking-wider md:tracking-widest text-[#111111] flex items-center gap-2 whitespace-nowrap">
-                <span className="text-[#984443]">♢</span> ENSO 管理
-              </h1>
-              <span className="hidden md:block text-[0.75rem] uppercase tracking-[0.3em] opacity-40 ml-7">
-                Kyoto Administrative Suite
-              </span>
+      <header className="admin-topbar">
+        <div className="admin-topbar__inner">
+          <div className="admin-brand">
+            <div className="admin-brand__wordmark">
+              <div className="admin-brand__name">ENSO</div>
+              <div className="admin-brand__descriptor">營運工作台 · OPERATIONS</div>
             </div>
-
-            {/* 桌機版導覽 */}
-            <nav className="hidden md:flex items-center gap-1 ml-4">
-              {NAV_ITEMS.map(({ to, label, end }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  end={end}
-                  className={({ isActive }) =>
-                    `px-4 py-1 text-sm tracking-widest transition-kyoto rounded-sm no-underline ${
-                      isActive
-                        ? 'text-[#111111] font-bold bg-[#D1C7B7]/20 shadow-[inset_0_-2px_0_0_#984443]'
-                        : 'text-[#111111]/40 hover:text-[#111111]'
-                    }`
-                  }
-                >
-                  {label}
-                </NavLink>
-              ))}
-            </nav>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-4 shrink-0">
-            <button
-              onClick={logout}
-              className="text-[12px] md:text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.2em] px-3 md:px-4 py-1 md:py-1.5 border border-[#D1C7B7] hover:bg-[#111111] hover:text-[#FAF9F6] hover:border-[#111111] transition-kyoto rounded-sm whitespace-nowrap"
-            >
-              登出
-            </button>
-
-            {/* 手機版選單按鈕 */}
-            <button
-              className="md:hidden p-2 text-[#111111]"
-              onClick={() => setIsNavOpen(!isNavOpen)}
-            >
-              <div className="w-6 h-4 flex flex-col justify-between items-end">
-                <span
-                  className={`h-[1px] bg-current transition-all ${isNavOpen ? 'w-6 translate-y-[7px] rotate-45' : 'w-6'}`}
-                />
-                <span
-                  className={`h-[1px] bg-current transition-all ${isNavOpen ? 'opacity-0' : 'w-4'}`}
-                />
-                <span
-                  className={`h-[1px] bg-current transition-all ${isNavOpen ? 'w-6 -translate-y-[8px] -rotate-45' : 'w-5'}`}
-                />
-              </div>
-            </button>
-          </div>
-        </div>
-
-        {/* 手機版導覽下拉 */}
-        {/* max-h-[32rem] = 512px，足以容納 7+ 個 nav item（每個 ~50px + gap + padding）。
-            之前用 max-h-64 (256px) 會把最後 3 個（札記／監管／使者）切掉。 */}
-        <div
-          className={`md:hidden overflow-hidden transition-all duration-500 ${isNavOpen ? 'max-h-[32rem] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}
-        >
-          <nav className="flex flex-col gap-2 py-4 border-t border-[#D1C7B7]/30">
+          <nav className="admin-nav admin-nav--desktop" aria-label="後台主要功能">
             {NAV_ITEMS.map(({ to, label, end }) => (
               <NavLink
                 key={to}
                 to={to}
                 end={end}
-                onClick={() => setIsNavOpen(false)}
                 className={({ isActive }) =>
-                  `px-4 py-3 text-sm tracking-[0.2em] transition-kyoto no-underline ${
-                    isActive
-                      ? 'bg-[#D1C7B7]/20 text-[#984443] font-bold'
-                      : 'text-[#111111]/60'
-                  }`
+                  `admin-nav__link ${isActive ? 'is-active' : ''}`
                 }
+                onClick={() => setIsNavOpen(false)}
               >
                 {label}
               </NavLink>
             ))}
           </nav>
+
+          <button type="button" className="admin-logout" onClick={logout}>
+            登出
+          </button>
+          <button
+            type="button"
+            className="admin-menu-toggle"
+            aria-label={isNavOpen ? '關閉導覽' : '開啟導覽'}
+            aria-expanded={isNavOpen}
+            onClick={() => setIsNavOpen((open) => !open)}
+          >
+            <span className="sr-only">{isNavOpen ? '關閉導覽' : '開啟導覽'}</span>
+            <span className="admin-menu-toggle__icon" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+          </button>
         </div>
+
+        {isNavOpen && (
+          <nav className="admin-nav admin-nav--mobile px-4 pb-3" aria-label="行動版後台功能">
+            {NAV_ITEMS.map(({ to, label, end }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={end}
+                className={({ isActive }) => `admin-nav__link ${isActive ? 'is-active' : ''}`}
+                onClick={() => setIsNavOpen(false)}
+              >
+                {label}
+              </NavLink>
+            ))}
+          </nav>
+        )}
       </header>
 
-      {/* 主要內容區 */}
-      <main className="flex-grow bg-kumiko relative">
-        <div className="max-w-7xl mx-auto min-h-[calc(100vh-140px)]">
+      <main className="admin-content">
+        <div className="min-h-[calc(100vh-160px)]">
           <Outlet />
         </div>
       </main>
 
-      {/* 底部資訊 - 極簡主義 */}
-      <footer className="py-12 border-t border-[#D1C7B7]/30 bg-[#FAF9F6]">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-4">
-          <div className="w-12 h-[1px] bg-[#984443]/30"></div>
-          <p className="text-[0.75rem] uppercase tracking-[0.4em] opacity-30 text-center leading-loose">
-            © 2025 ENSO INCENSE ARTISAN
-            <br />
-            PRECISE MONITORING • TRADITIONAL SOUL
-          </p>
-        </div>
+      <footer className="admin-footer">
+        ENSO OPERATIONS · 商品、訂單與庫存管理
       </footer>
     </div>
   );

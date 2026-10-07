@@ -1,5 +1,9 @@
 import { forwardRef, useState } from 'react';
 
+import { formatTwd } from '../assets/utils/filter';
+
+import ProductImage from './admin/ProductImage';
+
 const SingleProductModal = forwardRef(function SingleProductModal(
   { product, addToCart, closeModal },
   ref
@@ -24,7 +28,11 @@ const SingleProductModal = forwardRef(function SingleProductModal(
           </div>
 
           <div className="modal-body">
-            <img className="w-100" src={product?.imageUrl} />
+            <ProductImage
+              className="w-100"
+              src={product?.imageUrl}
+              alt={`${product?.title || '商品'}商品主圖`}
+            />
 
             <p className="mt-3">產品內容：{product?.content}</p>
 
@@ -32,8 +40,8 @@ const SingleProductModal = forwardRef(function SingleProductModal(
 
             <p>
               價錢：
-              <del>${product?.origin_price}</del>
-              ，特價：${product?.price}
+              <del>{formatTwd(product?.origin_price)}</del>
+              ，特價：{formatTwd(product?.price)}
             </p>
 
             <div className="d-flex align-items-center">

@@ -6,8 +6,12 @@
   "scripts": {
     "dev": "vite --configLoader native",
     "build": "vite build --configLoader native",
+    "build:showcase": "node scripts/build-showcase.mjs",
     "lint": "eslint .",
-    "verify": "npm run lint && npm run build",
+    "test": "node --test tests/*.test.mjs",
+    "test:browser": "playwright test",
+    "test:all": "npm run verify && npm run test:browser",
+    "verify": "npm run lint && npm test && npm run build",
     "preview": "vite preview --configLoader native",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
@@ -16,7 +20,7 @@
     "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
-    "gh-pages": "^6.3.0",
+    "gh-pages": "6.1.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.71.1",
@@ -30,6 +34,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",

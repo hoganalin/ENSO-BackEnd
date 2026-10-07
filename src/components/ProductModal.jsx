@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useState } from 'react';
 
 import useMessage from '../hooks/useMessage';
 import {
@@ -8,346 +8,330 @@ import {
   uploadAdminImage,
 } from '../service/adminProducts';
 
+import Dialog from './admin/Dialog';
+import ProductImage from './admin/ProductImage';
+
+const scenesOf = (value) =>
+  Array.from({ length: 3 }, (_, index) => String(value?.[index] ?? ''));
+const imagePurposes = [
+  '包裝細節',
+  '生活情境',
+  '香氣或材質特寫',
+  '比例與使用情境',
+  '補充圖片',
+];
+
 export default function ProductModal({
   modalType,
   templateProduct,
   closeModal,
   getData,
 }) {
-  const { showSuccess, showError } = useMessage();
-  const fileInputRef = useRef(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Normalizer to ensure scenes array etc.
-  const normalizer = (value) => {
-    if (Array.isArray(value)) {
-      return value.slice(0, 3).map((scene) => (scene == null ? '' : String(scene)));
-    }
-    return ['', '', ''];
-  };
-
-  const [tempData, setTempData] = useState(() => ({
+  const { showSuccess } = useMessage();
+  const [data, setData] = useState(() => ({
     ...templateProduct,
-    scenes: normalizer(templateProduct?.scenes),
+    scenes: scenesOf(templateProduct.scenes),
+    imagesUrl: (templateProduct.imagesUrl || []).filter(Boolean).slice(0, 5),
   }));
-
-  useEffect(() => {
-    setTempData({
-      ...templateProduct,
-      scenes: normalizer(templateProduct?.scenes),
-    });
-  }, [templateProduct]);
-
-  if (!modalType) return null;
-
-  const handleInputChange = (e) => {
-    const { name, value, checked, type } = e.target;
-    setTempData((prev) => ({
-      ...prev,
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const isDelete = modalType === 'delete';
+  const isDemo = document.cookie
+    .split('; ')
+    .includes('myToken=enso-demo-token');
+  const change = (event) => {
+    const { name, type, checked, value } = event.target;
+    setData((previous) => ({
+      ...previous,
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
-
-  const handleImageChange = (index, value) => {
-    const newImages = [...(tempData.imagesUrl || [])];
-    newImages[index] = value;
-    if (value !== '' && index === newImages.length - 1 && newImages.length < 5) {
-      newImages.push('');
-    }
-    setTempData({ ...tempData, imagesUrl: newImages });
-  };
-
-  const handleSceneChange = (index, value) => {
-    const nextScenes = [...tempData.scenes];
-    nextScenes[index] = value;
-    setTempData({ ...tempData, scenes: nextScenes });
-  };
-
-  const uploadImage = async (e) => {
-    const file = e.target.files?.[0];
+  const changeGallery = (index, value) =>
+    setData((previous) => ({
+      ...previous,
+      imagesUrl: previous.imagesUrl.map((url, i) =>
+        i === index ? value : url
+      ),
+    }));
+  const upload = async (event) => {
+    const file = event.target.files?.[0];
     if (!file) return;
-    const formData = new FormData();
-    formData.append('file-to-upload', file);
-    setIsLoading(true);
+    if (
+      !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) ||
+      file.size > 3 * 1024 * 1024
+    ) {
+      setError('請選擇 3 MB 以下的 JPG、PNG 或 WebP 圖片。');
+      event.target.value = '';
+      return;
+    }
+    setBusy(true);
+    setError('');
     try {
+      const formData = new FormData();
+      formData.append('file-to-upload', file);
       const response = await uploadAdminImage(formData);
-      setTempData((pre) => ({ ...pre, imageUrl: response.data.imageUrl }));
-    } catch (error) {
-      showError('圖片上傳失敗');
+      if (!response.data?.imageUrl || response.data.success === false)
+        throw new Error('上傳未成功，請重新選擇圖片。');
+      setData((previous) => ({
+        ...previous,
+        imageUrl: response.data.imageUrl,
+      }));
+    } catch (reason) {
+      setError(
+        reason.response?.data?.message ||
+          reason.message ||
+          '上傳失敗，請稍後重試。'
+      );
     } finally {
-      setIsLoading(false);
+      setBusy(false);
+      event.target.value = '';
     }
   };
-
-  const handleSubmit = async () => {
-    const payload = {
-      ...tempData,
-      origin_price: Number(tempData.origin_price),
-      price: Number(tempData.price),
-      is_enabled: tempData.is_enabled ? 1 : 0,
-      scenes: normalizer(tempData.scenes),
-    };
-    setIsLoading(true);
+  const submit = async (event) => {
+    event.preventDefault();
+    setBusy(true);
+    setError('');
     try {
-      if (modalType === 'edit') await updateAdminProduct(tempData.id, payload);
-      else await createAdminProduct(payload);
-      getData();
-      showSuccess('操作成功');
+      let response;
+      if (isDelete) response = await deleteAdminProduct(data.id);
+      else {
+        const payload = {
+          ...data,
+          title: data.title.trim(),
+          category: data.category.trim(),
+          origin_price: Number(data.origin_price),
+          price: Number(data.price),
+          inventory: Number(data.inventory || 0),
+          is_enabled: data.is_enabled ? 1 : 0,
+          scenes: scenesOf(data.scenes),
+          imageUrl: (data.imageUrl || '').trim(),
+          imagesUrl: data.imagesUrl
+            .map((url) => url.trim())
+            .filter(Boolean)
+            .slice(0, 5),
+        };
+        response =
+          modalType === 'edit'
+            ? await updateAdminProduct(data.id, payload)
+            : await createAdminProduct(payload);
+      }
+      if (response.data?.success === false)
+        throw new Error(response.data.message || '儲存未成功');
+      showSuccess(isDelete ? '商品已刪除' : '商品已儲存');
       closeModal();
-    } catch (error) {
-      showError('操作失敗');
+      await getData();
+    } catch (reason) {
+      setError(
+        reason.response?.data?.message ||
+          reason.message ||
+          '操作失敗，請檢查連線後再試。'
+      );
     } finally {
-      setIsLoading(false);
+      setBusy(false);
     }
   };
-
-  const handleDelete = async () => {
-    setIsLoading(true);
-    try {
-      await deleteAdminProduct(tempData.id);
-      getData();
-      showSuccess('產品已刪除');
-      closeModal();
-    } catch (error) {
-      showError('刪除失敗');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 transition-kyoto">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-[#111111]/40 backdrop-blur-sm"
-        onClick={closeModal}
+  const field = (name, label, type = 'text', required = false) => (
+    <label className="workspace-field" key={name}>
+      <span>
+        {label}
+        {required && '（必填）'}
+      </span>
+      <input
+        name={name}
+        type={type}
+        value={data[name] ?? ''}
+        onChange={change}
+        required={required}
+        {...(type === 'number'
+          ? { min: 0, step: name === 'inventory' ? 1 : 'any' }
+          : {})}
       />
-      
-      {/* Modal Container */}
-      <div className="relative bg-[#FAF9F6] w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl rounded-sm border border-[#D1C7B7] flex flex-col">
-        {/* Header */}
-        <div className={`sticky top-0 z-10 px-8 py-6 flex items-center justify-between border-b border-[#D1C7B7] bg-[#FAF9F6]`}>
-          <div>
-            <h2 className="font-serif text-2xl font-medium text-[#111111] tracking-tight">
-              {modalType === 'delete' ? '確認刪除' : modalType === 'edit' ? '編錄商物' : '新闢商物'}
-            </h2>
-            <p className="text-[0.75rem] uppercase tracking-[0.3em] opacity-40 mt-1">
-              {modalType === 'delete' ? 'Removal Confirmation' : 'Product Registry Update'}
-            </p>
-          </div>
-          <button onClick={closeModal} className="text-[#111111] opacity-30 hover:opacity-100 transition-kyoto">
-            <span className="text-2xl font-light">✕</span>
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="p-8">
-          {modalType === 'delete' ? (
-            <div className="py-12 flex flex-col items-center text-center">
-              <span className="text-4xl text-[#984443] mb-6 animate-pulse">♢</span>
-              <p className="font-serif text-xl mb-2 text-[#111111]">確定要將此產品從目錄中移除嗎？</p>
-              <p className="text-sm opacity-50 italic">「{tempData.title}」</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-              {/* Image Column */}
-              <div className="lg:col-span-4 space-y-6">
-                <div>
-                  <label className="block text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40 mb-3">商品影像 (Primary)</label>
-                  <div className="group relative w-full aspect-square bg-white border border-[#D1C7B7] rounded-sm overflow-hidden flex items-center justify-center shadow-inner">
-                    {tempData.imageUrl ? (
-                      <img src={tempData.imageUrl} alt="Preview" className="w-full h-full object-cover p-2" />
-                    ) : (
-                      <span className="text-[0.75rem] opacity-20">NO IMAGE</span>
-                    )}
-                    <input 
-                      type="file" 
-                      className="absolute inset-0 opacity-0 cursor-pointer" 
-                      onChange={uploadImage}
-                      ref={fileInputRef}
-                    />
-                    <div className="absolute inset-0 bg-[#111111]/0 group-hover:bg-[#111111]/5 transition-kyoto flex items-center justify-center">
-                       <span className="opacity-0 group-hover:opacity-100 text-[0.75rem] uppercase tracking-widest text-[#111111] font-bold bg-[#FAF9F6] px-3 py-1.5 shadow-sm border border-[#D1C7B7]">更換影像</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <label className="block text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">附加影像集 (Gallery)</label>
-                  {(tempData.imagesUrl || ['']).map((url, idx) => (
-                    <input
-                      key={idx}
-                      type="text"
-                      className="w-full bg-white border border-[#D1C7B7] rounded-sm py-2 px-3 text-xs focus:ring-1 focus:ring-[#111111] outline-none transition-kyoto placeholder:opacity-30 italic"
-                      placeholder={`影像網址 #${idx + 1}`}
-                      value={url}
-                      onChange={(e) => handleImageChange(idx, e.target.value)}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Info Column */}
-              <div className="lg:col-span-8 space-y-8">
-                <div className="grid grid-cols-1 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">商物標題</label>
-                    <input
-                      type="text"
-                      name="title"
-                      className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-lg font-serif outline-none focus:border-[#111111] transition-kyoto placeholder:opacity-30"
-                      placeholder="請輸入商物名稱..."
-                      value={tempData.title || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-8">
-                  <div className="space-y-2">
-                    <label className="text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">分類</label>
-                    <input
-                      type="text"
-                      name="category"
-                      className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-sm outline-none focus:border-[#111111] transition-kyoto"
-                      value={tempData.category || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">編制單位</label>
-                    <input
-                      type="text"
-                      name="unit"
-                      className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-sm outline-none focus:border-[#111111] transition-kyoto"
-                      value={tempData.unit || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-8">
-                  <div className="space-y-2">
-                    <label className="text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">原價</label>
-                    <input
-                      type="number"
-                      name="origin_price"
-                      className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-sm outline-none focus:border-[#111111] transition-kyoto"
-                      value={tempData.origin_price}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">售價</label>
-                    <input
-                      type="number"
-                      name="price"
-                      className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-sm outline-none focus:border-[#111111] transition-kyoto"
-                      value={tempData.price}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">當前庫存</label>
-                    <input
-                      type="number"
-                      name="inventory"
-                      className="w-full bg-transparent border-b border-[#D1C7B7] py-2 text-sm outline-none focus:border-[#111111] transition-kyoto"
-                      value={tempData.inventory ?? ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h4 className="text-[0.75rem] uppercase tracking-[0.4em] font-bold opacity-20 border-b border-[#D1C7B7]/30 pb-2">香道特性與場景</h4>
-                  
-                  <div className="space-y-2">
-                    <label className="text-[0.75rem] uppercase tracking-[0.2em] font-bold opacity-40">產品總覽 (Description)</label>
-                    <textarea
-                      name="description"
-                      rows="2"
-                      className="w-full bg-white border border-[#D1C7B7] rounded-sm p-4 text-xs outline-none focus:border-[#111111] transition-kyoto"
-                      value={tempData.description || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    {tempData.scenes.map((scene, idx) => (
-                      <div key={idx} className="space-y-1">
-                        <label className="text-[0.75rem] uppercase tracking-[0.2em] opacity-40">合宜場合 {idx + 1}</label>
-                        <input
-                          type="text"
-                          className="w-full bg-white border border-[#D1C7B7] rounded-sm p-2 text-[0.75rem] outline-none focus:border-[#111111]"
-                          value={scene}
-                          onChange={(e) => handleSceneChange(idx, e.target.value)}
-                        />
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-1">
-                        <label className="text-[0.75rem] uppercase tracking-[0.2em] opacity-40 font-bold text-[#111111]">基調 Top</label>
-                        <input type="text" name="top_smell" className="w-full bg-[#111111]/5 border-none p-2 text-[0.75rem] outline-none" value={tempData.top_smell || ''} onChange={handleInputChange} />
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-[0.75rem] uppercase tracking-[0.2em] opacity-40 font-bold text-[#984443]">中調 Heart</label>
-                        <input type="text" name="heart_smell" className="w-full bg-[#111111]/5 border-none p-2 text-[0.75rem] outline-none" value={tempData.heart_smell || ''} onChange={handleInputChange} />
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-[0.75rem] uppercase tracking-[0.2em] opacity-40 font-bold text-[#735C00]">末調 Base</label>
-                        <input type="text" name="base_smell" className="w-full bg-[#111111]/5 border-none p-2 text-[0.75rem] outline-none" value={tempData.base_smell || ''} onChange={handleInputChange} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4">
-                  <label className="flex items-center gap-3 cursor-pointer group">
-                    <div className="relative">
-                      <input
-                        type="checkbox"
-                        name="is_enabled"
-                        className="sr-only"
-                        checked={tempData.is_enabled || false}
-                        onChange={handleInputChange}
-                      />
-                      <div className={`w-10 h-5 rounded-full transition-kyoto ${tempData.is_enabled ? 'bg-[#3A4D39]' : 'bg-[#D1C7B7]'}`}></div>
-                      <div className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-kyoto ${tempData.is_enabled ? 'translate-x-5' : 'translate-x-0'}`}></div>
-                    </div>
-                    <span className="text-[0.75rem] uppercase tracking-[0.3em] font-bold opacity-60 group-hover:opacity-100 transition-kyoto">
-                      {tempData.is_enabled ? '公開上架中' : '暫時封存'}
-                    </span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="sticky bottom-0 z-10 p-8 border-t border-[#D1C7B7] bg-[#FAF9F6] flex justify-end gap-4">
+    </label>
+  );
+  return (
+    <Dialog
+      title={
+        isDelete ? '刪除商品' : modalType === 'edit' ? '編輯商品' : '新增商品'
+      }
+      onClose={closeModal}
+      busy={busy}
+      footer={
+        <>
           <button
+            className="enso-button-secondary"
             onClick={closeModal}
-            className="px-8 py-2 text-[0.75rem] uppercase tracking-[0.2em] border border-[#D1C7B7] hover:bg-[#111111] hover:text-[#FAF9F6] transition-kyoto rounded-sm"
+            disabled={busy}
           >
             取消
           </button>
           <button
-            onClick={modalType === 'delete' ? handleDelete : handleSubmit}
-            disabled={isLoading}
-            className={`px-10 py-2 text-[0.75rem] uppercase tracking-[0.2em] rounded-sm transition-kyoto shadow-sm ${
-              modalType === 'delete' 
-                ? 'bg-[#984443] text-white hover:bg-[#803332]' 
-                : 'bg-[#111111] text-white hover:bg-[#984443]'
-            } disabled:opacity-30`}
+            type="submit"
+            form="product-editor"
+            className={isDelete ? 'enso-button-danger' : 'enso-button-primary'}
+            disabled={busy}
           >
-            {isLoading ? '處理中...' : '確認執行'}
+            {busy ? '處理中…' : isDelete ? '確認刪除' : '儲存商品'}
           </button>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    >
+      <form id="product-editor" onSubmit={submit}>
+        {error && (
+          <p role="alert" className="workspace-error">
+            {error}
+          </p>
+        )}
+        {isDelete ? (
+          <p>確定刪除「{data.title}」？刪除後將無法從商品列表復原。</p>
+        ) : (
+          <fieldset disabled={busy} className="product-editor-grid">
+            <section className="product-media-editor" aria-label="商品圖片管理">
+              <h3>商品主圖</h3>
+              <div className="enso-image-frame">
+                <ProductImage
+                  variant="card"
+                  src={data.imageUrl}
+                  alt={(data.title || '商品') + '主圖預覽'}
+                />
+              </div>
+              {field('imageUrl', '主圖網址')}
+              <p className="workspace-hint">支援 https:// 網址或以斜線開頭的站內圖片路徑。</p>
+              <label className="workspace-field">
+                <span>上傳主圖</span>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={upload}
+                />
+              </label>
+              <p className="workspace-hint">
+                JPG、PNG、WebP，最大 3 MB。建議直式 4：5，保留完整包裝。
+              </p>
+              {isDemo && (
+                <p className="workspace-hint">
+                  展示模式上傳會回傳示範圖片，不會將所選檔案存入雲端。正式帳號才會呼叫圖片上傳服務。
+                </p>
+              )}
+              <h3>
+                商品圖庫 <small> {data.imagesUrl.length}／5</small>
+              </h3>
+              <p className="workspace-hint">
+                主圖之外最多五張，可預覽、更換及移除。
+              </p>
+              {data.imagesUrl.map((url, index) => (
+                <div className="gallery-editor-row" key={index}>
+                  <div className="gallery-editor-preview">
+                    <ProductImage
+                      variant="thumb"
+                      src={url}
+                      alt={
+                        (data.title || '商品') + imagePurposes[index] + '預覽'
+                      }
+                    />
+                  </div>
+                  <label className="workspace-field">
+                    <span>{imagePurposes[index]}</span>
+                    <input
+                      type="text"
+                      value={url}
+                      placeholder="https://…"
+                      onChange={(event) =>
+                        changeGallery(index, event.target.value)
+                      }
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="workspace-link"
+                    aria-label={'移除圖庫第 ' + (index + 1) + ' 張'}
+                    onClick={() =>
+                      setData((previous) => ({
+                        ...previous,
+                        imagesUrl: previous.imagesUrl.filter(
+                          (_, i) => i !== index
+                        ),
+                      }))
+                    }
+                  >
+                    移除
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="enso-button-secondary"
+                disabled={data.imagesUrl.length >= 5}
+                onClick={() =>
+                  setData((previous) => ({
+                    ...previous,
+                    imagesUrl: [...previous.imagesUrl, ''],
+                  }))
+                }
+              >
+                新增圖庫圖片
+              </button>
+            </section>
+            <section className="product-info-editor" aria-label="商品資料">
+              <h3>基本資料</h3>
+              {field('title', '商品名稱', 'text', true)}
+              <div className="workspace-field-grid">
+                {field('category', '分類', 'text', true)}
+                {field('unit', '販售單位')}
+              </div>
+              <div className="workspace-field-grid">
+                {field('origin_price', '原價（NT$）', 'number', true)}
+                {field('price', '售價（NT$）', 'number', true)}
+                {field('inventory', '目前庫存', 'number', true)}
+              </div>
+              <label className="workspace-checkbox">
+                <input
+                  type="checkbox"
+                  name="is_enabled"
+                  checked={!!data.is_enabled}
+                  onChange={change}
+                />
+                上架此商品
+              </label>
+              <h3>香氣與商品說明</h3>
+              {['description', 'content', 'feature'].map((name, index) => (
+                <label className="workspace-field" key={name}>
+                  <span>
+                    {['商品描述', '商品內容與原料', '商品特色'][index]}
+                  </span>
+                  <textarea
+                    name={name}
+                    rows={3}
+                    value={data[name] || ''}
+                    onChange={change}
+                  />
+                </label>
+              ))}
+              <div className="workspace-field-grid">
+                {field('top_smell', '前調')}
+                {field('heart_smell', '中調')}
+                {field('base_smell', '後調')}
+              </div>
+              <h3>使用情境</h3>
+              {data.scenes.map((scene, index) => (
+                <label className="workspace-field" key={index}>
+                  <span>情境 {index + 1}</span>
+                  <input
+                    value={scene}
+                    onChange={(event) =>
+                      setData((previous) => ({
+                        ...previous,
+                        scenes: previous.scenes.map((value, i) =>
+                          i === index ? event.target.value : value
+                        ),
+                      }))
+                    }
+                  />
+                </label>
+              ))}
+            </section>
+          </fieldset>
+        )}
+      </form>
+    </Dialog>
   );
 }
-

@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { clearWorkspace } from '../../shared/showcase';
+
 import {
   createCoupon,
   createProduct,
@@ -15,17 +17,24 @@ import {
   updateOrder,
   updateProduct,
 } from './demoStore';
+import { AUTH_TIMEOUT, clearSessionCookies, getApiBase, isShowcase, readSessionToken } from './session';
 
-export const API_PATH = import.meta.env.VITE_API_PATH;
-export const API_BASE = import.meta.env.VITE_API_BASE;
+export const API_PATH = isShowcase ? 'enso' : import.meta.env.VITE_API_PATH;
+export const API_BASE = getApiBase();
 
 //後台API
 export const apiAuth = axios.create({
   baseURL: API_BASE,
+  timeout: AUTH_TIMEOUT,
 });
 // 請求攔截器
 apiAuth.interceptors.request.use(
   (config) => {
+    if (isShowcase) {
+      config.baseURL = getApiBase();
+      config.headers.Authorization = readSessionToken();
+      return config;
+    }
     const token =
       document.cookie
         .split('; ')
@@ -88,7 +97,7 @@ function resolveDemoMock(config) {
     return { success: true, coupons: getCoupons(), pagination: PAGINATION };
   }
 
-  // 圖片上傳：round-robin 三張示範圖
+  // 圖片上傳：round-robin 六張本機示範主圖，不上傳至雲端
   if (path.endsWith('/admin/upload')) {
     return {
       success: true,
@@ -179,23 +188,31 @@ apiAuth.interceptors.response.use(
         url
       );
 
-      const data = resolveDemoMock(error.config);
+      let data;
+      try {
+        data = resolveDemoMock(error.config);
+      } catch (storageError) {
+        if (storageError.code === 'DEMO_STORAGE_UNAVAILABLE') {
+          storageError.response = { data: { success: false, message: storageError.message } };
+        }
+        return Promise.reject(storageError);
+      }
 
       // 用 Promise.resolve() 假裝正常連線回傳 (延遲 300ms 增加真實感)
       return new Promise((resolve) => setTimeout(() => resolve({ data }), 300));
     }
 
     const { response } = error;
+    if (isShowcase && [401, 410].includes(response?.status)) {
+      clearWorkspace();
+      window.location.assign('/shop/#/');
+      return Promise.reject(error);
+    }
 
     if (response?.status === 401) {
-      const message =
-        (typeof response.data === 'string'
-          ? response.data
-          : response.data?.message) || '未授權，請重新登入';
-      window.alert(message);
+      clearSessionCookies();
+      delete axios.defaults.headers.common.Authorization;
       window.location.hash = '#/login';
-    } else if (response?.status >= 500) {
-      window.alert('伺服器錯誤，請稍後再試');
     }
 
     return Promise.reject(error);

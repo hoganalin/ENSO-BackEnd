@@ -10,7 +10,9 @@ export const getAdminOrders = (page = 1) =>
 // 修改訂單（Hexschool v2: /admin/order/:id）
 export const updateAdminOrder = (orderOrId, data) => {
   const orderId = resolveOrderId(orderOrId);
-  return apiAuth.put(`/api/${API_PATH}/admin/order/${orderId}`, { data });
+  return apiAuth.put(`/api/${API_PATH}/admin/order/${orderId}`, {
+    data: { ...data, version: data?.version ?? orderOrId?.version },
+  });
 };
 
 // 刪除單筆訂單（Hexschool v2: /admin/order/:id）

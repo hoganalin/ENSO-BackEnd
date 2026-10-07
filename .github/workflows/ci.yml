@@ -1,0 +1,44 @@
+name: ENSO verification
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: enso_local
+          POSTGRES_USER: enso
+          POSTGRES_PASSWORD: ci-isolated-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U enso -d enso_local"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://enso:ci-isolated-only@127.0.0.1:5432/enso_local
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
+            storefront/package-lock.json
+      - run: npm ci
+      - run: npm ci --prefix server
+      - run: npm ci --prefix storefront
+      - run: npx playwright install --with-deps chromium
+      - run: npm run lint && npm test
+      - run: npm run lint --prefix server && npm run lint --prefix storefront
+      - run: node server/scripts/migrate.js
+      - run: node --test --test-concurrency=1 server/tests/*.test.js
+      - run: npm run build:showcase
+      - run: npm run test:showcase --prefix server

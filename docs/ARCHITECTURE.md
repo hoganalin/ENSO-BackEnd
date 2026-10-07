@@ -1,257 +1,65 @@
-# ARCHITECTURE
+# 架構
 
-## 目錄結構
+## 完整面試展示（2026-10-05）
 
-```
-src/
-├── main.jsx                  # ReactDOM root，掛 Provider + StrictMode
-├── App.jsx                   # RouterProvider wrapper
-├── router.jsx                # createHashRouter，所有路由定義
-│
-├── layout/
-│   ├── AdminLayout.jsx       # 後台外層：Header nav（7 項）+ Outlet + Footer + logout
-│   └── FrontendLayout.jsx    # 前台外層（目前 stub）
-│
-├── views/
-│   ├── Login.jsx             # 帳密登入 + demo 一鍵體驗
-│   ├── admin/
-│   │   ├── AdminHome.jsx     # 總覽 KPI + Recharts + IoT 即時日誌
-│   │   ├── AdminProducts.jsx # 商品 CRUD
-│   │   ├── AdminOrders.jsx   # 訂單檢視 + 編輯
-│   │   ├── AdminInventory.jsx# 庫存調整（自訂 inventory 欄位 + localStorage 歷史）
-│   │   ├── AdminCoupon.jsx   # 優惠券 CRUD
-│   │   ├── AdminDevices.jsx  # 模擬倉儲感測器 heartbeat
-│   │   └── AdminAgent.jsx    # AI agent chat + event stream + candidate cases
-│   └── front/
-│       └── NotFound.jsx      # 404
-│
-├── components/
-│   ├── FullPageLoading.jsx   # 全螢幕 spinner overlay（isLoading prop）
-│   ├── MessageToast.jsx      # 渲染 Redux message state 的 toast
-│   ├── Pagination.jsx        # 受控分頁，onChangePage(page) callback
-│   ├── ProductModal.jsx      # 商品 Modal（create / edit / delete by modalType prop）
-│   ├── SingleProductModal.jsx# 商品預覽 Modal
-│   ├── ProtectedRoute.jsx    # 進後台前呼叫 /api/user/check，401 → /login
-│   └── admin/                # AdminAgent 專用子元件（chat UI、event cards）
-│
-├── hooks/
-│   └── useMessage.js         # showSuccess / showError 封裝 Redux dispatch
-│
-├── service/                  # 所有 API 呼叫集中於此
-│   ├── api.js                # Axios 實例 + 攔截器 + demo mock
-│   ├── adminProducts.js      # HexSchool 商品 CRUD + 圖片上傳
-│   ├── adminOrders.js        # HexSchool 訂單 CRUD
-│   ├── coupon.js             # HexSchool 優惠券 CRUD
-│   ├── agentEvents.js        # fetch → Next.js /api/events + KPI/funnel 計算
-│   ├── candidateCases.js     # fetch → /api/candidate-cases + TS snippet generator
-│   ├── xiaodianChat.js       # 小店 agent 對話 loop（tool-use 迴圈）
-│   ├── xiaodianPersona.js    # 小店 system prompt + tool schemas
-│   └── xiaodianTools.js      # 小店的 5 支 tool executor
-│
-├── slices/messageSlice.js    # Toast 訊息 Redux slice（3 秒自動清除）
-├── store/store.js            # configureStore — 只有 message reducer
-│
-├── utils/validation.js       # EmailValidation RHF rule
-├── assets/
-│   ├── index.css             # 全域字體、scrollbar、Kumiko 背景
-│   ├── style.css             # 登入頁樣式
-│   └── utils/filter.js       # currency(value) → 千分位 NTD
-```
+showcase.js 同源提供 /shop/ 購物前台、/ 管理介面、/demo-api/:id API。ShowcaseGate 建立三十分鐘隔離資料區，shared/showcase.js 保存目前分頁的展示憑證。公開商品及購物車呼叫同一套 Express 路由，管理 Token 與訪客 Token 分別驗證。每次建立使用獨立 schema 與固定 search_path，schema 名稱由伺服器產生且白名單驗證，不接受使用者 SQL 識別字。
 
-## 啟動流程
+storefront Redux 管理購物車伺服器狀態。Checkout 保存送單代碼與確認金額，斷線時可重試原單，價格變動則重新確認。不是從 localStorage 假造訂單成功。資料清理及安全限制見 [展示指南](INTERVIEW-DEMO.md)。以下 Cookie 與 localStorage 段落描述仍保留的原管理模式，不是完整展示的認證方式。
 
-```
-main.jsx
-  └─ <StrictMode>
-       └─ <Provider store={store}>       ← Redux message slice
-            └─ <App>
-                 └─ <RouterProvider router={router}>  ← Hash router
-                      ├─ / → <FrontendLayout>         → Login / NotFound
-                      └─ /admin → <ProtectedRoute>    ← 呼叫 /api/user/check
-                                    └─ <AdminLayout>  ← nav + Outlet
-                                         └─ <AdminHome>... (7 個 admin view)
-```
+## 執行流程
 
-## 路由總覽
+main.jsx → Redux Provider → App → Hash Router → ProtectedRoute → AdminLayout → 管理頁。
 
-路由定義在 [src/router.jsx](../src/router.jsx)。全部用 Hash Router（`/#/xxx`）。
+路由由 src/router.jsx 定義，根路由導向登入。七個管理頁為總覽、商品、訂單、庫存、優惠券、金流與設備。舊的 /admin/agent 導回 /admin，舊元件保留在原始碼，但不在目前導覽與總覽資料流程中使用。
 
-| Path | Layout | View | 認證 |
-|---|---|---|---|
-| `/` | FrontendLayout | `<Navigate to="/login">` | 公開 |
-| `/login` | FrontendLayout | Login | 公開 |
-| `/admin` | ProtectedRoute → AdminLayout | AdminHome | 需 token |
-| `/admin/product` | 同上 | AdminProducts | 需 token |
-| `/admin/order` | 同上 | AdminOrders | 需 token |
-| `/admin/inventory` | 同上 | AdminInventory | 需 token |
-| `/admin/coupon` | 同上 | AdminCoupon | 需 token |
-| `/admin/devices` | 同上 | AdminDevices | 需 token |
-| `/admin/agent` | 同上 | AdminAgent | 需 token |
-| `*` | — | NotFound | 公開 |
+## 資料流程
 
-## 認證機制
+畫面呼叫 service/adminProducts.js、adminOrders.js 或 coupon.js，經 service/api.js 的 Axios 實例送往既有 API。正式請求使用 Cookie 中的 Token 加入 Authorization。ProtectedRoute 驗證管理員狀態。
 
-### Token 來源
-登入成功後，token 寫入 cookie `myToken`（HexSchool 舊課程程式碼曾用 `hexToken`，[api.js](../src/service/api.js) 做 fallback）。
+展示 Token enso-demo-token 會啟用攔截器，操作交由 service/demoStore.js，使用 localStorage 保存商品、訂單與優惠券。正式與展示路徑共用元件和 service 介面，不改 API payload。示範上傳只回傳原有圖片網址。
 
-### 攔截點
+Redux 僅管理通知。Login 與訂單使用 React Hook Form，其餘表單使用 React state。
 
-| 時機 | 位置 | 行為 |
-|---|---|---|
-| 進 `/admin` 前 | [ProtectedRoute](../src/components/ProtectedRoute.jsx) | `POST /api/user/check`，401 則 render `<Navigate to="/login">` |
-| 每次 API request | `apiAuth` request interceptor | 從 cookie 撈 token 塞進 `Authorization` header |
-| 每次 API response | `apiAuth` response interceptor | 401 → `alert` + `location.hash = '#/login'`；5xx → alert |
+## 登入與連線失敗
 
-### Demo 模式攔截（關鍵設計）
+session.js 集中讀取及清除 Cookie、建立登入 Cookie 與分類登入錯誤訊息。保持登入時兼容秒與毫秒的有效期限，拒絕失敗或缺少 Token 的登入回應。
 
-`ProtectedRoute` 與 `apiAuth` 都額外判斷 **token === `'enso-demo-token'`**：
+ProtectedRoute 只有收到 success 為 true 才放行。驗證拒絕或 401／403 會清除登入 Cookie 並回到登入；連線故障及服務暫時失效則保留 Cookie，提供重新確認按鈕。卸載頁面時取消尚未完成的驗證請求。
 
-1. `ProtectedRoute`：不打 `/api/user/check`，直接放行。
-2. `apiAuth` **request interceptor**：`Promise.reject({ isDemoMock: true, config })`。
-3. `apiAuth` **response interceptor** 的 error handler：看到 `isDemoMock` 就根據 `config.url` 的 `/admin/products` / `/admin/orders` / `/admin/coupons` 回對應 mock data（延遲 300ms 假裝是網路請求），用 `Promise.resolve()` 轉回正常 response。
+登入、狀態驗證、登出及管理 API 設有十五秒逾時。管理 API 401 會清除登入資料並導回登入，其他失敗交給頁面或表單提示，不再跳出阻塞操作的原生 alert。這些是前端處理，不能取代伺服器權限檢查。
 
-這樣 demo mode 下所有 admin 頁面不需網路就能看到假資料，面試展示不會因為後端掛掉而開天窗。
+## 商品與圖片
 
-## 資料流
+ProductModal 保留 imageUrl、imagesUrl 以及既有產品欄位。送出時轉換價格、庫存及啟用值型別，過濾空圖庫網址並限制五張。ProductImage 以失敗的 URL 為狀態，換成不同 URL 後可以重新載入。
 
-```
-User action
-   │
-   ▼
-View (AdminXxx.jsx)
-   │
-   ├──► service/adminXxx.js ──► apiAuth (Axios) ──► HexSchool API
-   │                                │
-   │                                └──► demo mock (若 token === enso-demo-token)
-   │
-   ├──► service/agentEvents.js ──► fetch ──► Next.js /api/events
-   │
-   └──► useMessage().showSuccess/Error ──► messageSlice ──► MessageToast
-```
+Dialog 使用原生 HTML dialog 的 showModal、Escape 與焦點管理，關閉後恢復先前焦點及頁面捲動。商品、訂單、庫存、優惠券、設備及導覽說明共用此元件。
 
-Redux 只管 toast 訊息，沒有其他全域狀態。View 內部 state 用 `useState`；表單用 React Hook Form（Login、AdminOrders 編輯）或 controlled state（其他）。
+## 樣式
 
-## API 層
+assets/index.css 定義 ENSO 色彩與共用表格、表單、對話框、響應式。Bootstrap 在獨立且較低優先序的 cascade layer，避免覆蓋 Tailwind 工具類。Login 使用 CSS Module，不依賴舊式裝飾背景。Tailwind 由本機 PostCSS 編譯，不再載入 Play CDN。字型與部分圖示仍使用外部樣式資源，因此不能宣稱全站已可離線使用。
 
-### Base URLs
+## 重要邊界
 
-| 用途 | 環境變數 | 預設 fallback |
-|---|---|---|
-| HexSchool 課程 API | `VITE_API_BASE` | — |
-| Hexschool path（租戶） | `VITE_API_PATH` | — |
-| Agent 後端（Next.js） | `VITE_AGENT_API_BASE` | `http://localhost:3000` |
+- 圖片 API 回傳 URL，前端不自行儲存檔案或更改伺服器格式。
+- 庫存仍透過更新商品 API，沒有獨立 inventory endpoint。
+- 庫存調整紀錄只存目前瀏覽器，沒有跨裝置同步。
+- 總覽只取得第一頁商品和訂單，圖表必須標示資料範圍。
+- 金流不合成缺少的付款方式，最多取得十頁訂單。
+- 設備狀態、校準、歷史測值為前端模擬，不具真實 MQTT 或 WebSocket 連線。
+- 自建 API 位於 server，使用 Express 與 PostgreSQL。詳細合約及資料保護規則見 [後端說明](../server/README.md)。
 
-所有 HexSchool endpoint 格式：`/api/${API_PATH}/admin/{resource}`。
+## 自建後端（2026-10-01）
 
-### 為什麼 agent 用 fetch、不用 Axios
+React service → Express 驗證與欄位檢查 → PostgreSQL 交易與參數化 SQL。前端 VITE_API_MODE=self-hosted 啟用對應訂單限制與伺服器庫存紀錄，展示 Token 仍只走 localStorage。
 
-刻意避開 `apiAuth` interceptor。[agentEvents.js](../src/service/agentEvents.js) 頂部註解說明：跨 repo call 不該帶 `hexToken`、也不該套 demo mock 邏輯。
+server/src/app.js 管理 HTTP、中介層、登入與圖片。catalog.js 處理商品、庫存紀錄與優惠券，orders.js 處理訂單及庫存交易。migrations 記錄資料表版本，scripts 提供獨立本機初始化與管理員建立。測試在隨機 schema 隔離執行，不覆蓋 public 資料。
 
-### HexSchool API 路由
+2026-10-02 新增 storefront.js 作為公開唯讀商品路由，沿用同一 products 資料表，只查詢 is_enabled 為 true 且 deleted_at 為空的資料。公開序列化使用獨立欄位白名單，不重用包含內部資訊的管理用 productView。商品分頁在唯讀 repeatable-read 交易取得總數與結果，分類以 SQL 參數傳入。管理路由的驗證不變，購物前台尚未切換新 API。
 
-| Service | 方法 | Endpoint |
-|---|---|---|
-| `getAdminProducts(page)` | GET | `/admin/products?page={page}` |
-| `createAdminProduct(data)` | POST | `/admin/product` body=`{data}` |
-| `updateAdminProduct(id, data)` | PUT | `/admin/product/{id}` body=`{data}` |
-| `deleteAdminProduct(id)` | DELETE | `/admin/product/{id}` |
-| `uploadAdminImage(formData)` | POST | `/admin/upload` (multipart) |
-| `getAdminOrders(page)` | GET | `/admin/orders?page={page}` |
-| `updateAdminOrder(id, data)` | PUT | `/admin/order/{id}` body=`{data}` |
-| `deleteAdminOrder(id)` | DELETE | `/admin/order/{id}` |
-| `deleteAllAdminOrders()` | DELETE | `/admin/orders/all` |
-| `getCoupons(page)` | GET | `/admin/coupons?page={page}` |
-| `createCoupon(data)` | POST | `/admin/coupon` |
-| `updateCoupon(id, data)` | PUT | `/admin/coupon/{id}` |
-| `deleteCoupon(id)` | DELETE | `/admin/coupon/{id}` |
+同日新增 guestCart.js，使用獨立 X-Guest-Token，不與管理員 session 混用。guest_sessions 的列鎖序列化單一訪客的購物車及送單，checkout_requests 保存每位訪客的送單代碼與有效內容摘要。訪客及管理員共用 orders.js 的 createOrder，在相同交易內依穩定商品 ID 順序鎖庫存、計算價格、建立訂單及紀錄異動。訪客操作不冒用管理員身分，inventory_logs 的 actor_id 與 guest_id 由資料庫約束限定恰好一種。
 
-HexSchool 統一回應格式（由 API 控制，**不是本專案定義**）：
+送單成功後才刪除該訪客購物車，重試先查持久化回執，避免重複扣庫存或誤清新購物車。訪客送單預設不開放，僅提供本機功能驗證，不包含支付或配送成本計算。migrate.js 依序執行尚未記錄的 SQL migration，既有資料透過增量 migration 保留。
 
-```js
-{ success: true, products: [...], pagination: {...} }
-// 或
-{ success: false, message: '錯誤訊息' }
-```
+自建登入不是 JWT，而是資料庫可撤銷的不透明 session Token。前端為相容既有介面仍存可由 JavaScript 讀取的 Cookie，伺服器要求 Authorization 標頭。公開部署前仍需評估 HttpOnly／CSRF、HTTPS 及多角色權限。
 
-### Agent 後端 API（Next.js repo：ENSO-Frontend-demo）
-
-不是本 repo 實作，但本 repo 的 service 會呼叫它：
-
-| Service | 方法 | Endpoint | 用途 |
-|---|---|---|---|
-| `fetchAgentEvents` | GET | `/api/events?limit&kind&since` | 拿 agent 對話事件、handoff、eval_run |
-| `sendXiaodianMessage` → `callAgentApi` | POST | `/api/agent` body=`{messages, systemPrompt, tools, agentId}` | 前端不直接打 Anthropic；走 Next.js proxy，避免 API key 洩漏 |
-| `fetchCandidates` | GET | `/api/candidate-cases?status&agentId` | 從 Live Trace promote 出來的待審 regression case |
-| `updateCandidateStatus` | PATCH | `/api/candidate-cases` body=`{id, status}` | proposed → approved / exported / archived |
-
-## 小店（xiaodian）AI Agent loop
-
-定義於 [xiaodianPersona.js](../src/service/xiaodianPersona.js) + [xiaodianTools.js](../src/service/xiaodianTools.js) + [xiaodianChat.js](../src/service/xiaodianChat.js)。
-
-```
-sendXiaodianMessage(priorMessages, userText)
-   │
-   ├─ append user message
-   │
-   └─ loop (max 5 rounds):
-        callAgentApi  ──POST──►  /api/agent  ──►  Anthropic Messages API
-                                                   │
-                                  ◄── response ────┘
-                                  {text, toolCalls, stopReason}
-        │
-        ├─ append assistant message
-        │
-        ├─ if stopReason === 'tool_use':
-        │     for each toolCall: executeXiaodianTool(name, input)
-        │     append tool message
-        │     continue  ─────────────────┐
-        │                                │
-        └─ else: break                   │
-                                         │
-                                         └─► 下一輪
-```
-
-**5 輪上限**：防止 Claude 無限呼叫 tool。`MAX_ROUNDS = 5`。
-
-### 可用 tools（商家視角，只讀事件流，不能改商品/訂單）
-
-| Tool | 用途 |
-|---|---|
-| `get_sales_summary` | 24h 對話量、handoff 數、平均 tool 使用、最新 eval pass rate |
-| `get_top_intents` | 使用者意圖分佈 top-N |
-| `get_agent_performance` | 小禾 / 小香 / 小管 三位前台 agent 表現對照 |
-| `get_recent_complaints` | 最新一次 eval_run 的 failed cases |
-| `get_eval_history` | 歷次 eval_run pass rate 時間軸 |
-
-Tool executor 都是純函式，從 `fetchAgentEvents` 抓事件後在前端聚合計算，不另外打 API。
-
-## 環境變數
-
-| 變數 | 必要 | 預設 | 用途 |
-|---|---|---|---|
-| `VITE_API_BASE` | 是 | — | HexSchool API base URL |
-| `VITE_API_PATH` | 是 | — | HexSchool 租戶 path |
-| `VITE_AGENT_API_BASE` | 否 | `http://localhost:3000` | Agent 後端（Next.js）base URL |
-
-`.env.example` 是 committed；`.env` 不 tracked（`.gitignore`）。詳見 [DEVELOPMENT.md](./DEVELOPMENT.md#env)。
-
-## 資料持久化
-
-本專案**沒有自己的資料庫**。
-
-- HexSchool API：商品、訂單、優惠券都在他們家的後端。
-- `localStorage`：庫存調整歷史 key=`enso_inventory_logs`，最多 200 筆，僅顯示用，**不同步到 API**。見 [AdminInventory.jsx](../src/views/admin/AdminInventory.jsx) 的 `getLogs` / `appendLog`。
-- Cookie：`myToken`（登入 token）、`enso-demo-token`（demo 模式 sentinel）。
-
-## 部署
-
-### Vercel（主）
-
-- 自動 build：push 到 `main` branch 即觸發。
-- 環境變數需在 Vercel Dashboard 設定（見 [DEVELOPMENT.md](./DEVELOPMENT.md)）。
-- Vite base path **不需改**（走自家 domain）。
-
-### GitHub Pages（備）
-
-- `npm run deploy` → `predeploy` 跑 `npm run build` → `gh-pages -d dist` push 到 `gh-pages` branch。
-- 需保留 [vite.config.js](../vite.config.js) 的 `base: '/vite-reacthomework-finalweek-backEnd/'`。
+自建模式庫存仍使用商品更新端點，但增加 version 防止覆蓋，異動與庫存紀錄在同一交易完成。後台會透過 inventory/logs 讀取伺服器紀錄，取代此模式下的本機紀錄。其他上述展示或舊 API 限制不應解讀為自建模式的伺服器行為。

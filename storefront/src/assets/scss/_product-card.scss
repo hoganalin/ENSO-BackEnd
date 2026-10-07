@@ -1,0 +1,376 @@
+/* Premium Product Card Styles */
+
+.product-card {
+  transition:
+    transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+    box-shadow 0.4s ease;
+  border-radius: 12px;
+  overflow: hidden;
+  background: $white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+    .product-img-overlay {
+      opacity: 1;
+    }
+
+    .product-img {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.product-img-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1; //  aspect-ratio 強制維持 1:1 正方形S
+  overflow: hidden;
+  background-color: #f8f6f1;
+}
+
+.product-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.product-img-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba($enso-brand-primary, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+.product-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: $enso-brand-gold;
+  color: $white;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: 4px;
+  z-index: 2;
+}
+
+.product-content {
+  padding: 1.5rem 1rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-category {
+  font-size: 11px;
+  color: $enso-brand-gold;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.product-title {
+  font-family: $headings-font-family;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: $enso-brand-primary;
+  line-height: 1.4;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: $enso-brand-gold;
+    }
+  }
+}
+
+.product-desc {
+  font-size: 0.875rem;
+  color: $enso-text-secondary;
+  margin-bottom: 1.25rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-price {
+  font-weight: 600;
+  color: $enso-brand-primary;
+  font-size: 1.1rem;
+}
+
+.product-card {
+  background: #fffaf6;
+  border: 1px solid rgba(9, 37, 111, 0.28);
+  border-radius: 0;
+  box-shadow: none;
+
+  &:hover {
+    box-shadow: 0 16px 28px rgba(9, 37, 111, 0.14);
+  }
+}
+
+.product-img-wrapper {
+  background: #efe6e1;
+}
+
+.product-img-overlay {
+  background: rgba(9, 37, 111, 0.72);
+  backdrop-filter: none;
+}
+
+.product-badge {
+  background: #d9f81b;
+  border-radius: 0;
+  color: #09256f;
+}
+
+.product-category {
+  color: #bf5c37;
+}
+
+.product-title,
+.product-title a,
+.product-price {
+  color: #09256f;
+}
+
+/* Category Slider/Pills optimization (類別滑塊與藥丸型選單優化) */
+.custom-nav {
+  .nav-pills {
+    gap: 12px; // 選項之間的間距
+    padding: 20px 0;
+
+    .nav-link {
+      background: $white;
+      color: $enso-brand-primary;
+      border: 1px solid $gray-300;
+      border-radius: 30px; // 藥丸型圓角
+      padding: 8px 24px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+
+      /* 當前選中狀態 */
+      &.active {
+        background: $enso-brand-primary;
+        color: $white;
+        border-color: $enso-brand-primary;
+        box-shadow: none; // 移除陰影
+
+        /* 移除原本全域 .custom-nav 定義的下底線裝飾 */
+        &::after {
+          display: none;
+        }
+      }
+
+      /* 懸浮效果 (非選中狀態) */
+      &:hover:not(.active) {
+        border-color: $enso-brand-gold;
+        color: $enso-brand-gold;
+        background: rgba($enso-brand-gold, 0.05); // 極淡金色背景，增加互動感
+      }
+    }
+  }
+}
+
+/* Golden Hour catalogue: a direct route from a moment to a scent. */
+.store-hero {
+  background: #09256f;
+  color: #fffaf6;
+  min-height: clamp(17rem, 31vw, 29rem);
+  display: grid;
+  align-items: end;
+  padding: clamp(2.75rem, 7vw, 7rem) 0 clamp(2.5rem, 5vw, 5.5rem);
+
+  &__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.55fr);
+    gap: clamp(2rem, 8vw, 10rem);
+    align-items: end;
+  }
+
+  h1 {
+    max-width: none;
+    color: #fffaf6 !important;
+    font-family: "Noto Sans TC", $font-family-sans-serif;
+    font-size: clamp(3.25rem, 6vw, 5.3rem);
+    font-weight: 900;
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    margin: 0 0 1.35rem;
+    white-space: nowrap;
+  }
+
+  p {
+    max-width: 39ch;
+    color: #d8e0ff;
+    font-size: clamp(1rem, 1.5vw, 1.23rem);
+    line-height: 1.72;
+    margin: 0;
+  }
+
+  &__shipping {
+    border-top: 1px solid rgba(255, 250, 246, 0.55);
+    padding-top: 1rem;
+    color: #d9f81b !important;
+    font-weight: 700;
+    line-height: 1.7 !important;
+  }
+}
+
+.store-category-bar {
+  background: #fffaf6;
+  border-bottom: 1px solid rgba(9, 37, 111, 0.25);
+}
+
+.store-category-bar .custom-nav .nav-pills {
+  gap: clamp(1rem, 3vw, 4rem);
+  padding: 1.1rem 0;
+}
+
+.store-category-bar .custom-nav .nav-pills .nav-link {
+  position: relative;
+  padding: 0.35rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #53669a;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: -0.2rem;
+    left: 0;
+    height: 3px;
+    background: #d9f81b;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 240ms cubic-bezier(.16, 1, .3, 1);
+  }
+
+  &.active,
+  &:hover:not(.active),
+  &:focus-visible {
+    background: transparent;
+    border: 0;
+    color: #09256f;
+    box-shadow: none;
+  }
+
+  &.active::after,
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+  }
+}
+
+.store-products {
+  padding-top: clamp(1.5rem, 4vw, 3rem);
+}
+
+.store-products .product-grid-item {
+  display: flex;
+}
+
+.store-products .product-card {
+  width: 100%;
+  border-color: rgba(9, 37, 111, 0.33);
+  transition: transform 360ms cubic-bezier(.16, 1, .3, 1), box-shadow 360ms cubic-bezier(.16, 1, .3, 1);
+
+  &:hover {
+    transform: translateY(-0.45rem);
+    box-shadow: 0 1.1rem 2rem rgba(9, 37, 111, 0.17);
+  }
+}
+
+.store-products .product-img-wrapper {
+  aspect-ratio: 4 / 5;
+}
+
+.store-products .product-content {
+  padding: 1.2rem 1.2rem 1.35rem;
+}
+
+.store-products .product-title {
+  font-size: clamp(1.05rem, 1.4vw, 1.32rem);
+}
+
+.store-products .product-desc {
+  color: #53669a;
+  min-height: 3.1em;
+}
+
+.store-products .product-footer .btn {
+  width: 2.55rem !important;
+  height: 2.55rem !important;
+  border-radius: 0 !important;
+}
+
+.store-products .pagination { margin-top: clamp(2rem, 5vw, 4rem); }
+.store-products .page-link { background: #fffaf6; border-color: rgba(9, 37, 111, 0.34); border-radius: 0 !important; color: #09256f; }
+.store-products .page-link:hover, .store-products .page-link:focus-visible { background: #d9f81b; border-color: #09256f; color: #09256f; box-shadow: none; }
+.store-products .page-item.active .page-link { background: #09256f; border-color: #09256f; color: #fffaf6; }
+
+@media (max-width: 767.98px) {
+  .store-hero {
+    min-height: 22rem;
+    padding-block: 4rem 2.5rem;
+
+    &__inner {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+
+    h1 {
+      font-size: 11.5vw;
+      line-height: 1.12;
+      letter-spacing: -0.055em;
+    }
+  }
+
+  .store-products .product-content {
+    padding: 0.9rem;
+  }
+
+  .store-products .product-desc {
+    display: none;
+  }
+}

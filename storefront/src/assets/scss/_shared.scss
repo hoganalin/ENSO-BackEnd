@@ -1,0 +1,150 @@
+/* Shared / Utilities */
+.text-yellow {
+  color: $yellow;
+}
+.text-gray-550 {
+  color: $gray-550;
+}
+
+.bg-navbar {
+  background-color: $custom-color-navbar-bg;
+}
+
+.btn-hover-effect {
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    background-color: $white;
+    color: $enso-brand-gold;
+    border-color: $white;
+  }
+}
+
+/* Section Common */
+.section-padding {
+  padding: $custom-section-padding;
+}
+
+.bg-custom-light {
+  background-color: $custom-bg-light;
+}
+
+.bg-custom-white {
+  background-color: $custom-bg-white;
+}
+
+/* Golden Hour system for every functional page outside the landing surface. */
+.site-shell:not(.site-shell--home) .site-main {
+  background: #efe6e1;
+  color: #09256f;
+  padding-bottom: clamp(3rem, 7vw, 7rem);
+}
+
+.site-main {
+  /* The legacy scroll-in attributes hid content before the observer ran. */
+  [data-aos] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .card,
+  .accordion,
+  .checkout-form-container,
+  .order-summary-card {
+    background: #fffaf6;
+    border: 1px solid rgba(9, 37, 111, 0.28) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .form-control,
+  .form-select,
+  .enso-input {
+    background: #fffaf6 !important;
+    border: 1px solid rgba(9, 37, 111, 0.45) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    color: #09256f;
+
+    &:focus {
+      border-color: #bf5c37 !important;
+      box-shadow: 0 0 0 3px rgba(191, 92, 55, 0.16) !important;
+    }
+  }
+
+  .btn-dark,
+  .btn-enso-primary,
+  .btn-primary {
+    background: #09256f !important;
+    border-color: #09256f !important;
+    border-radius: 0 !important;
+    color: #fffaf6 !important;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+
+    &:hover,
+    &:focus-visible {
+      background: #d9f81b !important;
+      border-color: #09256f !important;
+      color: #09256f !important;
+    }
+  }
+
+  .btn-outline-primary,
+  .btn-outline-secondary,
+  .btn-outline-danger {
+    background: transparent;
+    border-color: #09256f;
+    border-radius: 0 !important;
+    color: #09256f;
+
+    &:hover,
+    &:focus-visible {
+      background: #d9f81b;
+      border-color: #09256f;
+      color: #09256f;
+    }
+  }
+
+  .text-muted,
+  .text-secondary {
+    color: #53669a !important;
+  }
+
+  .text-gold,
+  .text-enso-gold {
+    color: #bf5c37 !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #09256f;
+  }
+}
+
+.not-found-page {
+  align-items: center;
+  background: #09256f;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: clamp(2rem, 7vw, 7rem) 1rem;
+}
+
+.not-found-page__panel {
+  color: #fffaf6;
+  max-width: 44rem;
+  text-align: center;
+
+  > p { color: #d9f81b; font-family: "Tilt Warp", sans-serif; font-size: clamp(4rem, 12vw, 11rem); line-height: 0.8; margin: 0 0 1rem; }
+  h1 { color: #fffaf6; font-family: "Noto Sans TC", $font-family-sans-serif; font-size: clamp(2.8rem, 6vw, 6rem); font-weight: 900; letter-spacing: -0.05em; line-height: 1.06; margin: 0 0 1.3rem; }
+  > span { color: #d8e0ff; display: block; margin-bottom: 2rem; }
+  .btn { background: #d9f81b !important; border-color: #d9f81b !important; color: #09256f !important; padding: 0.95rem 1.2rem; }
+  .btn:hover, .btn:focus-visible { background: #fffaf6 !important; border-color: #fffaf6 !important; }
+}

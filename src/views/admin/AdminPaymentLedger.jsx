@@ -19,36 +19,8 @@ import useMessage from '../../hooks/useMessage';
 import { getAdminOrders } from '../../service/adminOrders';
 import {
   PAYMENT_CATEGORIES,
-  PAYMENT_METHODS,
   getOrderPaymentMethod,
 } from '../../utils/paymentMethods';
-
-// 真實 HexSchool 帳號的訂單沒有 paid_method 欄位，這裡用 order.id hash
-// 對應到 12 種付款方式之一，讓 PaymentLedger 在正式登入也能展示完整圖表。
-// 確定性 (deterministic)：同一筆訂單每次都對應到同一種付款方式，不會跳動。
-const PAYMENT_METHOD_KEYS = Object.keys(PAYMENT_METHODS);
-function hashToIndex(str, n) {
-  let h = 0;
-  for (let i = 0; i < String(str).length; i += 1) {
-    h = (h * 31 + String(str).charCodeAt(i)) >>> 0;
-  }
-  return h % n;
-}
-function ensurePaidMethod(order) {
-  if (order?.user?.paid_method) return order;
-  const idx = hashToIndex(order?.id ?? '', PAYMENT_METHOD_KEYS.length);
-  const key = PAYMENT_METHOD_KEYS[idx];
-  const m = PAYMENT_METHODS[key];
-  return {
-    ...order,
-    user: {
-      ...(order?.user || {}),
-      paid_method: key,
-      paid_method_label: m.label,
-      paid_category: m.category,
-    },
-  };
-}
 
 /**
  * 金流台帳（Payment Ledger）
@@ -78,6 +50,7 @@ function AdminPaymentLedger() {
   const { showError } = useMessage();
   const [orders, setOrders] = useState([]);
   const [loading, setIsLoading] = useState(false);
+  const [loadWarning, setLoadWarning] = useState('');
   const isBelowLg = useIsBelowLg();
 
   useEffect(() => {
@@ -91,6 +64,7 @@ function AdminPaymentLedger() {
         );
         const results = await Promise.all(promises);
         if (cancelled) return;
+        if (results.some(result => !result?.data?.success)) setLoadWarning('部分交易資料無法載入，以下只顯示成功取得的紀錄。可重新整理頁面再試。');
         const merged = results
           .filter((r) => r?.data?.success)
           .flatMap((r) => {
@@ -112,11 +86,11 @@ function AdminPaymentLedger() {
     return () => {
       cancelled = true;
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
-  // 真實帳號的訂單沒有 paid_method 也合成一筆，PaymentLedger 在正式登入也能完整展示
+  // 僅顯示來源已提供付款方式的訂單，不替正式資料推測付款方式。
   const paidOrders = useMemo(
-    () => orders.map(ensurePaidMethod).filter((o) => getOrderPaymentMethod(o)),
+    () => orders.filter((o) => getOrderPaymentMethod(o)),
     [orders]
   );
 
@@ -194,33 +168,15 @@ function AdminPaymentLedger() {
 
   return (
     <>
-      {loading && <FullPageLoading />}
-      <div className="min-h-screen bg-[#FAF9F6] max-w-7xl mx-auto px-3 py-3 md:px-6 md:py-12 font-sans text-[#111111]">
+      <FullPageLoading isLoading={loading} />
+      <div className="enso-page">
+        {loadWarning && <p className="workspace-error" role="alert">{loadWarning}</p>}
         {/* ===== Header ===== */}
-        <div className="mb-6 md:mb-20">
-          <div className="flex flex-row md:items-end justify-between gap-3 md:gap-8 border-b border-[#D1C7B7] pb-3 md:pb-10 relative">
-            <div className="absolute -bottom-[1px] left-0 w-24 h-[1px] bg-[#984443]"></div>
-            <div className="min-w-0">
-              <div className="text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.6em] text-[#984443] font-bold mb-1 md:mb-4 opacity-80">
-                Payment Ledger
-              </div>
-              <h1 className="font-serif text-lg md:text-5xl font-medium tracking-tight text-[#111111]">
-                金流台帳
-                <span className="hidden md:inline text-[0.5em] ml-4 opacity-20 font-sans tracking-wider md:tracking-widest uppercase">
-                  ECPAY AGGREGATION
-                </span>
-              </h1>
-            </div>
-          </div>
-          <p className="text-[12px] md:text-[13px] text-[#111111]/50 mt-3 md:mt-4 max-w-xl italic">
-            來自 ECPay 模擬金流的交易紀錄。聚合近期所有帶有 paid_method
-            的訂單，給你按付款方式與時間維度的 funnel 視野。
-          </p>
-        </div>
+        <header className="enso-page-header"><div><h1 className="enso-page-title">金流紀錄</h1><p className="enso-page-description">彙整帶有付款方式的訂單資料。此頁為模擬金流，不代表實際收款或銀行對帳。</p></div></header>
 
         {/* 非 demo 帳號提示：有訂單但沒任何 paid_method（HexSchool 原生訂單沒帶 ECPay 欄位） */}
         {orders.length > 0 && paidOrders.length === 0 && (
-          <div className="mb-8 px-5 py-4 bg-[#FEF3C7]/40 border-l-4 border-[#F59E0B] text-[0.85rem] text-[#735C00]">
+          <div className="mb-8 rounded-xl border border-[#F59E0B]/50 bg-[#FEF3C7]/40 px-5 py-4 text-[0.85rem] text-[#805500]">
             <strong className="font-bold">本頁需要 ECPay 模擬資料：</strong>
             目前載入的 {orders.length} 筆訂單沒有{' '}
             <code className="px-1 bg-white/60">paid_method</code> 欄位（屬於
@@ -248,7 +204,7 @@ function AdminPaymentLedger() {
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-8 mb-6 md:mb-12">
-          <Panel title="付款方式分布" subtitle="Payment Method Distribution">
+          <Panel title="付款方式分布">
             {pieData.length === 0 ? (
               <EmptyHint />
             ) : (
@@ -282,7 +238,7 @@ function AdminPaymentLedger() {
                     cy="50%"
                     innerRadius={isBelowLg ? 44 : 72}
                     outerRadius={isBelowLg ? 70 : 120}
-                    stroke="#FAF9F6"
+                    stroke="#fffaf6"
                     strokeWidth={2}
                     label={({ name, percent }) =>
                       `${name} ${(percent * 100).toFixed(0)}%`
@@ -303,7 +259,7 @@ function AdminPaymentLedger() {
             )}
           </Panel>
 
-          <Panel title="近 14 天成交金額" subtitle="14-day Revenue Trend">
+          <Panel title="近 14 天成交金額（NT$）">
             {trendData.every((b) => b.amount === 0) ? (
               <EmptyHint />
             ) : (
@@ -322,7 +278,7 @@ function AdminPaymentLedger() {
                     stroke="#6B7280"
                     fontSize={12}
                     tickFormatter={(v) =>
-                      `$${v >= 1000 ? `${Math.round(v / 1000)}k` : v}`
+                      v >= 1000 ? `${Math.round(v / 1000)}k` : v
                     }
                   />
                   <Tooltip
@@ -331,7 +287,7 @@ function AdminPaymentLedger() {
                         ? [`NT$ ${Number(v).toLocaleString()}`, '金額']
                         : [`${v} 筆`, '筆數']
                     }
-                    labelStyle={{ color: '#111111' }}
+                    labelStyle={{ color: '#09256f' }}
                   />
                   <Legend />
                   <Line
@@ -347,7 +303,7 @@ function AdminPaymentLedger() {
                     type="monotone"
                     dataKey="count"
                     name="筆數"
-                    stroke="#984443"
+                    stroke="#ba3e2a"
                     strokeWidth={1.5}
                     strokeDasharray="4 4"
                     dot={false}
@@ -361,11 +317,11 @@ function AdminPaymentLedger() {
         </div>
 
         {/* Recent transactions table */}
-        <Panel title="最近交易明細" subtitle="Recent Transactions">
+        <Panel title="最近交易明細">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-[#D1C7B7]/40 text-[10px] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] font-bold text-[#111111]/50">
+                <tr className="border-b border-[#b6bfd0]/40 text-[10px] md:text-[0.75rem] uppercase tracking-[0.1em] md:tracking-normal font-bold text-ink-muted">
                   <th className="px-4 py-4">時間</th>
                   <th className="px-4 py-4">訂單</th>
                   <th className="px-4 py-4">客戶</th>
@@ -374,12 +330,12 @@ function AdminPaymentLedger() {
                   <th className="px-4 py-4 text-right">金額</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#D1C7B7]/20">
+              <tbody className="divide-y divide-[#b6bfd0]/20">
                 {paidOrders.length === 0 ? (
                   <tr>
                     <td
                       colSpan="6"
-                      className="px-4 py-20 text-center text-[#111111]/30 italic font-serif"
+                      className="px-4 py-20 text-center text-ink-muted not-italic font-sans"
                     >
                       目前還沒有交易紀錄。到前台下一筆試試 →
                     </td>
@@ -392,19 +348,19 @@ function AdminPaymentLedger() {
                     return (
                       <tr
                         key={order.id}
-                        className="hover:bg-[#111111]/[0.02] transition-colors"
+                        className="hover:bg-[#09256f]/[0.02] transition-colors"
                       >
-                        <td className="px-4 py-4 text-[0.75rem] text-[#111111]/70 whitespace-nowrap">
+                        <td className="px-4 py-4 text-[0.75rem] text-[#09256f]/70 whitespace-nowrap">
                           {formatShortDate(order.create_at)}
                         </td>
-                        <td className="px-4 py-4 font-mono text-[0.75rem] opacity-60">
+                        <td className="px-4 py-4 font-mono text-[0.75rem] opacity-80">
                           {String(order.id).slice(0, 8)}…
                         </td>
                         <td className="px-4 py-4">
-                          <div className="font-serif">
+                          <div className="font-sans">
                             {order.user?.name || '—'}
                           </div>
-                          <div className="text-[0.75rem] opacity-40">
+                          <div className="text-[0.75rem] opacity-80">
                             {order.user?.email}
                           </div>
                         </td>
@@ -416,11 +372,11 @@ function AdminPaymentLedger() {
                             {pm.shortLabel}
                           </span>
                         </td>
-                        <td className="px-4 py-4 font-mono text-[0.75rem] opacity-60">
+                        <td className="px-4 py-4 font-mono text-[0.75rem] opacity-80">
                           {order.user?.merchant_trade_no || '—'}
                         </td>
-                        <td className="px-4 py-4 text-right font-serif font-medium">
-                          <span className="text-[0.75rem] opacity-40 mr-1">
+                        <td className="px-4 py-4 text-right font-sans font-medium">
+                          <span className="text-[0.75rem] opacity-80 mr-1">
                             NT$
                           </span>
                           {Number(order.total || 0).toLocaleString()}
@@ -442,19 +398,19 @@ function KpiCard({ label, value, suffix, prefix, format }) {
   const displayValue =
     format === 'comma' ? Number(value || 0).toLocaleString() : value;
   return (
-    <div className="bg-white border border-[#D1C7B7]/40 px-2 py-3 md:px-6 md:py-5">
-      <div className="text-[12px] md:text-[0.75rem] uppercase tracking-[0.15em] md:tracking-[0.3em] text-[#111111]/40 font-bold mb-1 md:mb-3">
+    <div className="bg-white border border-[#b6bfd0]/40 px-2 py-3 md:px-6 md:py-5">
+      <div className="text-[12px] md:text-[0.75rem] uppercase tracking-[0.15em] md:tracking-normal text-ink-muted font-bold mb-1 md:mb-3">
         {label}
       </div>
-      <div className="font-serif text-lg md:text-3xl whitespace-nowrap overflow-hidden text-ellipsis">
+      <div className="font-sans text-lg md:text-3xl whitespace-nowrap overflow-hidden text-ellipsis">
         {prefix && (
-          <span className="text-[12px] md:text-sm opacity-50 mr-1">
+          <span className="text-[12px] md:text-sm opacity-80 mr-1">
             {prefix}
           </span>
         )}
         {displayValue}
         {suffix && (
-          <span className="text-[12px] md:text-sm opacity-50 ml-1">
+          <span className="text-[12px] md:text-sm opacity-80 ml-1">
             {suffix}
           </span>
         )}
@@ -463,14 +419,11 @@ function KpiCard({ label, value, suffix, prefix, format }) {
   );
 }
 
-function Panel({ title, subtitle, children }) {
+function Panel({ title, children }) {
   return (
-    <section className="bg-white border border-[#D1C7B7]/40 p-3 md:p-6">
-      <header className="mb-5 pb-3 border-b border-[#D1C7B7]/30">
-        <div className="text-[0.75rem] uppercase tracking-[0.1em] md:tracking-[0.3em] text-[#984443] font-bold mb-1">
-          {subtitle}
-        </div>
-        <h3 className="font-serif text-xl text-[#111111]">{title}</h3>
+    <section className="bg-white border border-[#b6bfd0]/40 p-3 md:p-6">
+      <header className="mb-5 pb-3 border-b border-[#b6bfd0]/30">
+        <h3 className="font-sans text-xl text-[#09256f]">{title}</h3>
       </header>
       {children}
     </section>
@@ -480,10 +433,10 @@ function Panel({ title, subtitle, children }) {
 function EmptyHint() {
   return (
     <div className="h-[320px] flex items-center justify-center">
-      <div className="text-center text-[#111111]/30 font-serif italic">
-        <div className="w-12 h-[1px] bg-[#984443]/30 mx-auto mb-3"></div>
+      <div className="text-center text-ink-muted font-sans not-italic">
+        <div className="w-12 h-[1px] bg-[#ba3e2a]/30 mx-auto mb-3"></div>
         尚無資料
-        <div className="w-12 h-[1px] bg-[#984443]/30 mx-auto mt-3"></div>
+        <div className="w-12 h-[1px] bg-[#ba3e2a]/30 mx-auto mt-3"></div>
       </div>
     </div>
   );

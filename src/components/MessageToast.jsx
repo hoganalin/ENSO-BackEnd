@@ -1,7 +1,10 @@
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { removeMessage } from '../slices/messageSlice';
 
 export default function MessageToast() {
   const messages = useSelector((state) => state.message);
+  const dispatch = useDispatch();
   return (
     <>
       <div className="position-fixed top-0 end-0 p-3" style={{ zIndex: 1055 }}>
@@ -18,8 +21,8 @@ export default function MessageToast() {
               <button
                 type="button"
                 className="btn-close"
-                data-bs-dismiss="toast"
-                aria-label="Close"
+                onClick={() => dispatch(removeMessage(message.id))}
+                aria-label="關閉通知"
               ></button>
             </div>
             <div className="toast-body">{message.text}</div>

@@ -54,6 +54,6 @@ export default defineConfig([
     },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', '.vercel/**', 'build/**'],
+    ignores: ['storefront/**', 'server/**', 'dist/**', 'node_modules/**', '.vercel/**', 'build/**', '.browser-build/**', 'playwright-report/**', 'test-results/**', '.impeccable/review/**'],
   },
 ]);

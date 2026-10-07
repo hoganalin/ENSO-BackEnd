@@ -1,0 +1,73 @@
+/* Layout tokens retained from the approved storefront composition. */
+:root {
+  --r-header-strip-x: 0.000%; --r-header-strip-y: 0.000%; --r-header-strip-w: 100.000%; --r-header-strip-h: 10.000%;
+  --r-brand-wordmark-x: 0.000%; --r-brand-wordmark-y: 0.640%; --r-brand-wordmark-w: 9.990%; --r-brand-wordmark-h: 9.350%;
+  --r-brand-wordmark-cap: 33px; --r-brand-wordmark-font: 48px;
+  --r-primary-navigation-x: 10.000%; --r-primary-navigation-y: 0.000%; --r-primary-navigation-w: 40.000%; --r-primary-navigation-h: 10.000%;
+  --r-utility-controls-x: 80.000%; --r-utility-controls-y: 0.000%; --r-utility-controls-w: 10.000%; --r-utility-controls-h: 10.000%;
+  --r-brand-promise-x: 90.000%; --r-brand-promise-y: 0.000%; --r-brand-promise-w: 10.000%; --r-brand-promise-h: 10.000%;
+  --r-brand-promise-cap: 11px; --r-brand-promise-font: 16px;
+  --r-time-rail-x: 0.000%; --r-time-rail-y: 10.000%; --r-time-rail-w: 10.000%; --r-time-rail-h: 80.000%;
+  --r-morning-time-x: 0.000%; --r-morning-time-y: 10.000%; --r-morning-time-w: 20.000%; --r-morning-time-h: 10.000%;
+  --r-morning-time-cap: 11px; --r-morning-time-font: 16px;
+  --r-midday-time-x: 0.000%; --r-midday-time-y: 20.000%; --r-midday-time-w: 20.000%; --r-midday-time-h: 10.000%;
+  --r-golden-hour-time-x: 0.000%; --r-golden-hour-time-y: 30.000%; --r-golden-hour-time-w: 20.000%; --r-golden-hour-time-h: 20.000%;
+  --r-golden-hour-time-cap: 12px; --r-golden-hour-time-font: 17px;
+  --r-evening-time-x: 0.000%; --r-evening-time-y: 50.000%; --r-evening-time-w: 20.000%; --r-evening-time-h: 10.000%;
+  --r-evening-time-cap: 27px; --r-evening-time-font: 39px;
+  --r-night-time-x: 0.000%; --r-night-time-y: 60.000%; --r-night-time-w: 20.000%; --r-night-time-h: 10.000%;
+  --r-night-time-cap: 11px; --r-night-time-font: 17px;
+  --r-rail-signoff-x: 0.000%; --r-rail-signoff-y: 70.000%; --r-rail-signoff-w: 10.000%; --r-rail-signoff-h: 20.000%;
+  --r-ritual-kicker-x: 20.000%; --r-ritual-kicker-y: 10.000%; --r-ritual-kicker-w: 30.000%; --r-ritual-kicker-h: 10.000%;
+  --r-hero-headline-x: 19.980%; --r-hero-headline-y: 19.980%; --r-hero-headline-w: 26.910%; --r-hero-headline-h: 19.980%;
+  --r-hero-headline-cap: 86px; --r-hero-headline-font: 127px; --r-hero-headline-family: 'Tilt Warp'; --r-hero-headline-weight: 400;
+  --r-hero-summary-x: 19.980%; --r-hero-summary-y: 41.230%; --r-hero-summary-w: 19.380%; --r-hero-summary-h: 6.380%;
+  --r-hero-summary-cap: 13px; --r-hero-summary-font: 19px;
+  --r-reading-choice-x: 20.000%; --r-reading-choice-y: 50.000%; --r-reading-choice-w: 10.000%; --r-reading-choice-h: 20.000%;
+  --r-yoga-choice-x: 30.000%; --r-yoga-choice-y: 50.000%; --r-yoga-choice-w: 10.000%; --r-yoga-choice-h: 20.000%;
+  --r-sleep-choice-x: 40.000%; --r-sleep-choice-y: 50.000%; --r-sleep-choice-w: 10.000%; --r-sleep-choice-h: 20.000%;
+  --r-reset-choice-x: 51.440%; --r-reset-choice-y: 50.050%; --r-reset-choice-w: 8.550%; --r-reset-choice-h: 19.980%;
+  --r-ritual-description-x: 20.000%; --r-ritual-description-y: 70.000%; --r-ritual-description-w: 30.000%; --r-ritual-description-h: 10.000%;
+  --r-ritual-description-cap: 10px; --r-ritual-description-font: 15px;
+  --r-ritual-link-x: 20.000%; --r-ritual-link-y: 80.000%; --r-ritual-link-w: 30.000%; --r-ritual-link-h: 10.000%;
+  --r-sunlit-room-x: 50.000%; --r-sunlit-room-y: 10.000%; --r-sunlit-room-w: 50.000%; --r-sunlit-room-h: 80.000%;
+  --r-incense-package-x: 60.000%; --r-incense-package-y: 10.000%; --r-incense-package-w: 30.000%; --r-incense-package-h: 80.000%;
+  --r-purchase-dock-x: 0.000%; --r-purchase-dock-y: 90.000%; --r-purchase-dock-w: 100.000%; --r-purchase-dock-h: 10.000%;
+  --r-dock-product-x: 0.000%; --r-dock-product-y: 90.000%; --r-dock-product-w: 10.000%; --r-dock-product-h: 10.000%;
+  --r-dock-details-x: 10.000%; --r-dock-details-y: 90.000%; --r-dock-details-w: 20.000%; --r-dock-details-h: 10.000%;
+  --r-dock-details-cap: 14px; --r-dock-details-font: 20px;
+  --r-dock-quantity-x: 30.000%; --r-dock-quantity-y: 90.000%; --r-dock-quantity-w: 20.000%; --r-dock-quantity-h: 10.000%;
+  --r-dock-add-to-cart-x: 50.000%; --r-dock-add-to-cart-y: 90.000%; --r-dock-add-to-cart-w: 40.000%; --r-dock-add-to-cart-h: 10.000%;
+  --r-dock-closing-line-x: 90.010%; --r-dock-closing-line-y: 90.010%; --r-dock-closing-line-w: 7.540%; --r-dock-closing-line-h: 7.650%;
+}
+
+.comp-frame { position: relative; width: 100%; aspect-ratio: 1672 / 941; overflow: hidden; }
+.r-header-strip { position: absolute; left: var(--r-header-strip-x); top: var(--r-header-strip-y); width: var(--r-header-strip-w); height: var(--r-header-strip-h); }
+.r-brand-wordmark { position: absolute; left: var(--r-brand-wordmark-x); top: var(--r-brand-wordmark-y); width: var(--r-brand-wordmark-w); height: var(--r-brand-wordmark-h); }
+.r-primary-navigation { position: absolute; left: var(--r-primary-navigation-x); top: var(--r-primary-navigation-y); width: var(--r-primary-navigation-w); height: var(--r-primary-navigation-h); }
+.r-utility-controls { position: absolute; left: var(--r-utility-controls-x); top: var(--r-utility-controls-y); width: var(--r-utility-controls-w); height: var(--r-utility-controls-h); }
+.r-brand-promise { position: absolute; left: var(--r-brand-promise-x); top: var(--r-brand-promise-y); width: var(--r-brand-promise-w); height: var(--r-brand-promise-h); }
+.r-time-rail { position: absolute; left: var(--r-time-rail-x); top: var(--r-time-rail-y); width: var(--r-time-rail-w); height: var(--r-time-rail-h); }
+.r-morning-time { position: absolute; left: var(--r-morning-time-x); top: var(--r-morning-time-y); width: var(--r-morning-time-w); height: var(--r-morning-time-h); }
+.r-midday-time { position: absolute; left: var(--r-midday-time-x); top: var(--r-midday-time-y); width: var(--r-midday-time-w); height: var(--r-midday-time-h); }
+.r-golden-hour-time { position: absolute; left: var(--r-golden-hour-time-x); top: var(--r-golden-hour-time-y); width: var(--r-golden-hour-time-w); height: var(--r-golden-hour-time-h); }
+.r-evening-time { position: absolute; left: var(--r-evening-time-x); top: var(--r-evening-time-y); width: var(--r-evening-time-w); height: var(--r-evening-time-h); }
+.r-night-time { position: absolute; left: var(--r-night-time-x); top: var(--r-night-time-y); width: var(--r-night-time-w); height: var(--r-night-time-h); }
+.r-rail-signoff { position: absolute; left: var(--r-rail-signoff-x); top: var(--r-rail-signoff-y); width: var(--r-rail-signoff-w); height: var(--r-rail-signoff-h); }
+.r-ritual-kicker { position: absolute; left: var(--r-ritual-kicker-x); top: var(--r-ritual-kicker-y); width: var(--r-ritual-kicker-w); height: var(--r-ritual-kicker-h); }
+.r-hero-headline { position: absolute; left: var(--r-hero-headline-x); top: var(--r-hero-headline-y); width: var(--r-hero-headline-w); height: var(--r-hero-headline-h); }
+.r-hero-summary { position: absolute; left: var(--r-hero-summary-x); top: var(--r-hero-summary-y); width: var(--r-hero-summary-w); height: var(--r-hero-summary-h); }
+.r-reading-choice { position: absolute; left: var(--r-reading-choice-x); top: var(--r-reading-choice-y); width: var(--r-reading-choice-w); height: var(--r-reading-choice-h); }
+.r-yoga-choice { position: absolute; left: var(--r-yoga-choice-x); top: var(--r-yoga-choice-y); width: var(--r-yoga-choice-w); height: var(--r-yoga-choice-h); }
+.r-sleep-choice { position: absolute; left: var(--r-sleep-choice-x); top: var(--r-sleep-choice-y); width: var(--r-sleep-choice-w); height: var(--r-sleep-choice-h); }
+.r-reset-choice { position: absolute; left: var(--r-reset-choice-x); top: var(--r-reset-choice-y); width: var(--r-reset-choice-w); height: var(--r-reset-choice-h); }
+.r-ritual-description { position: absolute; left: var(--r-ritual-description-x); top: var(--r-ritual-description-y); width: var(--r-ritual-description-w); height: var(--r-ritual-description-h); }
+.r-ritual-link { position: absolute; left: var(--r-ritual-link-x); top: var(--r-ritual-link-y); width: var(--r-ritual-link-w); height: var(--r-ritual-link-h); }
+.r-sunlit-room { position: absolute; left: var(--r-sunlit-room-x); top: var(--r-sunlit-room-y); width: var(--r-sunlit-room-w); height: var(--r-sunlit-room-h); }
+.r-incense-package { position: absolute; left: var(--r-incense-package-x); top: var(--r-incense-package-y); width: var(--r-incense-package-w); height: var(--r-incense-package-h); }
+.r-purchase-dock { position: absolute; left: var(--r-purchase-dock-x); top: var(--r-purchase-dock-y); width: var(--r-purchase-dock-w); height: var(--r-purchase-dock-h); }
+.r-dock-product { position: absolute; left: var(--r-dock-product-x); top: var(--r-dock-product-y); width: var(--r-dock-product-w); height: var(--r-dock-product-h); }
+.r-dock-details { position: absolute; left: var(--r-dock-details-x); top: var(--r-dock-details-y); width: var(--r-dock-details-w); height: var(--r-dock-details-h); }
+.r-dock-quantity { position: absolute; left: var(--r-dock-quantity-x); top: var(--r-dock-quantity-y); width: var(--r-dock-quantity-w); height: var(--r-dock-quantity-h); }
+.r-dock-add-to-cart { position: absolute; left: var(--r-dock-add-to-cart-x); top: var(--r-dock-add-to-cart-y); width: var(--r-dock-add-to-cart-w); height: var(--r-dock-add-to-cart-h); }
+.r-dock-closing-line { position: absolute; left: var(--r-dock-closing-line-x); top: var(--r-dock-closing-line-y); width: var(--r-dock-closing-line-w); height: var(--r-dock-closing-line-h); }

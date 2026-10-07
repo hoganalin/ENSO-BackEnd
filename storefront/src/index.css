@@ -1,0 +1,41 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Noto Sans TC", "Segoe UI", sans-serif;
+  color: #09256f;
+  background-color: #efe6e1;
+}
+
+a {
+  text-decoration: none;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::selection {
+  color: #09256f;
+  background: #d9f81b;
+}
+
+* {
+  scrollbar-color: #09256f #efe6e1;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #efe6e1;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #09256f;
+  border: 2px solid #efe6e1;
+}

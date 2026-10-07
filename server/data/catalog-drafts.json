@@ -1,0 +1,11 @@
+{
+  "collection": "enso-concepts-v1",
+  "products": [
+    { "slug": "amber-twilight", "title": "琥珀黃昏", "category": "線香系列", "origin_price": 1200, "price": 980, "description": "以夕陽、琥珀色與木質空間為靈感的香氣概念。" },
+    { "slug": "forest-morning", "title": "晨林沈靜", "category": "線香系列", "origin_price": 1500, "price": 1280, "description": "以清晨山林、綠意與柔和自然光為靈感的香氣概念。" },
+    { "slug": "dragon-resin", "title": "龍血沉香", "category": "線香系列", "origin_price": 2200, "price": 1980, "description": "以深色樹脂、夜間與沉穩木質氛圍為靈感的香氣概念。" },
+    { "slug": "white-sage", "title": "白鼠尾草淨化", "category": "草本系列", "origin_price": 380, "price": 280, "description": "以白色植物、明亮留白與整理空間為靈感的香氣概念。" },
+    { "slug": "jasmine-night", "title": "茉莉月夜", "category": "線香系列", "origin_price": 280, "price": 200, "description": "以月光、白色花朵與柔和藍色為靈感的香氣概念。" },
+    { "slug": "spring-dew", "title": "春分雨露", "category": "線香系列", "origin_price": 600, "price": 520, "description": "以春季雨水、嫩綠與露珠為靈感的香氣概念。" }
+  ]
+}

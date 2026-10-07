@@ -10,6 +10,12 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+.impeccable/review/
+playwright-report/
+test-results/
+.browser-build/
+server/.env
+server/coverage/
 *.local
 
 # Env files (keep .env.example tracked)

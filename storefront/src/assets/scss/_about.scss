@@ -1,0 +1,419 @@
+@import "variables-custom";
+
+.about-page {
+  // ── Hero Section ──
+  .about-hero {
+    padding: 140px 0;
+    background-color: #242a27; // 深橄欖綠背景
+    color: $white;
+    position: relative;
+    overflow: hidden;
+
+    .about-subtitle {
+      color: $enso-brand-gold;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 24px;
+    }
+
+    .about-title {
+      font-family: $headings-font-family;
+      font-size: 3.5rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-bottom: 32px;
+
+      @media (max-width: 767px) {
+        font-size: 2.25rem;
+      }
+    }
+
+    .about-divider {
+      width: 60px;
+      height: 2px;
+      background-color: $enso-brand-gold;
+      margin: 0 auto 40px;
+    }
+
+    .about-desc {
+      font-size: 1.15rem;
+      line-height: 2;
+      color: rgba($white, 0.85);
+      max-width: 800px;
+      margin: 0 auto;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+
+      @media (max-width: 767px) {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  // ── Story Section ──
+  .about-story {
+    padding: 120px 0;
+    // 使用透明度，讓背景圖顯現
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
+      url("https://images.unsplash.com/photo-1742859610211-c463e39f71eb?q=80&w=1740&auto=format&fit=crop");
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    color: $enso-text-primary;
+
+    .about-section-title {
+      font-family: $headings-font-family;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: $enso-text-primary;
+    }
+
+    .story-divider {
+      width: 60px;
+      height: 2px;
+      background-color: $enso-brand-gold;
+      margin: 0 auto 40px;
+    }
+
+    .story-content {
+      max-width: 800px;
+      margin: 0 auto;
+
+      p {
+        font-size: 1.05rem;
+        line-height: 2.2;
+        color: #444;
+        margin-bottom: 2rem;
+        letter-spacing: 0.02em;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  // ── Philosophy Section ──
+  .about-philosophy {
+    padding: 100px 0;
+    background-color: #f8f6f1;
+
+    .about-section-title {
+      font-family: $headings-font-family;
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: $enso-text-primary;
+    }
+
+    .story-divider {
+      width: 60px;
+      height: 2px;
+      background-color: $enso-brand-gold;
+      margin: 0 auto 40px;
+    }
+
+    .philosophy-card {
+      position: relative;
+      padding: 4rem 2rem;
+      border-radius: 20px;
+      height: 100%;
+      overflow: hidden;
+      color: $white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      transition: transform 0.4s ease;
+      background-size: cover;
+      background-position: center;
+
+      // 暗色遮罩層
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba($enso-brand-primary, 0.7);
+        z-index: 1;
+        transition: background 0.3s ease;
+      }
+
+      &:hover {
+        transform: translateY(-12px);
+        &::before {
+          background: rgba($enso-brand-primary, 0.6);
+        }
+      }
+
+      & > * {
+        position: relative;
+        z-index: 2;
+      }
+
+      &.card--nature {
+        background-image: url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=800");
+      }
+      &.card--craft {
+        background-image: url("https://images.unsplash.com/photo-1506806732259-39c2d0268443?q=80&w=1744&auto=format&fit=crop");
+      }
+      &.card--sustainability {
+        background-image: url("https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=800");
+      }
+
+      .philosophy-title {
+        font-family: $headings-font-family;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: $white;
+        text-align: center;
+      }
+
+      .philosophy-text {
+        font-size: 0.95rem;
+        line-height: 1.8;
+        color: rgba($white, 0.9);
+        text-align: center;
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // ── Milestones Section ──
+  .about-milestones {
+    padding: 120px 0;
+    // 遮罩
+    background-image:
+      linear-gradient(rgba(248, 246, 241, 0.9), rgba(248, 246, 241, 0.9)),
+      url("https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=2000");
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+
+    .about-section-title {
+      font-family: $headings-font-family;
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: $enso-text-primary;
+    }
+
+    .story-divider {
+      width: 60px;
+      height: 2px;
+      background-color: $enso-brand-gold;
+      margin: 0 auto 40px;
+    }
+
+    .timeline-wrapper {
+      max-width: 800px;
+      margin: 60px auto 0;
+      position: relative;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 1px;
+        background-color: rgba($enso-brand-gold, 0.4);
+        transform: translateX(-50%);
+
+        @media (max-width: 767px) {
+          left: 30px;
+        }
+      }
+
+      .timeline-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 60px;
+        position: relative;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .timeline-year {
+          width: 50%;
+          padding-right: 50px;
+          text-align: right;
+          font-family: $headings-font-family;
+          font-size: 1.2rem;
+          font-weight: 700;
+          color: $enso-brand-gold;
+          padding-top: 5px;
+
+          @media (max-width: 767px) {
+            width: auto;
+            padding-right: 0;
+            padding-left: 50px;
+            text-align: left;
+            margin-bottom: 8px;
+          }
+        }
+
+        .timeline-dot {
+          position: absolute;
+          left: 50%;
+          top: 15px;
+          width: 12px;
+          height: 12px;
+          background-color: $enso-brand-gold;
+          border-radius: 50%;
+          transform: translateX(-50%);
+          z-index: 1;
+
+          @media (max-width: 767px) {
+            left: 30px;
+          }
+        }
+
+        .timeline-content {
+          width: 50%;
+          padding-left: 50px;
+          text-align: left;
+
+          @media (max-width: 767px) {
+            width: 100%;
+            padding-left: 50px;
+          }
+
+          .milestone-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: $enso-text-primary;
+          }
+
+          .milestone-desc {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #666;
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+
+  // ── CTA Section ──
+  .about-cta {
+    padding: 140px 0;
+    background-color: #242a27; // 使用與 Hero 相同的深綠背景
+    color: $white;
+
+    .about-subtitle {
+      color: $enso-brand-gold;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 24px;
+    }
+
+    .about-title {
+      font-family: $headings-font-family;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 32px;
+    }
+
+    .about-divider {
+      width: 60px;
+      height: 2px;
+      background-color: $enso-brand-gold;
+      margin: 0 auto 40px;
+    }
+
+    .about-desc {
+      font-size: 1.15rem;
+      line-height: 2;
+      color: rgba($white, 0.8);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    // CTA 按鈕：金色底白字
+    .btn-enso-gold {
+      background-color: #c7a15a;
+      border-color: #c7a15a;
+      color: $white !important;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        background-color: lighten(#c7a15a, 5%);
+        border-color: lighten(#c7a15a, 5%);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(#c7a15a, 0.4);
+      }
+    }
+  }
+}
+
+/* Brand and help surfaces: no borrowed spa styling, only the ENSO paper world. */
+.site-main .about-page {
+  .about-hero, .about-cta { background: #09256f; padding-block: clamp(5rem, 11vw, 10rem); }
+  .about-hero .about-subtitle, .about-cta .about-subtitle { display: none; }
+  .about-hero .about-title, .about-cta .about-title { font-family: "Noto Sans TC", $font-family-sans-serif; font-size: clamp(3rem, 6.5vw, 6.6rem); font-weight: 900; letter-spacing: -0.05em; line-height: 1.05; color: #fffaf6; }
+  .about-hero .about-divider, .about-cta .about-divider, .story-divider { width: 100%; height: 1px; background: rgba(255, 250, 246, 0.55); }
+  .about-hero .about-desc, .about-cta .about-desc { color: #d8e0ff; max-width: 50ch; }
+  .about-story, .about-milestones { background: #efe6e1; background-image: none; padding-block: clamp(4rem, 9vw, 8rem); }
+  .about-philosophy { background: #fffaf6; padding-block: clamp(4rem, 9vw, 8rem); }
+  .about-section-title { font-family: "Noto Sans TC", $font-family-sans-serif !important; color: #09256f !important; font-size: clamp(2.2rem, 4vw, 4.2rem) !important; font-weight: 900 !important; letter-spacing: -0.045em; }
+  .about-story .story-divider, .about-philosophy .story-divider, .about-milestones .story-divider { background: #09256f; }
+  .about-story .story-content p { color: #243a79; max-width: 64ch; text-align: left; }
+  .philosophy-card { background: #fffaf6 !important; border: 1px solid rgba(9, 37, 111, 0.32); border-radius: 0 !important; box-shadow: none !important; color: #09256f !important; min-height: 16rem; }
+  .philosophy-card::before { display: none; }
+  .philosophy-card:hover { background: #d9f81b !important; transform: none !important; }
+  .philosophy-card .philosophy-title, .philosophy-card .philosophy-text { color: #09256f !important; }
+  .timeline-wrapper::before { background: rgba(9, 37, 111, 0.4) !important; }
+  .timeline-item .timeline-year { color: #bf5c37 !important; }
+  .timeline-item .timeline-dot { border-radius: 0 !important; background: #d9f81b !important; border: 1px solid #09256f; }
+  .timeline-item .milestone-title { color: #09256f !important; }
+  .timeline-item .milestone-desc { color: #53669a !important; }
+  .about-cta .btn-enso-gold { background: #d9f81b; border-color: #d9f81b; border-radius: 0; box-shadow: none; color: #09256f !important; }
+  .about-cta .btn-enso-gold:hover { background: #fffaf6; border-color: #fffaf6; box-shadow: none; transform: none; }
+}
+
+.site-main .faq-page, .site-main .contact-page {
+  max-width: 60rem;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: clamp(3rem, 8vw, 7rem) !important;
+  padding-bottom: clamp(4rem, 9vw, 8rem) !important;
+
+  .text-center > h2 { font-family: "Noto Sans TC", $font-family-sans-serif; font-size: clamp(2.8rem, 5vw, 5.5rem); font-weight: 900; letter-spacing: -0.05em; }
+  .text-center > div { width: 100% !important; background: #09256f !important; height: 1px !important; }
+  .accordion-item, .accordion-button { background: #fffaf6; color: #09256f; border-color: rgba(9, 37, 111, 0.28); border-radius: 0 !important; box-shadow: none; }
+  .accordion-button:not(.collapsed) { background: #d9f81b; color: #09256f; box-shadow: none; }
+  .accordion-button:focus { box-shadow: inset 0 0 0 2px #bf5c37; }
+  .accordion-body { color: #243a79 !important; }
+  .card { padding: clamp(1.5rem, 4vw, 3rem) !important; }
+  .form-label { color: #09256f !important; font-size: 0.82rem; letter-spacing: 0.06em; }
+}
+
+.site-main > .container.mt-5, .site-main > .container.mb-7 {
+  margin-top: 0 !important;
+  padding-top: clamp(3rem, 8vw, 7rem) !important;
+  padding-bottom: clamp(4rem, 8vw, 7rem) !important;
+
+  .card { border-radius: 0 !important; }
+  .card-body { padding: clamp(1.5rem, 5vw, 3.5rem) !important; }
+  h2 { font-family: "Noto Sans TC", $font-family-sans-serif; color: #09256f !important; font-size: clamp(2.2rem, 4vw, 3.8rem); font-weight: 900 !important; letter-spacing: -0.05em; }
+  .form-label { color: #09256f !important; letter-spacing: 0.06em; }
+}

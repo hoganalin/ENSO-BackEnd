@@ -1,0 +1,878 @@
+// ============================================
+// Single Product Detail Page
+// ============================================
+
+.single-product {
+  padding-top: 60px;
+
+  @media (max-width: 767px) {
+    padding: 40px 15px 60px; // 手機版保留邊距
+  }
+
+  &__main-img {
+    width: 100%;
+    border-radius: 24px;
+    background: $gray-200;
+    object-fit: cover; //自動裁切邊緣
+    aspect-ratio: 1 / 1; //設定為正方形
+  }
+
+  // 副圖列表（橫向小圖）
+  &__thumbs {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+
+    img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 12px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.2s ease;
+
+      &:hover,
+      &.active {
+        border-color: $enso-brand-primary;
+      }
+    }
+  }
+
+  // ── 特色標籤列（天然原料、手工製作…）──
+  &__features {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+
+    @media (max-width: 575px) {
+      gap: 10px;
+      // 如果寬度不夠，可以考慮 wrap 或者縮小字體
+      // flex-wrap: wrap;
+    }
+  }
+
+  &__feature-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: $gray-200; // 備用背景色
+    border-radius: 16px;
+    padding: 20px 16px;
+    flex: 1;
+    height: 120px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: none;
+
+    // 遮罩
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        to bottom,
+        rgba($black, 0.2),
+        rgba($black, 1)
+      );
+      z-index: 1;
+    }
+
+    // 內容層
+
+    .feature-label {
+      position: relative;
+      z-index: 2;
+      color: $white;
+      // 加強陰影，確保在各種背景下都清晰
+      text-shadow:
+        0 4px 8px rgba($black, 0.4),
+        0 0 20px rgba($black, 0.2);
+    }
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba($black, 0.2);
+
+      &::before {
+        background: rgba($black, 0.25);
+      }
+    }
+
+    // 各別背景設定
+    &.--natural {
+      background-image: url("https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&auto=format&fit=crop");
+      background-size: cover;
+      background-position: center;
+    }
+
+    &.--handmade {
+      background-image: url("https://images.unsplash.com/photo-1459156212016-c812468e2115?w=600&auto=format&fit=crop");
+      background-size: cover;
+      background-position: center;
+    }
+
+    &.--low-smoke {
+      background-image: url("https://images.unsplash.com/photo-1626906670379-c8da5cf8ffdd?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 4px;
+    }
+
+    .feature-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      white-space: nowrap;
+      letter-spacing: 1px;
+    }
+  }
+
+  // ── 右側資訊區 ──
+  &__info {
+    padding-left: 48px;
+
+    @media (max-width: 991px) {
+      padding: 40px 20px 0; // 手機版左右留白對稱
+      margin-top: 0;
+    }
+  }
+
+  // 分類標籤
+  &__category {
+    font-size: 0.9rem;
+    color: $enso-brand-gold;
+    font-weight: 500;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  // 產品名稱
+  &__title {
+    font-family: $headings-font-family; // 確保使用導出的字體
+    font-size: 2.75rem;
+    font-weight: 600;
+    color: $enso-brand-primary;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+
+  // 標題下裝飾線
+  &__title-divider {
+    width: 60px;
+    height: 2px;
+    background-color: $enso-brand-gold;
+    margin-bottom: 24px;
+  }
+
+  // 英文副標
+  &__subtitle {
+    font-family: Georgia, serif; // 使用襯線體營造高級感
+    font-style: italic;
+    font-size: 1.1rem;
+    color: $gray-500;
+    margin-bottom: 32px;
+    letter-spacing: 0.5px;
+  }
+
+  // 價格區
+  &__price-row {
+    margin-bottom: 32px;
+    gap: 16px;
+  }
+
+  &__price {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: $enso-brand-gold;
+  }
+
+  &__origin-price {
+    font-size: 1.1rem;
+    color: lighten($gray-500, 10%);
+    text-decoration: line-through;
+  }
+
+  // 描述文字
+  &__desc {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 40px;
+  }
+
+  // ── Aroma Notes 卡片 ──
+  &__aroma-card {
+    background-color: #f3f1eb; // 極淡卡其背景
+    border-radius: 20px;
+    padding: 24px 32px;
+    margin-bottom: 40px;
+    text-align: center;
+
+    @media (max-width: 575px) {
+      padding: 20px 16px; // 手機版縮小內距
+    }
+
+    .aroma-card-title {
+      font-size: 0.8rem;
+      color: #9a8c7e;
+      letter-spacing: 1.5px;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .aroma-grid {
+      position: relative;
+    }
+
+    .aroma-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+
+      &:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 20%;
+        height: 60%;
+        width: 1px;
+        background-color: #d1cfc7;
+      }
+    }
+
+    .aroma-label {
+      font-size: 0.75rem;
+      color: #b0a8a0;
+      letter-spacing: 0.5px;
+    }
+
+    .aroma-value {
+      font-size: 1rem;
+      color: $enso-brand-primary;
+      font-weight: 600;
+    }
+  }
+
+  // ── 產品規格列表 ──
+  &__specs-list {
+    margin-bottom: 48px;
+    border-top: 1px solid #eee;
+
+    .spec-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95rem;
+
+      .spec-label {
+        color: #888;
+      }
+
+      .spec-value {
+        color: #333;
+        font-weight: 500;
+      }
+    }
+  }
+
+  // ── 購買控制區 ──
+  &__purchase-controls {
+    margin-bottom: 24px;
+
+    .gap-3 {
+      @media (max-width: 480px) {
+        flex-direction: column; // 超小螢幕時改為垂直排列
+        gap: 12px !important;
+      }
+    }
+  }
+
+  &__qty-selector {
+    display: flex;
+    align-items: center;
+    background-color: #f8f7f2;
+    border-radius: 12px;
+    padding: 4px;
+    border: 1px solid #eceae0;
+
+    button {
+      width: 44px;
+      height: 44px;
+      border: none;
+      background: transparent;
+      font-size: 1.25rem;
+      color: #555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: color 0.2s;
+
+      &:hover {
+        color: $enso-brand-gold;
+      }
+    }
+
+    input {
+      width: 60px;
+      border: none;
+      background: transparent;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+      outline: none;
+    }
+  }
+
+  &__add-cart-btn {
+    background-color: #24302d; // 深墨綠色
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 18px 32px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      background-color: #1a2422;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &__go-cart-btn {
+    display: block;
+    width: 100%;
+    margin-top: 16px;
+    background-color: #f6f5ef;
+    color: #444;
+    border: 1px solid #e5e3d9;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: #e9e7dc;
+      color: #222;
+    }
+  }
+
+  // 免運提示
+  &__shipping-notice {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .shipping-icon {
+      font-size: 1.25rem;
+    }
+
+    .shipping-text {
+      font-size: 0.9rem;
+      color: #7c7467;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  // ── 下方副圖區（大圖展示）──
+  &__extra-images {
+    margin-top: 60px;
+
+    img {
+      width: 100%;
+      border-radius: 16px;
+      object-fit: cover;
+      margin-bottom: 20px;
+    }
+  }
+
+  // ── 香氣體驗 (Experience Section) ──
+  &__experience {
+    padding: 120px 0;
+    margin-top: 80px;
+
+    // 讓背景色左右延伸到最遠 (不使用 transform 以免破壞 background-attachment: fixed)
+    width: 100vw;
+    position: relative;
+    left: calc(50% - 50vw); //讓整個背景撐滿全螢幕
+
+    // 背景圖設定
+    background-image: url("https://images.unsplash.com/photo-1473116763249-2faaef81ccda?q=80&w=2000");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    // 深色遮罩，確保文字可讀
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.55); // 稍微加深遮罩
+      z-index: 1;
+    }
+
+    // 確保內容在遮罩上方
+    & > .container {
+      position: relative;
+      z-index: 2;
+    }
+
+    .experience-subtitle {
+      color: $enso-brand-gold;
+      letter-spacing: 2px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .experience-title {
+      font-family: $headings-font-family;
+      font-size: 2.5rem;
+      color: $white; // 背景深色，標題改白
+      margin-bottom: 20px;
+    }
+
+    .experience-divider {
+      width: 40px;
+      height: 2px;
+      background-color: $enso-brand-gold;
+      margin-bottom: 32px;
+    }
+
+    .experience-desc {
+      font-size: 1.05rem;
+      line-height: 1.9;
+      color: rgba($white, 0.8); // 描述改為淺灰色
+      margin-bottom: 32px;
+    }
+
+    .experience-scenes {
+      margin-bottom: 32px;
+
+      .scenes-label {
+        display: block;
+        font-weight: 600;
+        color: $enso-brand-gold; // 標籤改金色
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+      }
+
+      .scenes-list {
+        list-style: none;
+        padding-left: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        li {
+          position: relative;
+          padding-left: 24px;
+          color: $white; // 文字改白
+          font-weight: 500;
+
+          &::before {
+            content: "•";
+            color: $enso-brand-gold;
+            position: absolute;
+            left: 0;
+            font-size: 1.5rem;
+            line-height: 1;
+          }
+        }
+      }
+    }
+
+    .experience-quote {
+      padding: 24px;
+      background-color: rgba($white, 0.05); // 引用框改為極淡色
+      backdrop-filter: blur(5px); // 增加毛玻璃效果
+      border-top: 1px solid $enso-brand-gold;
+      border-radius: 0 16px 16px 0;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+      p {
+        margin-bottom: 0;
+        font-style: italic;
+        color: rgba($white, 0.9);
+        font-size: 1rem;
+      }
+    }
+
+    // 右側卡片網格
+    .experience-card {
+      position: relative;
+      padding: 40px 24px;
+      border-radius: 24px;
+      height: 100%;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      overflow: hidden;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      background-position: center;
+      color: $white; // 背景圖模式下使用白色文字
+
+      // 深色遮罩
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.2),
+          rgba(0, 0, 0, 0.6)
+        );
+        z-index: 1;
+        transition: background 0.3s ease;
+      }
+
+      &:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        &::before {
+          background: rgba(0, 0, 0, 0.4);
+        }
+      }
+
+      .card-icon,
+      .card-title,
+      .card-text {
+        position: relative;
+        z-index: 2;
+      }
+
+      .card-icon {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+      }
+
+      .card-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: $white;
+        margin-bottom: 12px;
+        letter-spacing: 1px;
+      }
+
+      .card-text {
+        font-size: 0.9rem;
+        color: rgba($white, 0.9);
+        margin-bottom: 0;
+        line-height: 1.6;
+        font-weight: 400;
+      }
+
+      // 各別卡片背景
+      &.--ritual {
+        background-color: #3d3b36;
+        background-image: url("https://plus.unsplash.com/premium_photo-1667250493220-d154cebdfc68?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8JUU3JTkxJTlDJUU3JThGJTg4fGVufDB8fDB8fHww");
+      }
+      &.--low-smoke {
+        background-color: #3a3f3a;
+        background-image: url("https://images.unsplash.com/photo-1626906670435-a99615fc5c9a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGxvdyUyMHNtb2tlfGVufDB8fDB8fHww");
+      }
+      &.--time {
+        background-color: #3f3e3a;
+        background-image: url("https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?q=80&w=928&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+      }
+      &.--natural {
+        background-color: #3a423a;
+        background-image: url("https://plus.unsplash.com/premium_photo-1675348351049-3af664982b45?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8JUU1JUE0JUE5JUU3JTg0JUI2fGVufDB8fDB8fHww");
+      }
+    }
+
+    @media (max-width: 767px) {
+      padding: 60px 20px;
+
+      .experience-title {
+        font-size: 2rem;
+      }
+
+      .experience-grid {
+        margin-top: 40px;
+      }
+    }
+  }
+
+  // ── 使用方式 (How to Use Section) ──
+  &__how-to {
+    padding: 120px 0;
+    background-color: #f7f6f2;
+
+    // 讓背景色左右延伸到最遠 (破出 container)
+    width: 100vw;
+    position: relative;
+    // 只有當 position 不是 static 時（例如 relative、absolute 或 fixed），left: 50% 才會生效，把區塊推到父容器的中間。
+    left: 50%;
+    transform: translateX(-50%);
+
+    // 內部內容需要手動補足 padding 以免貼邊 (手機版)
+    padding-left: 15px;
+    padding-right: 15px;
+
+    .how-to-subtitle {
+      color: $enso-brand-gold;
+      letter-spacing: 2px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .how-to-title {
+      font-family: $headings-font-family;
+      font-size: 2.5rem;
+      color: $enso-brand-primary;
+    }
+
+    .how-to-divider {
+      width: 40px;
+      height: 2px;
+      background-color: $enso-brand-gold;
+      margin-top: 20px;
+    }
+
+    .how-to-steps-wrapper {
+      margin-top: 60px;
+      position: relative;
+
+      // 連接線 (只在桌面版顯示)
+      @media (min-width: 768px) {
+        &::before {
+          content: "";
+          position: absolute;
+          top: 80px;
+          left: 15%;
+          right: 15%;
+          height: 1px;
+          border-top: 1px dashed #d1cfc7;
+          z-index: 0;
+        }
+      }
+    }
+
+    .step-item {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+
+      .step-number-badge {
+        position: absolute;
+        top: 0;
+        right: 20%;
+        background-color: $enso-brand-gold;
+        color: $white;
+        font-size: 0.75rem;
+        font-weight: 700;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .step-icon-wrapper {
+        width: 120px;
+        height: 120px;
+        background-color: $white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        font-size: 3rem;
+      }
+
+      .step-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 16px;
+      }
+
+      .step-desc {
+        font-size: 0.95rem;
+        color: #777;
+        line-height: 1.7;
+        max-width: 280px;
+        margin: 0 auto;
+      }
+    }
+
+    .how-to-notice {
+      background-color: #eee9df;
+      padding: 24px 32px;
+      border-radius: 16px;
+      max-width: 900px;
+      margin: 60px auto 0;
+
+      .notice-icon {
+        font-size: 1.5rem;
+        margin-right: 16px;
+        flex-shrink: 0;
+      }
+
+      .notice-text {
+        font-size: 0.95rem;
+        color: #555;
+        line-height: 1.6;
+      }
+    }
+
+    @media (max-width: 767px) {
+      padding: 80px 20px;
+
+      .step-icon-wrapper {
+        width: 100px;
+        height: 100px;
+        font-size: 2.5rem;
+      }
+
+      .how-to-notice {
+        padding: 20px;
+      }
+    }
+  }
+}
+
+/* Detail page overrides for the shared Golden Hour design system. */
+.site-main .single-product {
+  padding-top: clamp(2rem, 5vw, 5rem);
+
+  &__main-img {
+    border-radius: 0;
+    background: #fffaf6;
+    border: 1px solid rgba(9, 37, 111, 0.28);
+    aspect-ratio: 4 / 5;
+  }
+
+  &__thumbs img {
+    border-radius: 0;
+  }
+
+  &__features {
+    gap: 0;
+    border: 1px solid rgba(9, 37, 111, 0.28);
+  }
+
+  &__feature-item {
+    height: auto;
+    min-height: 5.5rem;
+    padding: 0.9rem 0.45rem;
+    border-radius: 0;
+    background: #fffaf6 !important;
+    border-right: 1px solid rgba(9, 37, 111, 0.28);
+
+    &:last-child { border-right: 0; }
+    &::before { display: none; }
+    .feature-label { color: #09256f; text-shadow: none; font-size: 0.76rem; letter-spacing: 0.03em; }
+    &:hover { transform: none; box-shadow: none; background: #d9f81b !important; }
+  }
+
+  &__info { padding-left: clamp(2rem, 5vw, 5.5rem); }
+  &__category { color: #bf5c37; font-weight: 800; letter-spacing: 0.1em; }
+  &__title { color: #09256f; font-family: "Tilt Warp", $headings-font-family; font-size: clamp(2.7rem, 5.2vw, 5.8rem); letter-spacing: -0.035em; line-height: 0.92; }
+  &__title-divider { width: 100%; background: #09256f; height: 1px; }
+  &__subtitle { color: #53669a; font-family: inherit; font-style: normal; }
+  &__price { color: #bf5c37; font-family: inherit; font-size: 2rem; }
+  &__desc { color: #243a79; }
+
+  &__aroma-card {
+    background: #d9f81b;
+    border-radius: 0;
+    padding: 1.5rem;
+    .aroma-card-title, .aroma-label, .aroma-value { color: #09256f; }
+    .aroma-item:not(:last-child)::after { background: rgba(9, 37, 111, 0.35); }
+  }
+
+  &__specs-list { border-color: rgba(9, 37, 111, 0.28); }
+  &__specs-list .spec-item { border-color: rgba(9, 37, 111, 0.28); }
+  &__specs-list .spec-label { color: #53669a; }
+  &__specs-list .spec-value { color: #09256f; }
+
+  &__qty-selector { border-radius: 0; background: #fffaf6; border-color: rgba(9, 37, 111, 0.38); }
+  &__qty-selector button, &__qty-selector input { color: #09256f; }
+  &__add-cart-btn { border-radius: 0; background: #09256f; box-shadow: none; letter-spacing: 0.08em; }
+  &__add-cart-btn:hover { background: #d9f81b; color: #09256f; transform: none; box-shadow: none; }
+  &__go-cart-btn { border-radius: 0; background: transparent; border-color: #09256f; color: #09256f; }
+  &__go-cart-btn:hover { background: #fffaf6; }
+  &__shipping-notice { border-top: 1px solid rgba(9, 37, 111, 0.28); padding-inline: 0; }
+  &__shipping-notice .shipping-icon, &__shipping-notice .shipping-text { color: #bf5c37; }
+
+  &__experience {
+    background: #09256f;
+    background-image: none;
+    background-attachment: initial;
+    margin-top: 5rem;
+    padding-block: clamp(4rem, 8vw, 8rem);
+    &::before { display: none; }
+    .experience-subtitle, .experience-title, .experience-desc, .experience-scenes .scenes-list li { color: #fffaf6; }
+    .experience-divider { background: #d9f81b; }
+    .experience-scenes .scenes-label, .experience-scenes .scenes-list li::before { color: #d9f81b; }
+    .experience-quote { display: none; }
+    .experience-card { border-radius: 0; background: transparent !important; border: 1px solid rgba(255, 250, 246, 0.45); min-height: 11rem; }
+    .experience-card::before { display: none; }
+    .experience-card:hover { background: #d9f81b !important; box-shadow: none; transform: none; }
+    .experience-card:hover .card-title, .experience-card:hover .card-text { color: #09256f; }
+  }
+
+  &__how-to { background: #fffaf6; padding-block: clamp(4rem, 8vw, 8rem); }
+  &__how-to .how-to-subtitle { display: none; }
+  &__how-to .how-to-title { font-family: "Tilt Warp", $headings-font-family; color: #09256f; font-size: clamp(2.6rem, 5vw, 5rem); letter-spacing: -0.035em; }
+  &__how-to .how-to-divider { width: 100%; background: #09256f; height: 1px; }
+  &__how-to .how-to-steps-wrapper::before { border-color: rgba(9, 37, 111, 0.4); }
+  &__how-to .step-number-badge { border-radius: 0; background: #d9f81b; color: #09256f; }
+  &__how-to .step-icon-wrapper { width: 100%; height: 16rem; border: 0; border-radius: 0; box-shadow: none; }
+  &__how-to .step-icon-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+  &__how-to .step-title { color: #09256f; }
+  &__how-to .step-desc { color: #53669a; }
+  &__how-to .how-to-notice { border: 1px solid rgba(9, 37, 111, 0.28); border-radius: 0; background: #efe6e1; }
+  &__how-to .notice-icon, &__how-to .notice-text { color: #09256f; }
+
+  @media (max-width: 991.98px) { &__info { padding-left: 1rem; } }
+  @media (max-width: 767.98px) {
+    &__features { margin-top: 0.75rem; }
+    &__feature-item .feature-label { white-space: normal; text-align: center; }
+    &__info { padding-inline: 0.75rem; }
+    &__how-to .step-icon-wrapper { height: 13rem; }
+  }
+}

@@ -14,3 +14,6 @@ export const deleteAdminProduct = (id) =>
 
 export const uploadAdminImage = (formData) =>
   apiAuth.post(`/api/${API_PATH}/admin/upload`, formData);
+
+export const getAdminInventoryLogs = (productId) =>
+  apiAuth.get(`/api/${API_PATH}/admin/inventory/logs`, { params: { product_id: productId } });
